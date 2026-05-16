@@ -1,65 +1,227 @@
-import Image from "next/image";
+type SoftwareCard = {
+  title: string;
+  href: string;
+  style: string;
+};
 
-export default function Home() {
+export default function HomePage() {
+  const softwareCards: SoftwareCard[] = [
+    {
+      title: "Manufacturing Productivity System",
+      href: "/software/manufacturing-productivity",
+      style: "border-red-300 bg-red-100 text-red-950",
+    },
+    {
+      title: "Warehouse Productivity System",
+      href: "/software/warehouse-productivity",
+      style: "border-orange-300 bg-orange-100 text-orange-950",
+    },
+    {
+      title: "Supply Chain Visibility System",
+      href: "/software/supply-chain-visibility",
+      style: "border-blue-300 bg-blue-100 text-blue-950",
+    },
+    {
+      title: "Value-Added Productivity System",
+      href: "/software/value-added-productivity",
+      style: "border-emerald-300 bg-emerald-100 text-emerald-950",
+    },
+    {
+      title: "Retail Productivity & Teamwork System",
+      href: "/software/retail-productivity",
+      style: "border-pink-300 bg-pink-100 text-pink-950",
+    },
+    {
+      title: "Restaurant Kitchen Operations System",
+      href: "/software/restaurant-kitchen-operations",
+      style: "border-amber-300 bg-amber-100 text-amber-950",
+    },
+    {
+      title: "Staff Planning & Deployment System",
+      href: "/software/staff-planning",
+      style: "border-violet-300 bg-violet-100 text-violet-950",
+    },
+    {
+      title: "Banking & Insurance Productivity System",
+      href: "/software/banking-insurance-productivity",
+      style: "border-teal-300 bg-teal-100 text-teal-950",
+    },
+    {
+      title: "Corporate Office Productivity System",
+      href: "/software/corporate-office-productivity",
+      style: "border-sky-300 bg-sky-100 text-sky-950",
+    },
+    {
+      title: "Store Management & Shelf Productivity System",
+      href: "/software/store-management",
+      style: "border-lime-300 bg-lime-100 text-lime-950",
+    },
+    {
+      title: "Small Business Accounting & Cash Point System",
+      href: "/software/small-business-accounting-cash-point",
+      style: "border-green-300 bg-green-100 text-green-950",
+    },
+    {
+      title: "AI Sales Productivity System",
+      href: "/software/ai-sales-productivity",
+      style: "border-rose-300 bg-rose-100 text-rose-950",
+    },
+    {
+      title: "Marketing Productivity & Campaign System",
+      href: "/software/marketing-productivity",
+      style: "border-fuchsia-300 bg-fuchsia-100 text-fuchsia-950",
+    },
+    {
+      title: "Butcher Shop Operations & Cost Control System",
+      href: "/software/butcher-shop-operations",
+      style: "border-stone-300 bg-stone-100 text-stone-950",
+    },
+    {
+      title: "Excel, Tableau & AI Dashboard System",
+      href: "/software/ai-dashboard",
+      style: "border-indigo-300 bg-indigo-100 text-indigo-950",
+    },
+  ];
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <main className="min-h-screen bg-white text-neutral-900">
+      <section className="bg-emerald-500 px-4 py-3 text-center text-sm font-semibold text-white sm:text-base">
+        We aim to deliver a minimum{" "}
+        <span className="text-lg font-extrabold text-yellow-300">20%</span>{" "}
+        efficiency improvement within three to six months, subject to agreed
+        scope and measurable baseline.
+      </section>
+
+      <section className="bg-blue-900 px-6 py-20 text-white">
+        <div className="mx-auto max-w-6xl">
+          <h1 className="text-5xl font-extrabold leading-tight text-blue-100">
+            MBN Consulting
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+
+          <p className="mt-6 max-w-3xl text-xl text-white/90">
+            Operational Excellence, Business Systems, Productivity Improvement,
+            and AI-Guided Transformation for Manufacturing, Hospitality,
+            Logistics, Retail, Banking, Insurance, Corporate Offices, and
+            Supply Chain Operations.
           </p>
+
+          <div className="mt-8 flex flex-wrap gap-4">
+            <a
+              href="/contact"
+              className="rounded bg-white px-6 py-3 font-semibold text-blue-900"
+            >
+              Request Consultation
+            </a>
+
+            <a
+              href="/services"
+              className="rounded border border-white px-6 py-3 font-semibold text-white"
+            >
+              Explore Services
+            </a>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+
+      <section className="px-6 py-16">
+        <div className="mx-auto max-w-6xl">
+          <h2 className="text-4xl font-extrabold text-violet-900">
+            Practical Business Transformation
+          </h2>
+
+          <p className="mt-6 max-w-4xl text-lg font-medium text-violet-800">
+            We help businesses improve operational efficiency, productivity,
+            workflow, reporting visibility, and business performance through
+            practical systems, analytics, and AI-guided operational
+            improvements.
+          </p>
+
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            <div className="rounded-2xl border border-red-300 bg-red-200 p-6 shadow-md">
+              <h3 className="text-2xl font-bold text-red-950">
+                Manufacturing Excellence
+              </h3>
+              <p className="mt-4 text-red-950">
+                Productivity improvement, bottleneck reduction, workflow
+                optimization, reporting systems, and operational efficiency.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-slate-300 bg-slate-200 p-6 shadow-md">
+              <h3 className="text-2xl font-bold text-slate-950">
+                Business Analytics
+              </h3>
+              <p className="mt-4 text-slate-800">
+                Data analysis using Excel, Tableau, operational dashboards, KPI
+                systems, and business reporting.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-violet-300 bg-violet-100 p-6 shadow-md">
+              <h3 className="text-2xl font-bold text-violet-950">
+                AI-Guided Systems
+              </h3>
+              <p className="mt-4 text-violet-950">
+                Practical AI-assisted operational systems for SMEs, logistics,
+                hospitality, retail, and office environments.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-16 rounded-3xl bg-blue-50 p-8 shadow-md">
+            <h2 className="text-3xl font-extrabold text-violet-900">
+              Productivity Software & Business Systems
+            </h2>
+
+            <p className="mt-4 max-w-5xl text-lg font-medium text-violet-800">
+              We design practical productivity software and business systems
+              for international customers who want measurable improvement in
+              efficiency, teamwork, visibility, service quality, cost control,
+              revenue growth, stock control, kitchen operations, cash point
+              reporting, and value-added performance. All systems can be
+              customised according to your operational needs.
+            </p>
+
+            <div className="mt-10 grid gap-6 md:grid-cols-3">
+              {softwareCards.map((item) => (
+                <a
+                  key={item.title}
+                  href={item.href}
+                  className={`min-h-56 rounded-2xl border p-6 shadow-md transition hover:-translate-y-1 hover:shadow-xl ${item.style}`}
+                >
+                  <h3 className="text-xl font-extrabold leading-snug">
+                    {item.title}
+                  </h3>
+
+                  <p className="mt-4 text-base leading-relaxed">
+                    Click to explore a guided demo tour. This is a view-only
+                    concept showcase and can be customised for your business
+                    needs.
+                  </p>
+                </a>
+              ))}
+            </div>
+
+            <div className="mt-10 rounded-2xl bg-yellow-50 p-6 shadow-sm">
+              <h3 className="text-2xl font-extrabold text-violet-900">
+                Retail, Restaurant & Small Business Focus
+              </h3>
+
+              <p className="mt-4 text-lg text-neutral-800">
+                Retail, restaurant, cash and carry, corner shop, convenience
+                store, and butcher shop systems can include teamwork,
+                empathy-led customer service, first-in-first-out shelf
+                discipline, shelf availability, kitchen order flow, cash point
+                reporting, stock rotation, waste reduction, daily task
+                accountability, staff planning, and simple performance
+                visibility. Entry-level small business accounting concepts can
+                be designed around affordable fixed-scope packages, subject to
+                agreed requirements.
+              </p>
+            </div>
+          </div>
         </div>
-      </main>
-    </div>
+      </section>
+    </main>
   );
 }

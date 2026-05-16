@@ -1,0 +1,137 @@
+"use client";
+
+import Link from "next/link";
+
+const securityAreas = [
+  "Theft and pilferage tracking",
+  "Unauthorized stock movement",
+  "Carton mismatch",
+  "Barcode mismatch",
+  "Warehouse damage",
+  "Missing inventory",
+  "Dispatch discrepancy",
+  "Loading and unloading loss",
+  "Gate pass control",
+  "CCTV / security evidence",
+  "Responsible person tracking",
+  "Corrective action follow-up",
+];
+
+const lossRisks = [
+  "Inventory shortage",
+  "Financial loss",
+  "Shipment mismatch",
+  "Buyer claim risk",
+  "Internal control weakness",
+  "Repeated warehouse leakage",
+];
+
+export default function WarehouseSecurityLossIntelligencePage() {
+  return (
+    <main className="min-h-screen bg-slate-950 text-white">
+      <section className="mx-auto max-w-7xl px-6 py-12">
+        <Link
+          href="/"
+          className="rounded-full border border-white/20 px-4 py-2 text-sm text-slate-200 hover:bg-white/10"
+        >
+          ← Back to Dashboard
+        </Link>
+
+        <div className="mt-8 rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl">
+          <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-amber-300">
+            MBNCON Warehouse Control Intelligence
+          </p>
+
+          <h1 className="text-4xl font-bold md:text-5xl">
+            Warehouse Security & Loss Intelligence
+          </h1>
+
+          <p className="mt-4 max-w-3xl text-lg text-slate-300">
+            Track warehouse theft, pilferage, stock movement, carton mismatch,
+            barcode mismatch, damage, dispatch discrepancy, loading loss, gate
+            pass control, and internal accountability.
+          </p>
+        </div>
+
+        <section className="mt-10 grid gap-6 md:grid-cols-4">
+          {[
+            ["Security Risk", "Monitored"],
+            ["Stock Movement", "Controlled"],
+            ["Dispatch Accuracy", "Tracked"],
+            ["Loss Exposure", "Measured"],
+          ].map(([label, value]) => (
+            <div
+              key={label}
+              className="rounded-2xl border border-white/10 bg-white/5 p-6"
+            >
+              <p className="text-sm text-slate-400">{label}</p>
+              <p className="mt-3 text-2xl font-bold text-amber-300">
+                {value}
+              </p>
+            </div>
+          ))}
+        </section>
+
+        <section className="mt-10 grid gap-6 md:grid-cols-2">
+          <div className="rounded-3xl border border-white/10 bg-slate-900 p-8">
+            <h2 className="text-2xl font-bold text-amber-200">
+              Warehouse Control Areas
+            </h2>
+
+            <div className="mt-6 space-y-3">
+              {securityAreas.map((item, index) => (
+                <div
+                  key={item}
+                  className="flex gap-3 rounded-xl border border-white/10 bg-white/5 p-3"
+                >
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-amber-400 text-sm font-bold text-slate-950">
+                    {index + 1}
+                  </span>
+
+                  <span className="text-sm text-slate-200">{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-3xl border border-white/10 bg-slate-900 p-8">
+            <h2 className="text-2xl font-bold text-amber-200">
+              Warehouse Loss Risks
+            </h2>
+
+            <div className="mt-6 space-y-4">
+              {lossRisks.map((item, index) => (
+                <div
+                  key={item}
+                  className="rounded-2xl border border-white/10 bg-white/5 p-5"
+                >
+                  <p className="font-semibold text-white">
+                    {index + 1}. {item}
+                  </p>
+
+                  <p className="mt-2 text-sm text-slate-400">
+                    Track value, quantity, responsible person, evidence,
+                    approval, investigation result, and corrective action.
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="mt-10 rounded-3xl border border-amber-400/30 bg-amber-400/10 p-8">
+          <h2 className="text-2xl font-bold text-amber-200">
+            Consultancy Application
+          </h2>
+
+          <p className="mt-4 text-slate-200">
+            This module helps factories reduce warehouse leakage, prevent
+            unauthorized stock movement, improve dispatch accuracy, protect
+            inventory value, and strengthen internal control across receiving,
+            storage, picking, packing, loading, and dispatch.
+          </p>
+        </section>
+      </section>
+    </main>
+  );
+}
