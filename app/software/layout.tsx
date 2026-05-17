@@ -9,16 +9,20 @@ export default function SoftwareLayout({
   children: ReactNode;
 }) {
   return (
-  <LanguageProvider>
-    <div className="flex min-h-screen bg-neutral-50">
-      <Sidebar />
+    <LanguageProvider>
+      <div className="min-h-screen bg-neutral-50">
+        <div className="flex min-h-screen">
+          <Sidebar />
 
-      <div className="flex min-h-screen flex-1 flex-col">
-        <Topbar />
+          <div className="flex min-h-screen min-w-0 flex-1 flex-col">
+            <Topbar />
 
-        <div className="flex-1">{children}</div>
-      </div>
+            <main className="flex-1 overflow-x-hidden">
+              {children}
+            </main>
+          </div>
         </div>
-  </LanguageProvider>
+      </div>
+    </LanguageProvider>
   );
 }

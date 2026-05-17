@@ -1,24 +1,39 @@
 "use client";
 
+import Link from "next/link";
 import { useLanguage } from "@/components/software/LanguageProvider";
 
 export default function Topbar() {
   const { language, setLanguage, t } = useLanguage();
 
   return (
-    <header className="sticky top-0 z-30 border-b border-neutral-200 bg-white/90 px-6 py-4 backdrop-blur">
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-neutral-500">
+    <header className="sticky top-0 z-30 border-b border-neutral-200 bg-white/95 px-4 py-3 backdrop-blur md:px-6 md:py-4">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div className="min-w-0">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-neutral-500 md:text-xs">
             {t.executiveDashboard}
           </p>
 
-          <h2 className="text-xl font-bold text-neutral-900">
+          <h2 className="truncate text-lg font-bold text-neutral-900 md:text-xl">
             {t.executiveCommandCenter}
           </h2>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <Link
+            href="/software"
+            className="rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1 text-sm font-semibold text-neutral-700"
+          >
+            Modules
+          </Link>
+
+          <Link
+            href="/software/training-manual"
+            className="rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1 text-sm font-semibold text-cyan-700"
+          >
+            Manual
+          </Link>
+
           <button
             onClick={() => setLanguage("en")}
             className={`rounded-full px-3 py-1 text-sm font-semibold transition ${
@@ -40,18 +55,16 @@ export default function Topbar() {
           >
             বাংলা
           </button>
-        </div>
 
-        <div className="hidden items-center gap-3 md:flex">
-          <div className="rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700">
+          <div className="hidden rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700 xl:block">
             {t.aiRiskActive}
           </div>
 
-          <div className="rounded-full border border-cyan-200 bg-cyan-50 px-4 py-2 text-sm font-semibold text-cyan-700">
+          <div className="hidden rounded-full border border-cyan-200 bg-cyan-50 px-4 py-2 text-sm font-semibold text-cyan-700 xl:block">
             {t.forecastEngineReady}
           </div>
 
-          <div className="rounded-full border border-neutral-200 bg-neutral-50 px-4 py-2 text-sm font-semibold text-neutral-700">
+          <div className="hidden rounded-full border border-neutral-200 bg-neutral-50 px-4 py-2 text-sm font-semibold text-neutral-700 xl:block">
             v1 Launch: 18 May 2026
           </div>
         </div>

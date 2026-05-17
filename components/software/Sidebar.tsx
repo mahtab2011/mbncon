@@ -28,11 +28,17 @@ export default function Sidebar() {
           href: "/software/leadership-dashboard",
         },
         {
-          name: label("AI Management Review Centre", "AI ম্যানেজমেন্ট রিভিউ সেন্টার"),
+          name: label(
+            "AI Management Review Centre",
+            "AI ম্যানেজমেন্ট রিভিউ সেন্টার"
+          ),
           href: "/software/ai-management-review-centre",
         },
         {
-          name: label("AI Enterprise Report Generator", "AI এন্টারপ্রাইজ রিপোর্ট জেনারেটর"),
+          name: label(
+            "AI Enterprise Report Generator",
+            "AI এন্টারপ্রাইজ রিপোর্ট জেনারেটর"
+          ),
           href: "/software/ai-enterprise-report-generator",
         },
       ],
@@ -136,7 +142,10 @@ export default function Sidebar() {
           href: "/software/ai-order-profitability-intelligence",
         },
         {
-          name: label("AI Notification & Escalation", "AI নোটিফিকেশন ও এস্কেলেশন"),
+          name: label(
+            "AI Notification & Escalation",
+            "AI নোটিফিকেশন ও এস্কেলেশন"
+          ),
           href: "/software/ai-notification-escalation-centre",
         },
         {
@@ -150,11 +159,17 @@ export default function Sidebar() {
       title: label("Governance & Security", "গভর্ন্যান্স ও সিকিউরিটি"),
       links: [
         {
-          name: label("Document & Evidence Control", "ডকুমেন্ট ও এভিডেন্স কন্ট্রোল"),
+          name: label(
+            "Document & Evidence Control",
+            "ডকুমেন্ট ও এভিডেন্স কন্ট্রোল"
+          ),
           href: "/software/ai-document-evidence-control-centre",
         },
         {
-          name: label("User Role & Access Control", "ইউজার রোল ও অ্যাক্সেস কন্ট্রোল"),
+          name: label(
+            "User Role & Access Control",
+            "ইউজার রোল ও অ্যাক্সেস কন্ট্রোল"
+          ),
           href: "/software/ai-user-role-access-control-centre",
         },
         {
@@ -174,45 +189,47 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="hidden h-screen w-80 overflow-y-auto border-r border-white/10 bg-black text-white lg:block">
-      <div className="border-b border-white/10 px-6 py-6">
-        <h1 className="text-2xl font-bold tracking-wide text-cyan-400">
+    <aside className="hidden lg:flex lg:w-80 xl:w-96 flex-col border-r border-white/10 bg-black text-white">
+      <div className="sticky top-0 z-20 border-b border-white/10 bg-black px-6 py-6">
+        <h1 className="break-up-word text-2xl font-bold tracking-wide text-cyan-400">
           MBNCON
         </h1>
 
-        <p className="mt-2 text-sm text-neutral-400">
+        <p className="mt-2 break-up-word text-sm leading-relaxed text-neutral-400">
           {t.platformTitle}
         </p>
       </div>
 
-      <div className="space-y-8 px-4 py-6">
-        {sections.map((section) => (
-          <div key={section.title}>
-            <h2 className="mb-3 px-3 text-xs font-semibold uppercase tracking-widest text-neutral-500">
-              {section.title}
-            </h2>
+      <div className="flex-1 overflow-y-auto px-4 py-6">
+        <div className="space-y-8 pb-10">
+          {sections.map((section) => (
+            <div key={section.title}>
+              <h2 className="mb-3 px-3 text-xs font-semibold uppercase tracking-widest text-neutral-500">
+                {section.title}
+              </h2>
 
-            <div className="space-y-1">
-              {section.links.map((link) => {
-                const active = pathname === link.href;
+              <div className="space-y-1">
+                {section.links.map((link) => {
+                  const active = pathname === link.href;
 
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={`block rounded-xl px-4 py-3 text-sm transition-all duration-200 ${
-                      active
-                        ? "bg-cyan-500/20 text-cyan-300"
-                        : "text-neutral-300 hover:bg-white/5 hover:text-white"
-                    }`}
-                  >
-                    {link.name}
-                  </Link>
-                );
-              })}
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className={`block rounded-2xl px-4 py-3 text-sm leading-relaxed transition-all duration-200 break-up-word ${
+                        active
+                          ? "border border-cyan-500/30 bg-cyan-500/20 text-cyan-300 shadow-lg shadow-cyan-500/10"
+                          : "text-neutral-300 hover:bg-white/5 hover:text-white"
+                      }`}
+                    >
+                      {link.name}
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
       <div className="border-t border-white/10 p-4 text-xs text-neutral-500">
