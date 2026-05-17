@@ -7,14 +7,14 @@ export default function Topbar() {
   const { language, setLanguage, t } = useLanguage();
 
   return (
-    <header className="sticky top-0 z-30 border-b border-neutral-200 bg-white/95 px-4 py-3 backdrop-blur md:px-6 md:py-4">
+    <header className="sticky top-0 z-30 border-b border-neutral-200 bg-white/98 px-4 py-3 backdrop-blur md:px-6 md:py-4">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div className="min-w-0">
           <p className="text-[10px] font-semibold uppercase tracking-widest text-neutral-500 md:text-xs">
             {t.executiveDashboard}
           </p>
 
-          <h2 className="truncate text-lg font-bold text-neutral-900 md:text-xl">
+          <h2 className="break-up-word text-lg font-bold text-neutral-900 md:text-xl">
             {t.executiveCommandCenter}
           </h2>
         </div>
@@ -35,6 +35,7 @@ export default function Topbar() {
           </Link>
 
           <button
+            type="button"
             onClick={() => setLanguage("en")}
             className={`rounded-full px-3 py-1 text-sm font-semibold transition ${
               language === "en"
@@ -46,6 +47,7 @@ export default function Topbar() {
           </button>
 
           <button
+            type="button"
             onClick={() => setLanguage("bn")}
             className={`rounded-full px-3 py-1 text-sm font-semibold transition ${
               language === "bn"
