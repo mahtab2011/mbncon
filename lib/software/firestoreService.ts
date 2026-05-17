@@ -22,13 +22,28 @@ import type {
   ExecutiveReport,
 } from "./firestoreSchema";
 
-type GenericRecord = Record<string, any>;
+type GenericRecord = Record<string, unknown>;
 
-async function addRecord(collectionName: string, data: GenericRecord) {
-  return addDoc(collection(db, collectionName), {
-    ...data,
-    createdAt: serverTimestamp(),
-  });
+async function addRecord(
+  collectionName: string,
+  data: GenericRecord
+) {
+  try {
+    return await addDoc(
+      collection(db, collectionName),
+      {
+        ...data,
+        createdAt: serverTimestamp(),
+      }
+    );
+  } catch (error) {
+    console.error(
+      `Firestore addRecord error (${collectionName}):`,
+      error
+    );
+
+    throw error;
+  }
 }
 
 async function getLatestRecords(
@@ -36,19 +51,28 @@ async function getLatestRecords(
   factoryId: string,
   count = 12
 ) {
-  const q = query(
-    collection(db, collectionName),
-    where("factoryId", "==", factoryId),
-    orderBy("createdAt", "desc"),
-    limit(count)
-  );
+  try {
+    const q = query(
+      collection(db, collectionName),
+      where("factoryId", "==", factoryId),
+      orderBy("createdAt", "desc"),
+      limit(count)
+    );
 
-  const snapshot = await getDocs(q);
+    const snapshot = await getDocs(q);
 
-  return snapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  }));
+    return snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+  } catch (error) {
+    console.error(
+      `Firestore getLatestRecords error (${collectionName}):`,
+      error
+    );
+
+    return [];
+  }
 }
 
 /* Core add functions */

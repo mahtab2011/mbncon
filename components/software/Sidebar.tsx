@@ -11,6 +11,8 @@ export default function Sidebar() {
   const label = (en: string, bn: string) =>
     language === "bn" ? bn : en;
 
+  const sectionCardClass =
+  "block rounded-2xl px-4 py-3 text-sm leading-relaxed transition-all duration-200 break-words";
   const sections = [
     {
       title: label("Executive Intelligence", "এক্সিকিউটিভ ইন্টেলিজেন্স"),
@@ -21,7 +23,7 @@ export default function Sidebar() {
         },
         {
           name: label("Executive Command Centre", "এক্সিকিউটিভ কমান্ড সেন্টার"),
-          href: "/software/executive-command-center",
+          href: "/software/executive-command-centre",
         },
         {
           name: label("Leadership Dashboard", "লিডারশিপ ড্যাশবোর্ড"),
@@ -210,7 +212,9 @@ export default function Sidebar() {
 
               <div className="space-y-1">
                 {section.links.map((link) => {
-                  const active = pathname === link.href;
+                  const active =
+  pathname === link.href ||
+  pathname.startsWith(`${link.href}/`);
 
                   return (
                     <Link

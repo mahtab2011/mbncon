@@ -212,6 +212,11 @@ export type BuyerOrderEntry = {
   createdAt: Date;
 };
 
+export type BaseEnterpriseRecord = {
+  companyId: string;
+  factoryId: string;
+  createdAt: Date;
+};
 export type SupplierOrderEntry = {
   companyId: string;
   factoryId: string;

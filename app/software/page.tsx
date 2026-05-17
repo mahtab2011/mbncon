@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect } from "react";
 
 const sections = [
   {
@@ -77,21 +78,29 @@ const sections = [
 ];
 
 export default function SoftwareDashboardPage() {
-  if (typeof window !== "undefined") {
-    document.oncontextmenu = () => false;
-    document.onselectstart = () => false;
-    document.ondragstart = () => false;
+  useEffect(() => {
+  document.oncontextmenu = () => false;
+  document.onselectstart = () => false;
+  document.ondragstart = () => false;
 
-    document.onkeydown = (e) => {
-      if (
-        e.ctrlKey &&
-        ["c", "p", "s", "u"].includes(e.key.toLowerCase())
-      ) {
-        e.preventDefault();
-        return false;
-      }
-    };
-  }
+  document.onkeydown = (e) => {
+    if (
+      e.ctrlKey &&
+      ["c", "p", "s", "u"].includes(e.key.toLowerCase())
+    ) {
+      e.preventDefault();
+      return false;
+    }
+  };
+
+  return () => {
+    document.oncontextmenu = null;
+    document.onselectstart = null;
+    document.ondragstart = null;
+    document.onkeydown = null;
+  };
+}, []);
+    
 
   return (
     <main className="relative min-h-screen select-none overflow-hidden bg-slate-950 text-white">
@@ -119,12 +128,16 @@ export default function SoftwareDashboardPage() {
           </p>
 
           <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <div className="min-w-0 rounded-2xl border border-cyan-400/20 bg-cyan-400/10 p-5">
-              <p className="text-sm text-cyan-200">Platform Modules</p>
-              <h2 className="mt-2 wrap-break-word text-3xl font-bold sm:text-4xl">
-                110+
-              </h2>
-            </div>
+            <Link
+  href="#modules"
+  className="block min-w-0 rounded-2xl border border-cyan-400/20 bg-cyan-400/10 p-5 transition hover:-translate-y-1 hover:border-cyan-300"
+>
+  <p className="text-sm text-cyan-200">Platform Modules</p>
+
+  <h2 className="mt-2 break-up-word text-3xl font-bold sm:text-4xl">
+    110+
+  </h2>
+</Link>
 
             <div className="min-w-0 rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-5">
               <p className="text-sm text-emerald-200">

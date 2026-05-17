@@ -15,17 +15,18 @@ import { useLanguage } from "@/components/software/LanguageProvider";
 type TrendData = {
   period: string;
   value: number;
+  [key: string]: string | number;
 };
 
 type Props = {
   title: string;
-  data: TrendData[];
+  data?: TrendData[];
   dataKey?: string;
 };
 
 export default function LiveTrendChart({
   title,
-  data,
+  data = [],
   dataKey = "value",
 }: Props) {
   const { language } = useLanguage();
@@ -33,11 +34,24 @@ export default function LiveTrendChart({
   const labels = {
     en: {
       subtitle: "Live operational trend visualization",
+      noData: "No live trend data available yet.",
     },
     bn: {
       subtitle: "লাইভ অপারেশনাল ট্রেন্ড ভিজ্যুয়ালাইজেশন",
+      noData: "এখনও কোনো লাইভ ট্রেন্ড ডেটা পাওয়া যায়নি।",
     },
   };
+
+  const safeData =
+    data.length > 0
+      ? data.map((item, index) => ({
+          ...item,
+          period: String(item.period || `P${index + 1}`),
+          [dataKey]: Number.isFinite(Number(item[dataKey]))
+            ? Number(item[dataKey])
+            : 0,
+        }))
+      : [];
 
   return (
     <div className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm">
@@ -51,27 +65,33 @@ export default function LiveTrendChart({
         </p>
       </div>
 
-      <div className="h-80 w-full">
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" />
+      {safeData.length === 0 ? (
+        <div className="flex h-80 items-center justify-center rounded-2xl bg-neutral-50 text-sm font-medium text-neutral-500">
+          {labels[language].noData}
+        </div>
+      ) : (
+        <div className="h-80 w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={safeData}>
+              <CartesianGrid strokeDasharray="3 3" />
 
-            <XAxis dataKey="period" />
+              <XAxis dataKey="period" />
 
-            <YAxis />
+              <YAxis />
 
-            <Tooltip />
+              <Tooltip />
 
-            <Line
-              type="monotone"
-              dataKey={dataKey}
-              stroke="#0891b2"
-              strokeWidth={3}
-              dot={{ r: 4 }}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
+              <Line
+                type="monotone"
+                dataKey={dataKey}
+                stroke="#0891b2"
+                strokeWidth={3}
+                dot={{ r: 4 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      )}
     </div>
   );
 }
