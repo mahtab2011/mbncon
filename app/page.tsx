@@ -8,77 +8,77 @@ export default function HomePage() {
   const softwareCards: SoftwareCard[] = [
     {
       title: "Manufacturing Productivity System",
-      href: "/software/manufacturing-productivity",
+      href: "/software",
       style: "border-red-300 bg-red-100 text-red-950",
     },
     {
       title: "Warehouse Productivity System",
-      href: "/software/warehouse-productivity",
+      href: "/software",
       style: "border-orange-300 bg-orange-100 text-orange-950",
     },
     {
       title: "Supply Chain Visibility System",
-      href: "/software/supply-chain-visibility",
+      href: "/software",
       style: "border-blue-300 bg-blue-100 text-blue-950",
     },
     {
       title: "Value-Added Productivity System",
-      href: "/software/value-added-productivity",
+      href: "/software",
       style: "border-emerald-300 bg-emerald-100 text-emerald-950",
     },
     {
       title: "Retail Productivity & Teamwork System",
-      href: "/software/retail-productivity",
+      href: "/software",
       style: "border-pink-300 bg-pink-100 text-pink-950",
     },
     {
       title: "Restaurant Kitchen Operations System",
-      href: "/software/restaurant-kitchen-operations",
+      href: "/software",
       style: "border-amber-300 bg-amber-100 text-amber-950",
     },
     {
       title: "Staff Planning & Deployment System",
-      href: "/software/staff-planning",
+      href: "/software",
       style: "border-violet-300 bg-violet-100 text-violet-950",
     },
     {
       title: "Banking & Insurance Productivity System",
-      href: "/software/banking-insurance-productivity",
+      href: "/software",
       style: "border-teal-300 bg-teal-100 text-teal-950",
     },
     {
       title: "Corporate Office Productivity System",
-      href: "/software/corporate-office-productivity",
+      href: "/software",
       style: "border-sky-300 bg-sky-100 text-sky-950",
     },
     {
       title: "Store Management & Shelf Productivity System",
-      href: "/software/store-management",
+      href: "/software",
       style: "border-lime-300 bg-lime-100 text-lime-950",
     },
     {
       title: "Small Business Accounting & Cash Point System",
-      href: "/software/small-business-accounting-cash-point",
+      href: "/software",
       style: "border-green-300 bg-green-100 text-green-950",
     },
     {
       title: "AI Sales Productivity System",
-      href: "/software/ai-sales-productivity",
+      href: "/software",
       style: "border-rose-300 bg-rose-100 text-rose-950",
     },
     {
       title: "Marketing Productivity & Campaign System",
-      href: "/software/marketing-productivity",
+      href: "/software",
       style: "border-fuchsia-300 bg-fuchsia-100 text-fuchsia-950",
     },
     {
       title: "Butcher Shop Operations & Cost Control System",
-      href: "/software/butcher-shop-operations",
+      href: "/software",
       style: "border-stone-300 bg-stone-100 text-stone-950",
     },
     {
       title: "Excel, Tableau & AI Dashboard System",
-      href: "/software/ai-dashboard",
+      href: "/software",
       style: "border-indigo-300 bg-indigo-100 text-indigo-950",
     },
   ];
@@ -107,14 +107,14 @@ export default function HomePage() {
 
           <div className="mt-8 flex flex-wrap gap-4">
             <a
-              href="/contact"
+              href="/software"
               className="rounded bg-white px-6 py-3 font-semibold text-blue-900"
             >
               Request Consultation
             </a>
 
             <a
-              href="/services"
+              href="/software"
               className="rounded border border-white px-6 py-3 font-semibold text-white"
             >
               Explore Services
@@ -178,8 +178,7 @@ export default function HomePage() {
               for international customers who want measurable improvement in
               efficiency, teamwork, visibility, service quality, cost control,
               revenue growth, stock control, kitchen operations, cash point
-              reporting, and value-added performance. All systems can be
-              customised according to your operational needs.
+              reporting, and value-added performance.
             </p>
 
             <div className="mt-10 grid gap-6 md:grid-cols-3">
@@ -194,30 +193,11 @@ export default function HomePage() {
                   </h3>
 
                   <p className="mt-4 text-base leading-relaxed">
-                    Click to explore a guided demo tour. This is a view-only
-                    concept showcase and can be customised for your business
-                    needs.
+                    Click to explore our enterprise software environment and
+                    guided productivity systems.
                   </p>
                 </a>
               ))}
-            </div>
-
-            <div className="mt-10 rounded-2xl bg-yellow-50 p-6 shadow-sm">
-              <h3 className="text-2xl font-extrabold text-violet-900">
-                Retail, Restaurant & Small Business Focus
-              </h3>
-
-              <p className="mt-4 text-lg text-neutral-800">
-                Retail, restaurant, cash and carry, corner shop, convenience
-                store, and butcher shop systems can include teamwork,
-                empathy-led customer service, first-in-first-out shelf
-                discipline, shelf availability, kitchen order flow, cash point
-                reporting, stock rotation, waste reduction, daily task
-                accountability, staff planning, and simple performance
-                visibility. Entry-level small business accounting concepts can
-                be designed around affordable fixed-scope packages, subject to
-                agreed requirements.
-              </p>
             </div>
           </div>
         </div>
