@@ -21,15 +21,15 @@ export default function Topbar() {
 
         <div className="flex flex-wrap items-center gap-2">
           <Link
-            href="/software"
-            className="rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1 text-sm font-semibold text-neutral-700"
+            href="/software#modules"
+            className="rounded-full border border-neutral-300 bg-neutral-50 px-3 py-1 text-sm font-semibold text-neutral-800 transition hover:bg-neutral-100"
           >
             Modules
           </Link>
 
           <Link
             href="/software/training-manual"
-            className="rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1 text-sm font-semibold text-cyan-700"
+            className="rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1 text-sm font-semibold text-cyan-700 transition hover:bg-cyan-100"
           >
             Manual
           </Link>

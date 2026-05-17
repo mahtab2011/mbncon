@@ -151,7 +151,10 @@ export default function SoftwareDashboardPage() {
           </div>
         </div>
 
-        <section className="mt-8 space-y-8 sm:mt-10 sm:space-y-10">
+        <section
+          id="modules"
+          className="scroll-mt-28 mt-8 space-y-8 sm:mt-10 sm:space-y-10"
+        >
           {sections.map((section) => (
             <div
               key={section.title}
@@ -166,14 +169,16 @@ export default function SoftwareDashboardPage() {
                   <Link
                     key={label}
                     href={href}
-                    className="min-w-0 rounded-2xl border border-white/10 bg-white/5 p-5 transition hover:border-cyan-400 hover:bg-cyan-400/10"
+                    className="group min-w-0 rounded-2xl border border-white/10 bg-white/5 p-5 transition duration-200 hover:-translate-y-1 hover:border-cyan-400 hover:bg-cyan-400/10"
                   >
                     <div className="flex min-w-0 items-start justify-between gap-3">
                       <h3 className="min-w-0 wrap-break-word text-base font-semibold text-white sm:text-lg">
                         {label}
                       </h3>
 
-                      <span className="shrink-0 text-cyan-300">→</span>
+                      <span className="shrink-0 text-cyan-300 transition group-hover:translate-x-1">
+                        →
+                      </span>
                     </div>
 
                     <p className="mt-3 text-sm text-slate-400">
