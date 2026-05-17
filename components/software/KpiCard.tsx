@@ -2,11 +2,17 @@
 
 import { useLanguage } from "@/components/software/LanguageProvider";
 
+type RiskLevel =
+  | "Low"
+  | "Medium"
+  | "High"
+  | "Critical";
+
 type KpiCardProps = {
   title: string;
   value: string;
   change?: string;
-  risk?: "Low" | "Medium" | "High" | "Critical";
+  risk?: RiskLevel | string;
 };
 
 export default function KpiCard({
@@ -61,10 +67,11 @@ export default function KpiCard({
         {risk ? (
           <div
             className={`rounded-full px-3 py-1 text-xs font-bold ${
-              riskStyles[risk]
+              riskStyles[risk as RiskLevel] ||
+"bg-neutral-200 text-neutral-700"
             }`}
           >
-            {riskText[language][risk]}
+            riskText[language][risk as RiskLevel] || risk
           </div>
         ) : null}
       </div>

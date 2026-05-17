@@ -6,7 +6,12 @@ export type AIObservation = {
   title: string;
   summary: string;
   recommendation: string;
-  priority: "Low" | "Medium" | "High" | "Critical";
+  priority:
+  | "Low"
+  | "Medium"
+  | "High"
+  | "Critical"
+  | string;
 };
 
 export function generateOperationalObservation(
@@ -100,6 +105,12 @@ export function generateExecutiveSummary(
   company: string,
   observations: AIObservation[]
 ): string {
+  if (!observations?.length) {
+    return `${
+      company || "Enterprise"
+    } currently has insufficient operational data for executive AI assessment.`;
+  }
+
   const criticalCount = observations.filter(
     (o) => o.priority === "Critical"
   ).length;
@@ -109,59 +120,20 @@ export function generateExecutiveSummary(
   ).length;
 
   if (criticalCount > 0) {
-    return `${company} currently faces critical operational exposure requiring immediate executive attention across multiple business functions.`;
+    return `${
+      company || "Enterprise"
+    } currently faces critical operational exposure requiring immediate executive attention across multiple business functions.`;
   }
 
   if (highCount > 2) {
-    return `${company} shows elevated operational risk trends that require structured management review and stabilization planning.`;
+    return `${
+      company || "Enterprise"
+    } shows elevated operational risk trends that require structured management review and stabilization planning.`;
   }
 
-  return `${company} is operating within manageable performance conditions with opportunities for continuous improvement and forecasting optimization.`;
-}
-export function generateTrendDeteriorationRecommendation(params: {
-  area: string;
-  currentValue: number;
-  previousValue: number;
-  higherIsBad?: boolean;
-}): AIObservation {
-  const { area, currentValue, previousValue, higherIsBad = true } = params;
-
-  if (previousValue === 0) {
-    return {
-      title: `${area} Trend Requires Baseline Review`,
-      summary: `${area} does not yet have enough stable previous data for reliable deterioration analysis.`,
-      recommendation:
-        "Collect more historical records and continue monitoring before making major management decisions.",
-      priority: "Medium",
-    };
-  }
-
-  const changePercent =
-    ((currentValue - previousValue) / previousValue) * 100;
-
-  const isDeteriorating = higherIsBad
-    ? changePercent > 10
-    : changePercent < -10;
-
-  if (isDeteriorating) {
-    return {
-      title: `${area} Deterioration Warning`,
-      summary: `${area} has deteriorated by ${Math.abs(
-        changePercent
-      ).toFixed(2)}% compared with the previous period.`,
-      recommendation:
-        "Management should investigate root causes, assign an accountable owner, and review corrective action progress within the next reporting cycle.",
-      priority: "High",
-    };
-  }
-
-  return {
-    title: `${area} Trend Stable`,
-    summary: `${area} trend remains within manageable variation compared with the previous period.`,
-    recommendation:
-      "Continue routine monitoring and maintain current operational controls.",
-    priority: "Low",
-  };
+  return `${
+    company || "Enterprise"
+  } is operating within manageable performance conditions with opportunities for continuous improvement and forecasting optimization.`;
 }
 
 export function generateDepartmentRecommendation(params: {

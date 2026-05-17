@@ -7,16 +7,12 @@ type ScoreRingProps = {
   score: number;
 };
 
-export default function ScoreRing({
-  label,
-  score,
-}: ScoreRingProps) {
+export default function ScoreRing({ label, score }: ScoreRingProps) {
   const { language } = useLanguage();
 
-  const safeScore = Math.max(
-    0,
-    Math.min(100, score)
-  );
+  const safeScore = Number.isFinite(score)
+    ? Math.max(0, Math.min(100, Math.round(score)))
+    : 0;
 
   const scoreLabels = {
     en: {
@@ -25,7 +21,6 @@ export default function ScoreRing({
       average: "Average",
       critical: "Critical",
     },
-
     bn: {
       excellent: "চমৎকার",
       good: "ভাল",
@@ -46,7 +41,7 @@ export default function ScoreRing({
 
   return (
     <div className="rounded-3xl border border-neutral-200 bg-white p-6 text-center shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-      <div className="mx-auto flex h-32 w-32 flex-col items-center justify-center rounded-full border-14 border-cyan-500 bg-cyan-50">
+      <div className="mx-auto flex h-32 w-32 flex-col items-center justify-center rounded-full border-[14px] border-cyan-500 bg-cyan-50">
         <span className="text-3xl font-bold text-neutral-950">
           {safeScore}%
         </span>

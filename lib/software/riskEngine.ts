@@ -11,13 +11,15 @@ export function assessRisk(
   score: number,
   context: string = "Operational area"
 ): RiskAssessment {
-  const safeScore = Math.max(0, Math.min(100, score));
+  const safeScore = Number.isFinite(score)
+  ? Math.max(0, Math.min(100, Math.round(score)))
+  : 0;
 
   if (safeScore >= 85) {
     return {
       level: "Low",
       score: safeScore,
-      message: `${context} is currently stable with low risk exposure.`,
+      message: `${context || "Operational area"} is currently stable with low risk exposure.`,
       action: "Maintain monitoring and continue standard improvement activities.",
     };
   }
@@ -26,7 +28,7 @@ export function assessRisk(
     return {
       level: "Medium",
       score: safeScore,
-      message: `${context} shows moderate risk and requires management attention.`,
+      message: `${context || "Operational area"} shows moderate risk and requires management attention.`,
       action: "Review recent trend data and assign improvement ownership.",
     };
   }
@@ -35,7 +37,7 @@ export function assessRisk(
     return {
       level: "High",
       score: safeScore,
-      message: `${context} shows high operational risk and possible performance leakage.`,
+      message: `${context || "Operational area"} shows high operational risk and possible performance leakage.`,
       action: "Start corrective action planning and monitor daily until stabilized.",
     };
   }
@@ -43,7 +45,7 @@ export function assessRisk(
   return {
     level: "Critical",
     score: safeScore,
-    message: `${context} is in critical condition and may cause serious business loss.`,
+    message: `${context || "Operational area"} is in critical condition and may cause serious business loss.`,
     action: "Escalate immediately to senior management and launch urgent recovery plan.",
   };
 }
@@ -222,7 +224,7 @@ export function assessThresholdRisk(
     return {
       level: "Critical",
       score: 35,
-      message: `${context} has crossed the critical limit of ${criticalLimit}.`,
+      message: `${context || "Operational area"} has crossed the critical limit of ${criticalLimit}.`,
       action: "Immediate escalation and corrective action required.",
     };
   }
@@ -231,7 +233,7 @@ export function assessThresholdRisk(
     return {
       level: "High",
       score: 55,
-      message: `${context} has crossed the warning limit of ${warningLimit}.`,
+      message: `${context || "Operational area"} has crossed the warning limit of ${warningLimit}.`,
       action: "Management review required before the issue becomes critical.",
     };
   }
@@ -239,7 +241,7 @@ export function assessThresholdRisk(
   return {
     level: "Low",
     score: 90,
-    message: `${context} is within acceptable control limits.`,
+    message: `${context || "Operational area"} is within acceptable control limits.`,
     action: "Continue normal monitoring.",
   };
 }

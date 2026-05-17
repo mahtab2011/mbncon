@@ -7,7 +7,7 @@ type ForecastCardProps = {
   current: string;
   forecast: string;
   accuracy: string;
-  note: string;
+  note?: string;
 };
 
 export default function ForecastCard({
@@ -77,9 +77,11 @@ export default function ForecastCard({
         </div>
       </div>
 
-      <p className="mt-6 text-sm leading-7 text-neutral-600">
-        {note}
-      </p>
+      {note ? (
+  <p className="mt-6 text-sm leading-7 text-neutral-600">
+    {note}
+  </p>
+) : null}
     </div>
   );
 }

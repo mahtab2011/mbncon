@@ -5,7 +5,7 @@ import { useLanguage } from "@/components/software/LanguageProvider";
 type AlertPanelProps = {
   title: string;
   message: string;
-  severity?: "info" | "warning" | "danger";
+  severity?: "info" | "warning" | "danger" | string;
 };
 
 export default function AlertPanel({
@@ -37,7 +37,9 @@ export default function AlertPanel({
 
   return (
     <div
-      className={`rounded-3xl border p-6 shadow-sm ${styles[severity]}`}
+      className={`rounded-3xl border p-6 shadow-sm ${
+  styles[severity as keyof typeof styles] || styles.info
+}`}
     >
       <div className="flex items-center justify-between gap-4">
         <h3 className="text-lg font-bold">
@@ -45,7 +47,11 @@ export default function AlertPanel({
         </h3>
 
         <div className="rounded-full bg-white/70 px-3 py-1 text-xs font-bold">
-          {severityLabels[language][severity]}
+          {
+  severityLabels[language][
+    severity as keyof typeof severityLabels.en
+  ] || severity
+}
         </div>
       </div>
 
