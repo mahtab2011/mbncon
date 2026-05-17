@@ -1,3 +1,4 @@
+"use client";
 import DashboardShell from "@/components/software/DashboardShell";
 import KpiCard from "@/components/software/KpiCard";
 import ScoreRing from "@/components/software/ScoreRing";
@@ -14,7 +15,7 @@ import {
   generateExecutiveSummary,
 } from "@/lib/software/aiObservations";
 
-export default function ExecutiveCommandCenterPage() {
+export default function ExecutiveCommandCentrePage() {
   const productionForecast = exponentialSmoothing([
     { period: "Jan", actual: 82 },
     { period: "Feb", actual: 85 },
@@ -48,7 +49,7 @@ export default function ExecutiveCommandCenterPage() {
 
   return (
     <DashboardShell
-      title="Executive Command Center"
+      title="Executive Command Centre"
       subtitle="AI-assisted manufacturing intelligence, operational forecasting, executive scoring, and consultancy decision-support system."
     >
       <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">

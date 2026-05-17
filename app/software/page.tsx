@@ -6,7 +6,7 @@ const sections = [
   {
     title: "Executive Intelligence",
     items: [
-      ["Executive Command Center", "/software/executive-command-center"],
+      ["Executive Command Centre", "/software/executive-command-centre"],
       ["Leadership Dashboard", "/software/leadership-dashboard"],
       ["AI Master Control Centre", "/software/ai-master-control-centre"],
       ["AI Global Search & Module Finder", "/software/ai-global-search-module-finder"],

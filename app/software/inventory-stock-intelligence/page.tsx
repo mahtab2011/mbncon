@@ -3,32 +3,96 @@
 import Link from "next/link";
 
 const stockCategories = [
-  "Raw materials stock",
-  "Work-in-progress (WIP) stock",
-  "Finished goods stock",
-  "Rejected / seconds stock",
-  "Surplus stock",
-  "Slow-moving stock",
+  {
+    id: "raw-materials-stock",
+    title: "Raw materials stock",
+    detail:
+      "Monitor raw material inventory levels, ageing profile, supplier dependency, overstock risk, and shortage exposure impacting production continuity.",
+  },
+  {
+    id: "wip-stock",
+    title: "Work-in-progress (WIP) stock",
+    detail:
+      "Track unfinished production quantities, bottlenecks, delayed operations, and factory floor congestion affecting throughput efficiency.",
+  },
+  {
+    id: "finished-goods-stock",
+    title: "Finished goods stock",
+    detail:
+      "Analyse shipment readiness, warehouse holding period, buyer dispatch schedule, and excess finished inventory risk.",
+  },
+  {
+    id: "rejected-stock",
+    title: "Rejected / seconds stock",
+    detail:
+      "Identify defective inventory, quality rejection causes, salvage opportunities, and financial recovery potential.",
+  },
+  {
+    id: "surplus-stock",
+    title: "Surplus stock",
+    detail:
+      "Detect excess procurement, duplicate inventory, over-ordering patterns, and slow consumption materials.",
+  },
+  {
+    id: "slow-moving-stock",
+    title: "Slow-moving stock",
+    detail:
+      "Highlight low-rotation inventory, ageing stock, blocked cashflow, and potential disposal or liquidation actions.",
+  },
 ];
 
 const inventoryControls = [
-  "Probable use/completion/shipment date",
-  "Warehouse ageing period",
-  "Stock over 3 months alert",
-  "Stock carrying interest cost",
-  "Financial value of inventory",
-  "Material utilisation trend",
-  "Excess inventory identification",
-  "Disposal recommendation",
+  {
+    id: "shipment-date",
+    title: "Probable use/completion/shipment date",
+    detail:
+      "Estimate expected material usage and shipment completion timeline using production planning and buyer delivery schedule.",
+  },
+  {
+    id: "warehouse-ageing",
+    title: "Warehouse ageing period",
+    detail:
+      "Track how long inventory remains stored and identify ageing-related operational or financial risks.",
+  },
+  {
+    id: "three-month-alert",
+    title: "Stock over 3 months alert",
+    detail:
+      "Automatically escalate inventory exceeding acceptable storage duration thresholds.",
+  },
+  {
+    id: "stock-interest-cost",
+    title: "Stock carrying interest cost",
+    detail:
+      "Calculate financing and opportunity cost associated with excess inventory holding.",
+  },
 ];
 
 const disposalMethods = [
-  "Spot sale",
-  "Resale to secondary market",
-  "Discount liquidation",
-  "Reprocessing / reuse",
-  "Dump / scrap disposal",
-  "Controlled destruction",
+  {
+    id: "spot-sale",
+    title: "Spot sale",
+    detail:
+      "Immediate stock liquidation strategy for recovering blocked cash from surplus inventory.",
+  },
+  {
+    id: "secondary-market",
+    title: "Resale to secondary market",
+    detail:
+      "Resell slow-moving or excess stock through alternative buyers or secondary channels.",
+  },
+  {
+    id: "discount-liquidation",
+    title: "Discount liquidation",
+    detail:
+      "Controlled markdown disposal process to reduce ageing inventory exposure.",
+  },
+  {
+    id: "reprocessing",
+    title: "Reprocessing / reuse",
+    detail:
+      "Recover material value through rework, repurposing, or internal reuse opportunities.",
+  },
 ];
 
 export default function InventoryStockIntelligencePage() {
@@ -36,7 +100,7 @@ export default function InventoryStockIntelligencePage() {
     <main className="min-h-screen bg-slate-950 text-white">
       <section className="mx-auto max-w-7xl px-6 py-12">
         <Link
-          href="/"
+          href="/software"
           className="rounded-full border border-white/20 px-4 py-2 text-sm text-slate-200 hover:bg-white/10"
         >
           ← Back to Dashboard
@@ -71,6 +135,7 @@ export default function InventoryStockIntelligencePage() {
               className="rounded-2xl border border-white/10 bg-white/5 p-6"
             >
               <p className="text-sm text-slate-400">{label}</p>
+
               <p className="mt-3 text-2xl font-bold text-yellow-300">
                 {value}
               </p>
@@ -78,7 +143,10 @@ export default function InventoryStockIntelligencePage() {
           ))}
         </section>
 
-        <section className="mt-10 grid gap-6 md:grid-cols-3">
+        <section
+          id="modules"
+          className="mt-10 grid gap-6 md:grid-cols-3"
+        >
           <div className="rounded-3xl border border-white/10 bg-slate-900 p-8">
             <h2 className="text-2xl font-bold text-yellow-200">
               Stock Categories
@@ -86,16 +154,19 @@ export default function InventoryStockIntelligencePage() {
 
             <div className="mt-6 space-y-3">
               {stockCategories.map((item, index) => (
-                <div
-                  key={item}
-                  className="flex gap-3 rounded-xl border border-white/10 bg-white/5 p-3"
+                <a
+                  key={item.id}
+                  href={`#${item.id}`}
+                  className="flex gap-3 rounded-xl border border-white/10 bg-white/5 p-3 transition hover:border-yellow-400 hover:bg-yellow-400/10"
                 >
                   <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-yellow-400 text-sm font-bold text-slate-950">
                     {index + 1}
                   </span>
 
-                  <span className="text-sm text-slate-200">{item}</span>
-                </div>
+                  <span className="text-sm text-slate-200">
+                    {item.title}
+                  </span>
+                </a>
               ))}
             </div>
           </div>
@@ -107,16 +178,19 @@ export default function InventoryStockIntelligencePage() {
 
             <div className="mt-6 space-y-3">
               {inventoryControls.map((item, index) => (
-                <div
-                  key={item}
-                  className="flex gap-3 rounded-xl border border-white/10 bg-white/5 p-3"
+                <a
+                  key={item.id}
+                  href={`#${item.id}`}
+                  className="flex gap-3 rounded-xl border border-white/10 bg-white/5 p-3 transition hover:border-yellow-400 hover:bg-yellow-400/10"
                 >
                   <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-yellow-400 text-sm font-bold text-slate-950">
                     {index + 1}
                   </span>
 
-                  <span className="text-sm text-slate-200">{item}</span>
-                </div>
+                  <span className="text-sm text-slate-200">
+                    {item.title}
+                  </span>
+                </a>
               ))}
             </div>
           </div>
@@ -128,19 +202,44 @@ export default function InventoryStockIntelligencePage() {
 
             <div className="mt-6 space-y-3">
               {disposalMethods.map((item, index) => (
-                <div
-                  key={item}
-                  className="flex gap-3 rounded-xl border border-white/10 bg-white/5 p-3"
+                <a
+                  key={item.id}
+                  href={`#${item.id}`}
+                  className="flex gap-3 rounded-xl border border-white/10 bg-white/5 p-3 transition hover:border-yellow-400 hover:bg-yellow-400/10"
                 >
                   <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-yellow-400 text-sm font-bold text-slate-950">
                     {index + 1}
                   </span>
 
-                  <span className="text-sm text-slate-200">{item}</span>
-                </div>
+                  <span className="text-sm text-slate-200">
+                    {item.title}
+                  </span>
+                </a>
               ))}
             </div>
           </div>
+        </section>
+
+        <section className="mt-12 space-y-6">
+          {[
+            ...stockCategories,
+            ...inventoryControls,
+            ...disposalMethods,
+          ].map((item) => (
+            <div
+              key={item.id}
+              id={item.id}
+              className="scroll-mt-28 rounded-3xl border border-white/10 bg-slate-900 p-8"
+            >
+              <h2 className="text-2xl font-bold text-yellow-200">
+                {item.title}
+              </h2>
+
+              <p className="mt-4 leading-relaxed text-slate-300">
+                {item.detail}
+              </p>
+            </div>
+          ))}
         </section>
 
         <section className="mt-10 rounded-3xl border border-yellow-400/30 bg-yellow-400/10 p-8">
