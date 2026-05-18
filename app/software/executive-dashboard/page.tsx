@@ -1,5 +1,6 @@
 "use client";
 
+
 import { useEffect, useMemo, useState } from "react";
 
 import DashboardShell from "@/components/software/DashboardShell";
@@ -102,7 +103,14 @@ function severityFromRisk(level: string) {
   if (level === "Medium") return "warning";
   return "info";
 }
-
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
 export default function ExecutiveDashboardPage() {
   const factoryId = "demo-factory";
 
@@ -338,72 +346,124 @@ export default function ExecutiveDashboardPage() {
       ) : null}
 
       <section id="executive-intelligence" className="scroll-mt-28">
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-          <KpiCard
-            title="Live Records"
-            value={String(dashboard.liveRecordCount)}
-            change="Firestore connected"
-            risk={dashboard.liveRecordCount > 0 ? "Low" : "Medium"}
-          />
+  <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+    <div
+      onClick={() => {
+        window.location.href = "#executive-ai-summary";
+      }}
+      className="cursor-pointer transition hover:-translate-y-1 hover:scale-[1.01]"
+    >
+      <KpiCard
+        title="Live Records"
+        value={String(dashboard.liveRecordCount)}
+        change="Firestore connected"
+        risk={dashboard.liveRecordCount > 0 ? "Low" : "Medium"}
+      />
+    </div>
 
-          <KpiCard
-            title="Overall Score"
-            value={`${dashboard.executiveScore.score}%`}
-            change={dashboard.executiveScore.status}
-            risk={dashboard.executiveRisk.level}
-          />
+    <div
+      onClick={() => {
+        window.location.href = "#executive-ai-summary";
+      }}
+      className="cursor-pointer transition hover:-translate-y-1 hover:scale-[1.01]"
+    >
+      <KpiCard
+        title="Overall Score"
+        value={`${dashboard.executiveScore.score}%`}
+        change={dashboard.executiveScore.status}
+        risk={dashboard.executiveRisk.level}
+      />
+    </div>
 
-          <KpiCard
-            title="Production Forecast"
-            value={`${dashboard.productionForecast.nextForecast}%`}
-            change={dashboard.productionForecast.trend}
-            risk={dashboard.productionForecast.riskLevel}
-          />
+    <div
+      onClick={() => {
+        window.location.href = "#forecast-intelligence";
+      }}
+      className="cursor-pointer transition hover:-translate-y-1 hover:scale-[1.01]"
+    >
+      <KpiCard
+        title="Production Forecast"
+        value={`${dashboard.productionForecast.nextForecast}%`}
+        change={dashboard.productionForecast.trend}
+        risk={dashboard.productionForecast.riskLevel}
+      />
+    </div>
 
-          <KpiCard
-            title="Forecast Accuracy"
-            value={`${dashboard.productionForecast.averageAccuracy}%`}
-            change="Exponential smoothing"
-            risk={dashboard.productionForecast.riskLevel}
-          />
-        </div>
+    <div
+      onClick={() => {
+        window.location.href = "#forecast-intelligence";
+      }}
+      className="cursor-pointer transition hover:-translate-y-1 hover:scale-[1.01]"
+    >
+      <KpiCard
+        title="Forecast Accuracy"
+        value={`${dashboard.productionForecast.averageAccuracy}%`}
+        change="Exponential smoothing"
+        risk={dashboard.productionForecast.riskLevel}
+      />
+    </div>
+  </div>
 
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-          {navigationCards.map((item) => (
-            <a
-              key={item.href}
-              href={item.href}
-              className="rounded-3xl border border-neutral-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:border-cyan-300 hover:shadow-lg"
-            >
-              <p className="text-sm font-black text-cyan-700">{item.number}</p>
-              <h3 className="mt-2 text-base font-bold text-neutral-950">
-                {item.title}
-              </h3>
-              <p className="mt-2 text-xs text-neutral-500">
-                Open detail section
-              </p>
-            </a>
-          ))}
-        </div>
+  <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+    {navigationCards.map((item) => (
+      <a
+        key={item.href}
+        href={item.href}
+        className="rounded-3xl border border-neutral-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:border-cyan-300 hover:shadow-lg"
+      >
+        <p className="text-sm font-black text-cyan-700">
+          {item.number}
+        </p>
 
-        <div className="mt-10 grid gap-6 lg:grid-cols-3">
-          <ScoreRing
-            label="Executive Score"
-            score={Math.round(dashboard.executiveScore.score)}
-          />
+        <h3 className="mt-2 text-base font-bold text-neutral-950">
+          {item.title}
+        </h3>
 
-          <ScoreRing
-            label="Forecast Accuracy"
-            score={Math.round(dashboard.productionForecast.averageAccuracy)}
-          />
+        <p className="mt-2 text-xs text-neutral-500">
+          Open detail section
+        </p>
+      </a>
+    ))}
+  </div>
 
-          <ScoreRing
-            label="Risk Score"
-            score={dashboard.executiveRisk.score}
-          />
-        </div>
-      </section>
+  <div className="mt-10 grid gap-6 lg:grid-cols-3">
+    <div
+      onClick={() => {
+        window.location.href = "#executive-ai-summary";
+      }}
+      className="cursor-pointer transition hover:-translate-y-1 hover:scale-[1.01]"
+    >
+      <ScoreRing
+        label="Executive Score"
+        score={Math.round(dashboard.executiveScore.score)}
+      />
+    </div>
 
+    <div
+      onClick={() => {
+        window.location.href = "#forecast-intelligence";
+      }}
+      className="cursor-pointer transition hover:-translate-y-1 hover:scale-[1.01]"
+    >
+      <ScoreRing
+        label="Forecast Accuracy"
+        score={Math.round(dashboard.productionForecast.averageAccuracy)}
+      />
+    </div>
+
+    <div
+      onClick={() => {
+        window.location.href = "#operational-risks";
+      }}
+      className="cursor-pointer transition hover:-translate-y-1 hover:scale-[1.01]"
+    >
+      <ScoreRing
+        label="Risk Score"
+        score={dashboard.executiveRisk.score}
+      />
+    </div>
+  </div>
+</section>
       <section id="operational-risks" className="scroll-mt-28">
         <SectionHeader
           label="02 Operational Risks"
@@ -715,24 +775,37 @@ function RiskCard({
   };
 }) {
   return (
-    <div className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm">
-      <div className="flex items-center justify-between gap-4">
-        <h3 className="text-lg font-bold text-neutral-950">{title}</h3>
+    <div
+  onClick={() => {
+    window.location.href = "#executive-ai-summary";
+  }}
+  className="cursor-pointer rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:border-cyan-300 hover:shadow-lg"
+>
+  <div className="flex items-center justify-between gap-4">
+    <h3 className="text-lg font-bold text-neutral-950">
+      {title}
+    </h3>
 
-        <span className="rounded-full bg-neutral-100 px-3 py-1 text-xs font-bold text-neutral-700">
-          {risk.level}
-        </span>
-      </div>
+    <span className="rounded-full bg-neutral-100 px-3 py-1 text-xs font-bold text-neutral-700">
+      {risk.level}
+    </span>
+  </div>
 
-      <p className="mt-4 text-3xl font-bold text-neutral-950">{risk.score}</p>
+  <p className="mt-4 text-3xl font-bold text-neutral-950">
+    {risk.score}
+  </p>
 
-      <p className="mt-4 text-sm leading-7 text-neutral-600">
-        {risk.message}
-      </p>
+  <p className="mt-4 text-sm leading-7 text-neutral-600">
+    {risk.message}
+  </p>
 
-      <p className="mt-4 text-sm font-semibold leading-7 text-cyan-700">
-        {risk.action}
-      </p>
-    </div>
+  <p className="mt-4 text-sm font-semibold leading-7 text-cyan-700">
+    {risk.action}
+  </p>
+
+  <p className="mt-4 text-xs text-neutral-500">
+    Click to review executive AI summary
+  </p>
+</div>
   );
 }

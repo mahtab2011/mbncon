@@ -74,7 +74,13 @@ function getRiskColor(
 
   return "text-green-300 border-green-700/40 bg-green-950/20";
 }
-
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
 function getBuyerAssessment(
   critical: number,
   high: number
@@ -232,57 +238,28 @@ export default function AIBuyerSatisfactionIntelligencePage() {
             </div>
           ) : (
             <>
-              <section className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <section className="grid grid-cols-1 gap-4 md:grid-cols-4">
+  {[
+    ["01", "Critical Buyer Risks", intelligence.criticalRisks, "#critical-buyer-risks", "border-red-700/40 bg-red-950/20 text-red-300"],
+    ["02", "High Relationship Risks", intelligence.highRisks, "#high-relationship-risks", "border-orange-700/40 bg-orange-950/20 text-orange-300"],
+    ["03", "Avg On-Time Delivery", `${intelligence.averageDelivery}%`, "#avg-on-time-delivery", "border-sky-700/40 bg-sky-950/20 text-sky-300"],
+    ["04", "Avg Repeat Probability", `${intelligence.averageRepeatProbability}%`, "#avg-repeat-probability", "border-green-700/40 bg-green-950/20 text-green-300"],
+  ].map(([number, label, value, href, className]) => (
+    <a
+      key={String(href)}
+      href={String(href)}
+      className={`rounded-2xl border p-5 transition hover:-translate-y-1 hover:border-sky-400 ${className}`}
+    >
+      <p className="text-xs font-bold">{number}</p>
 
-                <div className="rounded-2xl border border-red-700/40 bg-red-950/20 p-5">
+      <p className="mt-2 text-sm">{label}</p>
 
-                  <p className="text-red-300 text-sm">
-                    Critical Buyer Risks
-                  </p>
-
-                  <h2 className="text-5xl font-bold mt-3">
-                    {intelligence.criticalRisks}
-                  </h2>
-
-                </div>
-
-                <div className="rounded-2xl border border-orange-700/40 bg-orange-950/20 p-5">
-
-                  <p className="text-orange-300 text-sm">
-                    High Relationship Risks
-                  </p>
-
-                  <h2 className="text-5xl font-bold mt-3">
-                    {intelligence.highRisks}
-                  </h2>
-
-                </div>
-
-                <div className="rounded-2xl border border-sky-700/40 bg-sky-950/20 p-5">
-
-                  <p className="text-sky-300 text-sm">
-                    Avg On-Time Delivery
-                  </p>
-
-                  <h2 className="text-5xl font-bold mt-3">
-                    {intelligence.averageDelivery}%
-                  </h2>
-
-                </div>
-
-                <div className="rounded-2xl border border-green-700/40 bg-green-950/20 p-5">
-
-                  <p className="text-green-300 text-sm">
-                    Avg Repeat Probability
-                  </p>
-
-                  <h2 className="text-5xl font-bold mt-3">
-                    {intelligence.averageRepeatProbability}%
-                  </h2>
-
-                </div>
-
-              </section>
+      <h2 className="mt-3 text-5xl font-bold">
+        {value}
+      </h2>
+    </a>
+  ))}
+</section>
 
               <section className="rounded-2xl border border-sky-700/40 bg-sky-950/10 p-6">
 
@@ -303,7 +280,53 @@ export default function AIBuyerSatisfactionIntelligencePage() {
                 </p>
 
               </section>
+<section className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+  <h2 className="text-2xl font-bold">
+    KPI Detail Sections
+  </h2>
 
+  <div className="mt-6 grid gap-5 md:grid-cols-2">
+    {[
+      [
+        "critical-buyer-risks",
+        "Critical Buyer Risks",
+        "Buyers with critical relationship exposure requiring immediate executive engagement and recovery planning.",
+      ],
+
+      [
+        "high-relationship-risks",
+        "High Relationship Risks",
+        "Buyers showing elevated retention, delivery, quality, or communication risk.",
+      ],
+
+      [
+        "avg-on-time-delivery",
+        "Average On-Time Delivery",
+        "Average shipment delivery reliability across monitored buyers.",
+      ],
+
+      [
+        "avg-repeat-probability",
+        "Average Repeat Probability",
+        "AI-estimated probability of buyers placing repeat orders.",
+      ],
+    ].map(([id, title, detail]) => (
+      <section
+        key={String(id)}
+        id={String(id)}
+        className="scroll-mt-28 rounded-xl border border-slate-800 bg-slate-950/70 p-5"
+      >
+        <h3 className="text-xl font-bold text-sky-300">
+          {title}
+        </h3>
+
+        <p className="mt-3 text-sm leading-7 text-slate-300">
+          {detail}
+        </p>
+      </section>
+    ))}
+  </div>
+</section>
               <section className="rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden">
 
                 <div className="border-b border-slate-800 p-5">

@@ -16,7 +16,12 @@ import {
 } from "@/lib/software/executiveScoring";
 
 type RecordType = Record<string, any>;
-
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
 export default function AiExecutiveReportPage() {
   const [loading, setLoading] = useState(true);
 
@@ -272,32 +277,37 @@ export default function AiExecutiveReportPage() {
         </section>
 
         <div className="rounded-3xl border border-amber-200 bg-amber-50 p-8">
-          <h2 className="text-2xl font-bold text-amber-900">
-            Executive Action Priorities
-          </h2>
 
-          <div className="mt-6 grid gap-4 md:grid-cols-2">
-            {[
-              "Reduce inventory ageing and dead stock exposure.",
-              "Strengthen material ordering discipline.",
-              "Improve production planning and shipment coordination.",
-              "Reduce rejection and rework exposure.",
-              "Improve maintenance response and preventive maintenance.",
-              "Launch executive recovery review meetings.",
-              "Strengthen accountability across departments.",
-              "Improve operational reporting frequency.",
-            ].map((item) => (
-              <div
-                key={item}
-                className="rounded-2xl border border-amber-200 bg-white p-4"
-              >
-                <p className="font-medium text-slate-700">
-                  {item}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
+  <h2 className="text-2xl font-bold text-amber-900">
+    Executive Action Priorities
+  </h2>
+
+  <div className="mt-6 grid gap-4 md:grid-cols-2">
+
+    {[
+      "Reduce inventory ageing and dead stock exposure.",
+      "Strengthen material ordering discipline.",
+      "Improve production planning and shipment coordination.",
+      "Reduce rejection and rework exposure.",
+      "Improve maintenance response and preventive maintenance.",
+      "Launch executive recovery review meetings.",
+      "Strengthen accountability across departments.",
+      "Improve operational reporting frequency.",
+    ].map((item) => (
+      <a
+        key={item}
+        href={`#${slugify(item)}`}
+        className="block rounded-2xl border border-amber-200 bg-white p-4 transition hover:-translate-y-1 hover:border-amber-400/40 hover:shadow-lg"
+      >
+        <p className="font-medium text-slate-700">
+          {item}
+        </p>
+      </a>
+    ))}
+
+  </div>
+
+</div>
       </div>
     </DashboardShell>
   );
@@ -311,7 +321,10 @@ function ReportCard({
   value: string;
 }) {
   return (
-    <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+    <a
+      href={`#${slugify(title)}`}
+      className="block rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:border-indigo-400/40 hover:shadow-xl"
+    >
       <p className="text-sm font-medium text-slate-500">
         {title}
       </p>
@@ -319,7 +332,7 @@ function ReportCard({
       <h2 className="mt-4 text-3xl font-bold text-slate-900">
         {value}
       </h2>
-    </div>
+    </a>
   );
 }
 

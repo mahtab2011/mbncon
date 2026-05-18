@@ -217,6 +217,14 @@ const sizeTemplates: Record<string, string[]> = {
 ],
   "General Size": ["XS", "S", "M", "L", "XL", "XXL"],
 };
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
 export default function BuyerOrderEntryPage() {
   const { language } = useLanguage();
   const t = content[language];
@@ -293,6 +301,35 @@ export default function BuyerOrderEntryPage() {
     totalOrderValue > 0 ? (expectedProfit / totalOrderValue) * 100 : 0;
 
   const quantityDifference = toNumber(form.orderQty) - totalSizeQty;
+  const executiveAssessment =
+  marginPercentage >= 20
+    ? "Healthy Order Profitability"
+    : marginPercentage >= 10
+    ? "Moderate Margin Pressure"
+    : "Critical Margin Exposure";
+
+const kpiCards = [
+  {
+    title: "Expected Profit",
+    value: `${form.currency}${expectedProfit.toFixed(0)}`,
+    href: "#pricing-intelligence",
+  },
+  {
+    title: "Margin %",
+    value: `${marginPercentage.toFixed(1)}%`,
+    href: "#executive-assessment",
+  },
+  {
+    title: "Qty Difference",
+    value: quantityDifference,
+    href: "#size-breakdown-intelligence",
+  },
+  {
+    title: "Buyer Risk",
+    value: form.buyerRiskLevel,
+    href: "#risk-intelligence",
+  },
+];
 
   const updateField = (field: string, value: string) => {
     setForm((prev) => {
@@ -424,13 +461,56 @@ export default function BuyerOrderEntryPage() {
           </h1>
 
           <p className="mt-4 max-w-5xl text-slate-600">{t.subtitle}</p>
+          <section
+  id="enterprise-kpis"
+  className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-4 scroll-mt-28"
+>
+  {kpiCards.map((card) => (
+    <a
+      key={card.title}
+      href={card.href}
+      className="rounded-2xl border border-cyan-100 bg-cyan-50 p-5 transition hover:-translate-y-1 hover:border-cyan-400 hover:shadow-xl"
+    >
+      <p className="text-sm text-slate-500">{card.title}</p>
+
+      <h2 className="mt-3 text-3xl font-bold text-cyan-700">
+        {card.value}
+      </h2>
+
+      <p className="mt-3 text-xs text-slate-500">
+        Click to review intelligence
+      </p>
+    </a>
+  ))}
+</section>
+
+<section
+  id="executive-assessment"
+  className="mt-8 scroll-mt-28 rounded-3xl border border-cyan-200 bg-cyan-50 p-6"
+>
+  <p className="text-sm uppercase tracking-widest text-cyan-700">
+    Executive Order Assessment
+  </p>
+
+  <h2 className="mt-2 text-3xl font-bold text-slate-900">
+    {executiveAssessment}
+  </h2>
+
+  <p className="mt-4 text-slate-700">
+    AI evaluates profitability, buyer exposure, shipment readiness,
+    quantity alignment, costing pressure, and operational risk before
+    confirming management approval.
+  </p>
+</section>
         </div>
 
         <form
           onSubmit={handleSubmit}
           className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm"
         >
-          <SectionTitle title="Order Identity" />
+          <div id="order-identity" className="scroll-mt-28">
+  <SectionTitle title="Order Identity" />
+</div>
 
           <div className="grid gap-6 md:grid-cols-2">
             <TextInput
@@ -555,7 +635,10 @@ export default function BuyerOrderEntryPage() {
             />
           </div>
 
-          <div className="mt-8 rounded-3xl border border-slate-200 bg-slate-50 p-6">
+          <div
+  id="size-breakdown-intelligence"
+  className="mt-8 scroll-mt-28 rounded-3xl border border-slate-200 bg-slate-50 p-6"
+>
             <h2 className="text-xl font-bold text-slate-900">
               Size Breakdown Quantity
             </h2>
@@ -612,7 +695,9 @@ export default function BuyerOrderEntryPage() {
             </div>
           </div>
 
-          <SectionTitle title="Pricing, Costing & Margin" />
+          <div id="pricing-intelligence" className="scroll-mt-28">
+  <SectionTitle title="Pricing, Costing & Margin" />
+</div>
 
           <div className="grid gap-6 md:grid-cols-2">
             <SelectInput
@@ -664,8 +749,9 @@ export default function BuyerOrderEntryPage() {
             />
           </div>
 
-          <SectionTitle title="Dates, Readiness & Risk" />
-
+          <div id="risk-intelligence" className="scroll-mt-28">
+  <SectionTitle title="Dates, Readiness & Risk" />
+</div>
           <div className="grid gap-6 md:grid-cols-2">
             <DateInput
               label="Order Receive Date"
@@ -735,7 +821,18 @@ export default function BuyerOrderEntryPage() {
               onChange={(v) => updateField("remarks", v)}
             />
           </div>
+<div className="mt-10 rounded-3xl border border-cyan-200 bg-cyan-50 p-6">
+  <p className="text-sm uppercase tracking-widest text-cyan-700">
+    AI Recommendation
+  </p>
 
+  <p className="mt-3 text-slate-700">
+    Management should validate order profitability, shipment readiness,
+    size alignment, buyer risk exposure, and margin sustainability before
+    final production approval. Orders with low margin and high shipment
+    pressure should trigger executive review.
+  </p>
+</div>
           <div className="mt-8 flex items-center gap-4">
             <button
               type="submit"

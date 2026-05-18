@@ -22,6 +22,15 @@ type AccessRole = {
   action: string;
 };
 
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 function riskStyle(risk: AccessRole["risk"]) {
   if (risk === "Low") {
     return "border-emerald-500 bg-emerald-500/10 text-emerald-300";
@@ -36,6 +45,22 @@ function riskStyle(risk: AccessRole["risk"]) {
   }
 
   return "border-red-500 bg-red-500/10 text-red-300";
+}
+
+function getGovernanceAssessment(score: number) {
+  if (score >= 85) {
+    return "Enterprise Access Governance Stable";
+  }
+
+  if (score >= 70) {
+    return "Moderate Governance Monitoring Required";
+  }
+
+  if (score >= 50) {
+    return "High Access Control Risk Exposure";
+  }
+
+  return "Critical Access Governance Intervention Required";
 }
 
 export default function AIUserRoleAccessControlCentrePage() {
@@ -227,6 +252,43 @@ export default function AIUserRoleAccessControlCentrePage() {
     return Math.round(total / accessRoles.length);
   }, [accessRoles]);
 
+  const governanceAssessment = getGovernanceAssessment(governanceScore);
+
+  const criticalRoles = accessRoles.filter(
+    (item) => item.risk === "Critical"
+  ).length;
+
+  const highRiskRoles = accessRoles.filter(
+    (item) => item.risk === "High" || item.risk === "Critical"
+  ).length;
+
+  const kpiCards = [
+    {
+      title: "Governance Score",
+      value: governanceScore,
+      href: "#executive-access-assessment",
+      className: "border-cyan-500/20 bg-cyan-500/10",
+    },
+    {
+      title: "Critical Roles",
+      value: criticalRoles,
+      href: "#role-access-feed",
+      className: "border-red-500/30 bg-red-500/10",
+    },
+    {
+      title: "High Risk Roles",
+      value: highRiskRoles,
+      href: "#role-access-feed",
+      className: "border-yellow-500/30 bg-yellow-500/10",
+    },
+    {
+      title: "Governance Checklist",
+      value: 9,
+      href: "#governance-checklist",
+      className: "border-emerald-500/30 bg-emerald-500/10",
+    },
+  ];
+
   return (
     <DashboardShell title="AI User Role & Access Control Centre">
       <main className="min-h-screen bg-slate-950 text-white">
@@ -246,20 +308,6 @@ export default function AIUserRoleAccessControlCentrePage() {
               intelligence control across manufacturing operations.
             </p>
 
-            <div className="mt-8 rounded-2xl border border-cyan-500/20 bg-cyan-500/10 p-6">
-              <p className="text-sm text-cyan-200">
-                Access governance protection score
-              </p>
-
-              <div className="mt-3 flex items-end gap-4">
-                <h2 className="text-6xl font-bold">{governanceScore}</h2>
-
-                <div className="mb-2 rounded-full border border-cyan-400/30 px-4 py-1 text-sm text-cyan-200">
-                  Enterprise Security Governance
-                </div>
-              </div>
-            </div>
-
             {loading && (
               <p className="mt-5 text-sm text-cyan-200">
                 Loading live role governance intelligence...
@@ -272,77 +320,147 @@ export default function AIUserRoleAccessControlCentrePage() {
           </div>
         </section>
 
-        <section className="mx-auto max-w-7xl px-6 py-8">
-          <div className="grid gap-6 md:grid-cols-2">
-            {accessRoles.map((item) => (
-              <div
-                key={item.role}
-                className="rounded-2xl border border-white/10 bg-white/5 p-6 shadow-xl"
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <h2 className="text-2xl font-semibold">{item.role}</h2>
+        <section
+          id="enterprise-kpis"
+          className="mx-auto grid max-w-7xl scroll-mt-28 grid-cols-1 gap-4 px-6 py-8 md:grid-cols-4"
+        >
+          {kpiCards.map((card) => (
+            <a
+              key={card.title}
+              href={card.href}
+              className={`rounded-2xl border p-5 transition hover:-translate-y-1 hover:border-cyan-400/70 hover:shadow-xl ${card.className}`}
+            >
+              <p className="text-sm text-slate-300">{card.title}</p>
 
-                    <p className="mt-2 text-sm text-cyan-300">
-                      {item.accessLevel}
-                    </p>
-                  </div>
+              <h2 className="mt-3 text-5xl font-bold">{card.value}</h2>
 
-                  <div
-                    className={`rounded-full border px-4 py-1 text-xs font-semibold ${riskStyle(
-                      item.risk
-                    )}`}
-                  >
-                    {item.risk}
-                  </div>
-                </div>
+              <p className="mt-3 text-xs text-slate-500">
+                Click to review access intelligence
+              </p>
+            </a>
+          ))}
+        </section>
 
-                <div className="mt-5 rounded-xl border border-white/10 bg-slate-900/70 p-4">
-                  <p className="text-sm font-semibold text-cyan-300">
-                    Responsibility
-                  </p>
+        <section
+          id="executive-access-assessment"
+          className="mx-auto max-w-7xl scroll-mt-28 px-6 pb-8"
+        >
+          <div className="rounded-2xl border border-cyan-500/20 bg-cyan-500/10 p-6">
+            <p className="text-sm uppercase tracking-widest text-cyan-200">
+              Executive Access Assessment
+            </p>
 
-                  <p className="mt-2 text-sm text-slate-200">
-                    {item.responsibility}
-                  </p>
-                </div>
+            <div className="mt-3 flex flex-col gap-4 md:flex-row md:items-end">
+              <h2 className="text-5xl font-bold md:text-6xl">
+                {governanceScore}
+              </h2>
 
-                <div className="mt-4 rounded-xl border border-white/10 bg-slate-900/70 p-4">
-                  <p className="text-sm font-semibold text-yellow-300">
-                    Accessible modules
-                  </p>
-
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {item.modules.map((module) => (
-                      <span
-                        key={module}
-                        className="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-xs text-cyan-200"
-                      >
-                        {module}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="mt-4 rounded-xl border border-white/10 bg-slate-900/70 p-4">
-                  <p className="text-sm font-semibold text-red-300">
-                    Governance action
-                  </p>
-
-                  <p className="mt-2 text-sm text-slate-200">
-                    {item.action}
-                  </p>
-                </div>
+              <div className="mb-2 rounded-full border border-cyan-400/30 px-4 py-1 text-sm text-cyan-200">
+                {governanceAssessment}
               </div>
-            ))}
+            </div>
+
+            <p className="mt-4 max-w-4xl text-sm text-slate-300">
+              AI evaluates user roles, permission exposure, operational access,
+              audit control and confidential module governance to reduce
+              enterprise data leakage, unauthorized actions and accountability
+              gaps.
+            </p>
           </div>
         </section>
 
-        <section className="mx-auto max-w-7xl px-6 pb-10">
+        <section
+          id="role-access-feed"
+          className="mx-auto max-w-7xl scroll-mt-28 px-6 py-8"
+        >
+          <div className="grid gap-6 md:grid-cols-2">
+            {accessRoles.map((item) => {
+              const sectionId = slugify(item.role);
+
+              return (
+                <a
+                  key={item.role}
+                  id={sectionId}
+                  href="#governance-checklist"
+                  className="scroll-mt-28 rounded-2xl border border-white/10 bg-white/5 p-6 shadow-xl transition hover:-translate-y-1 hover:border-cyan-400/70 hover:shadow-2xl"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <h2 className="text-2xl font-semibold">{item.role}</h2>
+
+                      <p className="mt-2 text-sm text-cyan-300">
+                        {item.accessLevel}
+                      </p>
+                    </div>
+
+                    <div
+                      className={`rounded-full border px-4 py-1 text-xs font-semibold ${riskStyle(
+                        item.risk
+                      )}`}
+                    >
+                      {item.risk}
+                    </div>
+                  </div>
+
+                  <div className="mt-5 rounded-xl border border-white/10 bg-slate-900/70 p-4">
+                    <p className="text-sm font-semibold text-cyan-300">
+                      Responsibility
+                    </p>
+
+                    <p className="mt-2 text-sm text-slate-200">
+                      {item.responsibility}
+                    </p>
+                  </div>
+
+                  <div className="mt-4 rounded-xl border border-white/10 bg-slate-900/70 p-4">
+                    <p className="text-sm font-semibold text-yellow-300">
+                      Accessible modules
+                    </p>
+
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {item.modules.map((module) => (
+                        <span
+                          key={module}
+                          className="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-xs text-cyan-200"
+                        >
+                          {module}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="mt-4 rounded-xl border border-white/10 bg-slate-900/70 p-4">
+                    <p className="text-sm font-semibold text-red-300">
+                      AI Governance Recommendation
+                    </p>
+
+                    <p className="mt-2 text-sm text-slate-200">
+                      {item.action}
+                    </p>
+                  </div>
+
+                  <p className="mt-4 text-xs text-slate-500">
+                    Click to review governance checklist
+                  </p>
+                </a>
+              );
+            })}
+          </div>
+        </section>
+
+        <section
+          id="governance-checklist"
+          className="mx-auto max-w-7xl scroll-mt-28 px-6 pb-10"
+        >
           <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
             <h2 className="text-2xl font-bold">
               Enterprise access governance checklist
             </h2>
+
+            <p className="mt-3 text-sm text-slate-300">
+              This checklist supports access governance, audit readiness,
+              permission ownership and enterprise confidentiality discipline.
+            </p>
 
             <div className="mt-6 grid gap-4 md:grid-cols-3">
               {[
@@ -356,12 +474,13 @@ export default function AIUserRoleAccessControlCentrePage() {
                 "Document confidentiality",
                 "User suspension & recovery",
               ].map((item) => (
-                <div
+                <a
                   key={item}
-                  className="rounded-xl border border-white/10 bg-slate-900/70 p-4 text-sm text-slate-200"
+                  href="#enterprise-kpis"
+                  className="rounded-xl border border-white/10 bg-slate-900/70 p-4 text-sm text-slate-200 transition hover:-translate-y-1 hover:border-cyan-400/70 hover:bg-slate-800"
                 >
                   {item}
-                </div>
+                </a>
               ))}
             </div>
           </div>

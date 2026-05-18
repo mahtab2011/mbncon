@@ -112,6 +112,13 @@ function getRecommendation(record: KaizenRecord) {
   return "Kaizen initiative progressing within operational expectation.";
 }
 
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
 export default function AIKaizenImprovementTrackerPage() {
   const [loading, setLoading] = useState(true);
 
@@ -126,8 +133,6 @@ export default function AIKaizenImprovementTrackerPage() {
       try {
         setLoading(true);
 
-        // Enterprise-safe async loading block
-        // Future Firestore + AI integration goes here
         const data = demoKaizenData;
 
         if (active) {
@@ -229,7 +234,10 @@ export default function AIKaizenImprovementTrackerPage() {
             <>
               <section className="grid grid-cols-1 md:grid-cols-4 gap-4">
 
-                <div className="rounded-2xl border border-green-700/40 bg-green-950/20 p-5">
+                <a
+                  href="#completed-projects"
+                  className="block rounded-2xl border border-green-700/40 bg-green-950/20 p-5 transition hover:-translate-y-1 hover:border-green-400/40"
+                >
 
                   <p className="text-green-300 text-sm">
                     Completed Projects
@@ -239,9 +247,12 @@ export default function AIKaizenImprovementTrackerPage() {
                     {intelligence.completedProjects}
                   </h2>
 
-                </div>
+                </a>
 
-                <div className="rounded-2xl border border-emerald-700/40 bg-emerald-950/20 p-5">
+                <a
+                  href="#estimated-savings"
+                  className="block rounded-2xl border border-emerald-700/40 bg-emerald-950/20 p-5 transition hover:-translate-y-1 hover:border-emerald-400/40"
+                >
 
                   <p className="text-emerald-300 text-sm">
                     Estimated Savings
@@ -252,9 +263,12 @@ export default function AIKaizenImprovementTrackerPage() {
                     {intelligence.totalEstimatedSavings.toLocaleString()}
                   </h2>
 
-                </div>
+                </a>
 
-                <div className="rounded-2xl border border-cyan-700/40 bg-cyan-950/20 p-5">
+                <a
+                  href="#actual-savings"
+                  className="block rounded-2xl border border-cyan-700/40 bg-cyan-950/20 p-5 transition hover:-translate-y-1 hover:border-cyan-400/40"
+                >
 
                   <p className="text-cyan-300 text-sm">
                     Actual Savings
@@ -265,9 +279,12 @@ export default function AIKaizenImprovementTrackerPage() {
                     {intelligence.totalActualSavings.toLocaleString()}
                   </h2>
 
-                </div>
+                </a>
 
-                <div className="rounded-2xl border border-orange-700/40 bg-orange-950/20 p-5">
+                <a
+                  href="#average-participation"
+                  className="block rounded-2xl border border-orange-700/40 bg-orange-950/20 p-5 transition hover:-translate-y-1 hover:border-orange-400/40"
+                >
 
                   <p className="text-orange-300 text-sm">
                     Avg Participation
@@ -277,7 +294,7 @@ export default function AIKaizenImprovementTrackerPage() {
                     {intelligence.averageParticipation}%
                   </h2>
 
-                </div>
+                </a>
 
               </section>
 
@@ -354,7 +371,8 @@ export default function AIKaizenImprovementTrackerPage() {
                       {records.map((record) => (
                         <tr
                           key={record.id}
-                          className="border-b border-slate-800"
+                          id={slugify(record.initiative)}
+                          className="border-b border-slate-800 transition hover:bg-emerald-900/20"
                         >
 
                           <td className="p-4">
@@ -362,7 +380,12 @@ export default function AIKaizenImprovementTrackerPage() {
                           </td>
 
                           <td className="p-4">
-                            {record.initiative}
+                            <a
+                              href={`#${slugify(record.initiative)}`}
+                              className="text-cyan-300 underline hover:text-cyan-200"
+                            >
+                              {record.initiative}
+                            </a>
                           </td>
 
                           <td className="p-4">
@@ -401,9 +424,10 @@ export default function AIKaizenImprovementTrackerPage() {
               <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
                 {records.map((record) => (
-                  <div
+                  <a
                     key={record.id}
-                    className={`rounded-2xl border p-5 ${getStatusColor(
+                    href={`#${slugify(record.initiative)}`}
+                    className={`block rounded-2xl border p-5 transition hover:-translate-y-1 hover:border-emerald-400/40 ${getStatusColor(
                       record.status
                     )}`}
                   >
@@ -437,7 +461,109 @@ export default function AIKaizenImprovementTrackerPage() {
 
                     </div>
 
-                  </div>
+                  </a>
+                ))}
+
+              </section>
+
+              <section className="space-y-5">
+
+                {records.map((record) => (
+                  <section
+                    key={record.id}
+                    id={slugify(record.initiative)}
+                    className="scroll-mt-28 rounded-2xl border border-slate-800 bg-slate-900/70 p-6"
+                  >
+
+                    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+
+                      <div>
+
+                        <p className="text-sm uppercase tracking-widest text-emerald-300">
+                          {record.department} · {record.id}
+                        </p>
+
+                        <h2 className="text-2xl font-bold mt-2">
+                          {record.initiative}
+                        </h2>
+
+                      </div>
+
+                      <div
+                        className={`rounded-full border px-4 py-2 text-sm font-semibold ${getStatusColor(
+                          record.status
+                        )}`}
+                      >
+                        {record.status}
+                      </div>
+
+                    </div>
+
+                    <div className="mt-6 grid gap-4 md:grid-cols-4">
+
+                      <div className="rounded-xl bg-slate-950/70 p-4">
+
+                        <p className="text-sm text-slate-400">
+                          Owner
+                        </p>
+
+                        <p className="mt-2 font-semibold">
+                          {record.owner}
+                        </p>
+
+                      </div>
+
+                      <div className="rounded-xl bg-slate-950/70 p-4">
+
+                        <p className="text-sm text-slate-400">
+                          Progress
+                        </p>
+
+                        <p className="mt-2 font-semibold text-orange-300">
+                          {record.implementationProgress}%
+                        </p>
+
+                      </div>
+
+                      <div className="rounded-xl bg-slate-950/70 p-4">
+
+                        <p className="text-sm text-slate-400">
+                          Estimated Savings
+                        </p>
+
+                        <p className="mt-2 font-semibold text-emerald-300">
+                          £{record.estimatedSavings.toLocaleString()}
+                        </p>
+
+                      </div>
+
+                      <div className="rounded-xl bg-slate-950/70 p-4">
+
+                        <p className="text-sm text-slate-400">
+                          Actual Savings
+                        </p>
+
+                        <p className="mt-2 font-semibold text-cyan-300">
+                          £{record.actualSavings.toLocaleString()}
+                        </p>
+
+                      </div>
+
+                    </div>
+
+                    <div className="mt-6 rounded-xl border border-emerald-700/30 bg-emerald-950/20 p-5">
+
+                      <p className="text-sm uppercase tracking-widest text-emerald-300">
+                        AI Recommendation
+                      </p>
+
+                      <p className="mt-3 text-slate-200">
+                        {getRecommendation(record)}
+                      </p>
+
+                    </div>
+
+                  </section>
                 ))}
 
               </section>

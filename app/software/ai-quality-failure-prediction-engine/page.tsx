@@ -119,7 +119,12 @@ function getRecommendation(record: QualityFailureRecord) {
 
   return "Quality risk currently manageable with operational monitoring.";
 }
-
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
 export default function AIQualityFailurePredictionEnginePage() {
   const [loading, setLoading] = useState(true);
 
@@ -244,55 +249,67 @@ export default function AIQualityFailurePredictionEnginePage() {
             <>
               <section className="grid grid-cols-1 md:grid-cols-4 gap-4">
 
-                <div className="rounded-2xl border border-red-700/40 bg-red-950/20 p-5">
+  <a
+    href="#critical-quality-risks"
+    className="block rounded-2xl border border-red-700/40 bg-red-950/20 p-5 transition hover:-translate-y-1 hover:border-red-400/40"
+  >
 
-                  <p className="text-red-300 text-sm">
-                    Critical Quality Risks
-                  </p>
+    <p className="text-red-300 text-sm">
+      Critical Quality Risks
+    </p>
 
-                  <h2 className="text-5xl font-bold mt-3">
-                    {intelligence.criticalRisks}
-                  </h2>
+    <h2 className="text-5xl font-bold mt-3">
+      {intelligence.criticalRisks}
+    </h2>
 
-                </div>
+  </a>
 
-                <div className="rounded-2xl border border-orange-700/40 bg-orange-950/20 p-5">
+  <a
+    href="#high-quality-exposure"
+    className="block rounded-2xl border border-orange-700/40 bg-orange-950/20 p-5 transition hover:-translate-y-1 hover:border-orange-400/40"
+  >
 
-                  <p className="text-orange-300 text-sm">
-                    High Quality Exposure
-                  </p>
+    <p className="text-orange-300 text-sm">
+      High Quality Exposure
+    </p>
 
-                  <h2 className="text-5xl font-bold mt-3">
-                    {intelligence.highRisks}
-                  </h2>
+    <h2 className="text-5xl font-bold mt-3">
+      {intelligence.highRisks}
+    </h2>
 
-                </div>
+  </a>
 
-                <div className="rounded-2xl border border-pink-700/40 bg-pink-950/20 p-5">
+  <a
+    href="#failure-probability"
+    className="block rounded-2xl border border-pink-700/40 bg-pink-950/20 p-5 transition hover:-translate-y-1 hover:border-pink-400/40"
+  >
 
-                  <p className="text-pink-300 text-sm">
-                    Avg Failure Probability
-                  </p>
+    <p className="text-pink-300 text-sm">
+      Avg Failure Probability
+    </p>
 
-                  <h2 className="text-5xl font-bold mt-3">
-                    {intelligence.averageFailureProbability}%
-                  </h2>
+    <h2 className="text-5xl font-bold mt-3">
+      {intelligence.averageFailureProbability}%
+    </h2>
 
-                </div>
+  </a>
 
-                <div className="rounded-2xl border border-yellow-700/40 bg-yellow-950/20 p-5">
+  <a
+    href="#rejection-rate"
+    className="block rounded-2xl border border-yellow-700/40 bg-yellow-950/20 p-5 transition hover:-translate-y-1 hover:border-yellow-400/40"
+  >
 
-                  <p className="text-yellow-300 text-sm">
-                    Avg Rejection Rate
-                  </p>
+    <p className="text-yellow-300 text-sm">
+      Avg Rejection Rate
+    </p>
 
-                  <h2 className="text-5xl font-bold mt-3">
-                    {intelligence.averageRejection}%
-                  </h2>
+    <h2 className="text-5xl font-bold mt-3">
+      {intelligence.averageRejection}%
+    </h2>
 
-                </div>
+  </a>
 
-              </section>
+</section>
 
               <section className="rounded-2xl border border-pink-700/40 bg-pink-950/10 p-6">
 
@@ -365,44 +382,50 @@ export default function AIQualityFailurePredictionEnginePage() {
 
                     <tbody>
 
-                      {records.map((record) => (
-                        <tr
-                          key={record.id}
-                          className="border-b border-slate-800"
-                        >
+  {records.map((record) => (
+    <tr
+      key={record.id}
+      id={slugify(record.product)}
+      className="border-b border-slate-800 transition hover:bg-pink-900/20"
+    >
 
-                          <td className="p-4">
-                            {record.productionLine}
-                          </td>
+      <td className="p-4">
+        {record.productionLine}
+      </td>
 
-                          <td className="p-4">
-                            {record.buyer}
-                          </td>
+      <td className="p-4">
+        {record.buyer}
+      </td>
 
-                          <td className="p-4">
-                            {record.product}
-                          </td>
+      <td className="p-4">
+        <a
+          href={`#${slugify(record.product)}`}
+          className="text-cyan-300 underline hover:text-cyan-200"
+        >
+          {record.product}
+        </a>
+      </td>
 
-                          <td className="p-4 text-red-300">
-                            {record.rejectionRate}%
-                          </td>
+      <td className="p-4 text-red-300">
+        {record.rejectionRate}%
+      </td>
 
-                          <td className="p-4 text-orange-300">
-                            {record.reworkRate}%
-                          </td>
+      <td className="p-4 text-orange-300">
+        {record.reworkRate}%
+      </td>
 
-                          <td className="p-4">
-                            {record.materialVariance}%
-                          </td>
+      <td className="p-4">
+        {record.materialVariance}%
+      </td>
 
-                          <td className="p-4 text-pink-300">
-                            {record.predictedFailureProbability}%
-                          </td>
+      <td className="p-4 text-pink-300">
+        {record.predictedFailureProbability}%
+      </td>
 
-                        </tr>
-                      ))}
+    </tr>
+  ))}
 
-                    </tbody>
+</tbody>
 
                   </table>
 
@@ -412,46 +435,47 @@ export default function AIQualityFailurePredictionEnginePage() {
 
               <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                {records.map((record) => (
-                  <div
-                    key={record.id}
-                    className={`rounded-2xl border p-5 ${getRiskColor(
-                      record.riskLevel
-                    )}`}
-                  >
+  {records.map((record) => (
+    <a
+      key={record.id}
+      href={`#${slugify(record.product)}`}
+      className={`block rounded-2xl border p-5 transition hover:-translate-y-1 hover:border-pink-400/40 ${getRiskColor(
+        record.riskLevel
+      )}`}
+    >
 
-                    <p className="text-sm opacity-80">
-                      {record.productionLine} · {record.buyer}
-                    </p>
+      <p className="text-sm opacity-80">
+        {record.productionLine} · {record.buyer}
+      </p>
 
-                    <h3 className="text-2xl font-bold mt-2">
-                      {record.product}
-                    </h3>
+      <h3 className="text-2xl font-bold mt-2">
+        {record.product}
+      </h3>
 
-                    <p className="mt-4 text-slate-200">
-                      {getRecommendation(record)}
-                    </p>
+      <p className="mt-4 text-slate-200">
+        {getRecommendation(record)}
+      </p>
 
-                    <div className="mt-5 flex justify-between">
+      <div className="mt-5 flex justify-between">
 
-                      <span>
-                        Rejection:
-                        {" "}
-                        {record.rejectionRate}%
-                      </span>
+        <span>
+          Rejection:
+          {" "}
+          {record.rejectionRate}%
+        </span>
 
-                      <span>
-                        Failure Risk:
-                        {" "}
-                        {record.predictedFailureProbability}%
-                      </span>
+        <span>
+          Failure Risk:
+          {" "}
+          {record.predictedFailureProbability}%
+        </span>
 
-                    </div>
+      </div>
 
-                  </div>
-                ))}
+    </a>
+  ))}
 
-              </section>
+</section>
 
             </>
           )}

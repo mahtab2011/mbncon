@@ -55,49 +55,41 @@ const demoShipmentRecoveryData: ShipmentRecoveryRecord[] = [
   },
 ];
 
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 function getRiskLevel(probability: number) {
-  if (probability >= 85) {
-    return "Shipment Stable";
-  }
-
-  if (probability >= 70) {
-    return "Moderate Shipment Risk";
-  }
-
-  if (probability >= 55) {
-    return "High Shipment Risk";
-  }
-
+  if (probability >= 85) return "Shipment Stable";
+  if (probability >= 70) return "Moderate Shipment Risk";
+  if (probability >= 55) return "High Shipment Risk";
   return "Critical Shipment Risk";
 }
 
-function getRecommendation(
-  record: ShipmentRecoveryRecord
-) {
+function getRecommendation(record: ShipmentRecoveryRecord) {
   if (record.recoveryProbability < 55) {
-    return "Immediate shipment recovery action required. Evaluate air shipment and executive buyer escalation.";
+    return "Immediate shipment recovery action required. Evaluate air shipment, production recovery, and executive buyer escalation.";
   }
 
   if (record.shipmentDaysLeft <= 4) {
-    return "Shipment timeline approaching critical threshold. Daily logistics monitoring recommended.";
+    return "Shipment timeline is approaching a critical threshold. Daily logistics monitoring and recovery ownership are recommended.";
   }
 
-  if (
-    record.airShipmentCost <
-    record.estimatedPenalty
-  ) {
-    return "AI recommends evaluating partial or full air shipment recovery.";
+  if (record.airShipmentCost < record.estimatedPenalty) {
+    return "AI recommends evaluating partial or full air shipment recovery because penalty exposure is higher than recovery cost.";
   }
 
-  return "Shipment recovery remains operationally manageable.";
+  return "Shipment recovery remains operationally manageable with normal monitoring and logistics coordination.";
 }
 
 export default function AIShipmentRecoveryIntelligencePage() {
   const [loading, setLoading] = useState(true);
-
-  const [records, setRecords] = useState<
-    ShipmentRecoveryRecord[]
-  >([]);
+  const [records, setRecords] = useState<ShipmentRecoveryRecord[]>([]);
 
   useEffect(() => {
     let active = true;
@@ -114,10 +106,7 @@ export default function AIShipmentRecoveryIntelligencePage() {
           setRecords(data);
         }
       } catch (error) {
-        console.error(
-          "Failed to load shipment recovery intelligence:",
-          error
-        );
+        console.error("Failed to load shipment recovery intelligence:", error);
 
         if (active) {
           setRecords([]);
@@ -143,10 +132,8 @@ export default function AIShipmentRecoveryIntelligencePage() {
       totalOrders === 0
         ? 0
         : Math.round(
-            records.reduce(
-              (sum, r) => sum + r.recoveryProbability,
-              0
-            ) / totalOrders
+            records.reduce((sum, r) => sum + r.recoveryProbability, 0) /
+              totalOrders
           );
 
     const criticalShipments = records.filter(
@@ -169,279 +156,257 @@ export default function AIShipmentRecoveryIntelligencePage() {
       criticalShipments,
       totalPenaltyExposure,
       totalAirRecoveryCost,
-      riskLevel: getRiskLevel(
-        averageRecoveryProbability
-      ),
+      riskLevel: getRiskLevel(averageRecoveryProbability),
     };
   }, [records]);
 
+  const kpiCards = [
+    {
+      label: "Recovery Orders",
+      value: intelligence.totalOrders,
+      href: "#shipment-recovery-feed",
+      className: "bg-slate-900 border-slate-800",
+    },
+    {
+      label: "Critical Shipments",
+      value: intelligence.criticalShipments,
+      href: "#ai-shipment-assessment",
+      className: "bg-red-950/20 border-red-700/40",
+    },
+    {
+      label: "Recovery Probability",
+      value: `${intelligence.averageRecoveryProbability}%`,
+      href: "#ai-recommendations",
+      className: "bg-blue-950/20 border-blue-700/40",
+    },
+    {
+      label: "Penalty Exposure",
+      value: `£${intelligence.totalPenaltyExposure.toLocaleString()}`,
+      href: "#financial-recovery-assessment",
+      className: "bg-orange-950/20 border-orange-700/40",
+    },
+    {
+      label: "Air Recovery Cost",
+      value: `£${intelligence.totalAirRecoveryCost.toLocaleString()}`,
+      href: "#financial-recovery-assessment",
+      className: "bg-cyan-950/20 border-cyan-700/40",
+    },
+  ];
+
   return (
     <DashboardShell title="AI Shipment Recovery Intelligence">
-
-      <main className="min-h-screen bg-slate-950 text-white p-6">
-
-        <div className="max-w-7xl mx-auto space-y-6">
-
+      <main className="min-h-screen bg-slate-950 p-6 text-white">
+        <div className="mx-auto max-w-7xl space-y-6">
           <section className="rounded-2xl border border-blue-700/40 bg-slate-900 p-6 shadow-xl">
-
-            <p className="text-blue-300 uppercase tracking-widest text-sm">
+            <p className="text-sm uppercase tracking-widest text-blue-300">
               Module 28 · AI Shipment Recovery Intelligence
             </p>
 
-            <h1 className="text-4xl font-bold mt-3">
+            <h1 className="mt-3 text-4xl font-bold">
               Shipment Rescue & Logistics Recovery Intelligence
             </h1>
 
-            <p className="text-slate-300 mt-4 max-w-4xl">
-              AI-powered shipment recovery system for
-              estimating delivery risk, recovery feasibility,
-              air shipment decisions, penalty exposure,
-              and buyer escalation priorities before
-              shipment disruption becomes financially critical.
+            <p className="mt-4 max-w-4xl text-slate-300">
+              AI-powered shipment recovery system for estimating delivery risk,
+              recovery feasibility, air shipment decisions, penalty exposure,
+              and buyer escalation priorities before shipment disruption becomes
+              financially critical.
             </p>
-
           </section>
 
           {loading ? (
-            <div className="rounded-2xl bg-slate-900 border border-slate-800 p-6">
+            <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
               Loading shipment recovery intelligence...
             </div>
           ) : (
             <>
-              <section className="grid grid-cols-1 md:grid-cols-5 gap-4">
-
-                <div className="rounded-2xl bg-slate-900 border border-slate-800 p-5">
-
-                  <p className="text-slate-400 text-sm">
-                    Recovery Orders
-                  </p>
-
-                  <h2 className="text-5xl font-bold mt-3">
-                    {intelligence.totalOrders}
-                  </h2>
-
-                </div>
-
-                <div className="rounded-2xl bg-red-950/20 border border-red-700/40 p-5">
-
-                  <p className="text-red-300 text-sm">
-                    Critical Shipments
-                  </p>
-
-                  <h2 className="text-5xl font-bold mt-3">
-                    {intelligence.criticalShipments}
-                  </h2>
-
-                </div>
-
-                <div className="rounded-2xl bg-blue-950/20 border border-blue-700/40 p-5">
-
-                  <p className="text-blue-300 text-sm">
-                    Recovery Probability
-                  </p>
-
-                  <h2 className="text-5xl font-bold mt-3">
-                    {intelligence.averageRecoveryProbability}%
-                  </h2>
-
-                </div>
-
-                <div className="rounded-2xl bg-orange-950/20 border border-orange-700/40 p-5">
-
-                  <p className="text-orange-300 text-sm">
-                    Penalty Exposure
-                  </p>
-
-                  <h2 className="text-4xl font-bold mt-3">
-                    £
-                    {intelligence.totalPenaltyExposure.toLocaleString()}
-                  </h2>
-
-                </div>
-
-                <div className="rounded-2xl bg-cyan-950/20 border border-cyan-700/40 p-5">
-
-                  <p className="text-cyan-300 text-sm">
-                    Air Recovery Cost
-                  </p>
-
-                  <h2 className="text-4xl font-bold mt-3">
-                    £
-                    {intelligence.totalAirRecoveryCost.toLocaleString()}
-                  </h2>
-
-                </div>
-
+              <section
+                id="executive-kpis"
+                className="grid scroll-mt-28 grid-cols-1 gap-4 md:grid-cols-5"
+              >
+                {kpiCards.map((card) => (
+                  <a
+                    key={card.label}
+                    href={card.href}
+                    className={`rounded-2xl border p-5 transition hover:-translate-y-1 hover:border-blue-400/70 hover:shadow-xl ${card.className}`}
+                  >
+                    <p className="text-sm text-slate-300">{card.label}</p>
+                    <h2 className="mt-3 text-4xl font-bold">{card.value}</h2>
+                    <p className="mt-3 text-xs text-slate-500">
+                      Click to review details
+                    </p>
+                  </a>
+                ))}
               </section>
 
-              <section className="rounded-2xl border border-blue-700/40 bg-blue-950/10 p-6">
-
-                <p className="text-blue-300 uppercase tracking-widest text-sm">
+              <section
+                id="ai-shipment-assessment"
+                className="scroll-mt-28 rounded-2xl border border-blue-700/40 bg-blue-950/10 p-6"
+              >
+                <p className="text-sm uppercase tracking-widest text-blue-300">
                   AI Shipment Assessment
                 </p>
 
-                <h2 className="text-3xl font-bold mt-2">
+                <h2 className="mt-2 text-3xl font-bold">
                   {intelligence.riskLevel}
                 </h2>
 
-                <p className="text-slate-300 mt-4">
-                  AI continuously evaluates shipment
-                  feasibility, logistics timing,
-                  production readiness, and financial
-                  recovery options to reduce export risk
-                  and delivery penalties.
+                <p className="mt-4 text-slate-300">
+                  AI continuously evaluates shipment feasibility, logistics
+                  timing, production readiness, and financial recovery options to
+                  reduce export risk and delivery penalties.
                 </p>
-
               </section>
 
-              <section className="rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden">
+              <section
+                id="financial-recovery-assessment"
+                className="scroll-mt-28 rounded-2xl border border-slate-800 bg-slate-900 p-6"
+              >
+                <p className="text-sm uppercase tracking-widest text-cyan-300">
+                  Financial Recovery Assessment
+                </p>
 
+                <h2 className="mt-2 text-3xl font-bold">
+                  Penalty vs Air Shipment Recovery Decision
+                </h2>
+
+                <p className="mt-4 text-slate-300">
+                  Total penalty exposure is{" "}
+                  <span className="font-semibold text-orange-300">
+                    £{intelligence.totalPenaltyExposure.toLocaleString()}
+                  </span>
+                  , while estimated air recovery cost is{" "}
+                  <span className="font-semibold text-cyan-300">
+                    £{intelligence.totalAirRecoveryCost.toLocaleString()}
+                  </span>
+                  . Management should compare the recovery cost against buyer
+                  penalty, relationship risk, future order risk, and shipment
+                  delay exposure.
+                </p>
+              </section>
+
+              <section
+                id="shipment-recovery-feed"
+                className="scroll-mt-28 overflow-hidden rounded-2xl border border-slate-800 bg-slate-900"
+              >
                 <div className="border-b border-slate-800 p-5">
-
                   <h2 className="text-2xl font-bold">
                     Shipment Recovery Intelligence Feed
                   </h2>
-
                 </div>
 
                 <div className="overflow-x-auto">
-
                   <table className="w-full text-sm">
-
                     <thead className="bg-slate-800 text-slate-300">
-
                       <tr>
-                        <th className="text-left p-4">
-                          Order
-                        </th>
-
-                        <th className="text-left p-4">
-                          Buyer
-                        </th>
-
-                        <th className="text-left p-4">
-                          Destination
-                        </th>
-
-                        <th className="text-left p-4">
-                          Shipment Left
-                        </th>
-
-                        <th className="text-left p-4">
-                          Completion
-                        </th>
-
-                        <th className="text-left p-4">
-                          Recovery
-                        </th>
-
-                        <th className="text-left p-4">
-                          Penalty
-                        </th>
+                        <th className="p-4 text-left">Order</th>
+                        <th className="p-4 text-left">Buyer</th>
+                        <th className="p-4 text-left">Destination</th>
+                        <th className="p-4 text-left">Shipment Left</th>
+                        <th className="p-4 text-left">Completion</th>
+                        <th className="p-4 text-left">Recovery</th>
+                        <th className="p-4 text-left">Penalty</th>
                       </tr>
-
                     </thead>
 
                     <tbody>
+                      {records.map((record) => {
+                        const sectionId = slugify(
+                          `${record.orderNo}-${record.buyer}`
+                        );
 
-                      {records.map((record) => (
-                        <tr
-                          key={record.id}
-                          className="border-b border-slate-800"
-                        >
-
-                          <td className="p-4">
-                            {record.orderNo}
-                          </td>
-
-                          <td className="p-4">
-                            {record.buyer}
-                          </td>
-
-                          <td className="p-4">
-                            {record.destination}
-                          </td>
-
-                          <td className="p-4 text-orange-300">
-                            {record.shipmentDaysLeft} days
-                          </td>
-
-                          <td className="p-4">
-                            {record.productionCompletion}%
-                          </td>
-
-                          <td className="p-4">
-                            {record.recoveryProbability}%
-                          </td>
-
-                          <td className="p-4 text-red-300">
-                            £
-                            {record.estimatedPenalty.toLocaleString()}
-                          </td>
-
-                        </tr>
-                      ))}
-
+                        return (
+                          <tr
+                            key={record.id}
+                            onClick={() => {
+                              document
+                                .getElementById(sectionId)
+                                ?.scrollIntoView({
+                                  behavior: "smooth",
+                                  block: "start",
+                                });
+                            }}
+                            className="cursor-pointer border-b border-slate-800 transition hover:bg-slate-800/70"
+                          >
+                            <td className="p-4 font-semibold">
+                              {record.orderNo}
+                            </td>
+                            <td className="p-4">{record.buyer}</td>
+                            <td className="p-4">{record.destination}</td>
+                            <td className="p-4 text-orange-300">
+                              {record.shipmentDaysLeft} days
+                            </td>
+                            <td className="p-4">
+                              {record.productionCompletion}%
+                            </td>
+                            <td className="p-4">
+                              {record.recoveryProbability}%
+                            </td>
+                            <td className="p-4 text-red-300">
+                              £{record.estimatedPenalty.toLocaleString()}
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
-
                   </table>
-
                 </div>
-
               </section>
 
-              <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <section
+                id="ai-recommendations"
+                className="grid scroll-mt-28 grid-cols-1 gap-4 md:grid-cols-2"
+              >
+                {records.map((record) => {
+                  const sectionId = slugify(`${record.orderNo}-${record.buyer}`);
 
-                {records.map((record) => (
-                  <div
-                    key={record.id}
-                    className="rounded-2xl bg-slate-900 border border-slate-800 p-5"
-                  >
+                  return (
+                    <a
+                      key={record.id}
+                      id={sectionId}
+                      href="#shipment-recovery-feed"
+                      className="scroll-mt-28 rounded-2xl border border-slate-800 bg-slate-900 p-5 transition hover:-translate-y-1 hover:border-blue-400/70 hover:shadow-xl"
+                    >
+                      <p className="text-sm text-slate-400">
+                        {record.orderNo} · {record.buyer} ·{" "}
+                        {record.destination}
+                      </p>
 
-                    <p className="text-sm text-slate-400">
-                      {record.orderNo} · {record.buyer}
-                    </p>
+                      <h3 className="mt-2 text-xl font-bold">
+                        {getRiskLevel(record.recoveryProbability)}
+                      </h3>
 
-                    <h3 className="text-xl font-bold mt-2">
-                      {getRiskLevel(
-                        record.recoveryProbability
-                      )}
-                    </h3>
+                      <p className="mt-4 text-slate-300">
+                        {getRecommendation(record)}
+                      </p>
 
-                    <p className="text-slate-300 mt-4">
-                      {getRecommendation(record)}
-                    </p>
+                      <div className="mt-5 grid grid-cols-1 gap-3 text-sm md:grid-cols-2">
+                        <div className="rounded-xl border border-red-700/40 bg-red-950/20 p-4">
+                          <p className="text-slate-400">Penalty Exposure</p>
+                          <p className="mt-1 text-lg font-bold text-red-300">
+                            £{record.estimatedPenalty.toLocaleString()}
+                          </p>
+                        </div>
 
-                    <div className="mt-5 flex justify-between">
+                        <div className="rounded-xl border border-cyan-700/40 bg-cyan-950/20 p-4">
+                          <p className="text-slate-400">Air Recovery Cost</p>
+                          <p className="mt-1 text-lg font-bold text-cyan-300">
+                            £{record.airShipmentCost.toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
 
-                      <span className="text-red-300">
-                        Penalty:
-                        {" "}
-                        £
-                        {record.estimatedPenalty.toLocaleString()}
-                      </span>
-
-                      <span className="text-cyan-300">
-                        Air:
-                        {" "}
-                        £
-                        {record.airShipmentCost.toLocaleString()}
-                      </span>
-
-                    </div>
-
-                  </div>
-                ))}
-
+                      <p className="mt-4 text-xs text-slate-500">
+                        Click to return to shipment recovery feed
+                      </p>
+                    </a>
+                  );
+                })}
               </section>
-
             </>
           )}
-
         </div>
-
       </main>
-
     </DashboardShell>
   );
 }

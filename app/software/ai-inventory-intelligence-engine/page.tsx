@@ -62,9 +62,7 @@ const demoInventoryData: InventoryRecord[] = [
   },
 ];
 
-function getRiskColor(
-  risk: InventoryRecord["riskLevel"]
-) {
+function getRiskColor(risk: InventoryRecord["riskLevel"]) {
   if (risk === "Critical") {
     return "text-red-300 border-red-700/40 bg-red-950/20";
   }
@@ -115,6 +113,13 @@ function getRecommendation(record: InventoryRecord) {
   return "Inventory level currently manageable with standard monitoring.";
 }
 
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
 export default function AIInventoryIntelligenceEnginePage() {
   const [loading, setLoading] = useState(true);
 
@@ -129,8 +134,6 @@ export default function AIInventoryIntelligenceEnginePage() {
       try {
         setLoading(true);
 
-        // Enterprise-safe async loading block
-        // Future Firestore + AI integration goes here
         const data = demoInventoryData;
 
         if (active) {
@@ -227,7 +230,10 @@ export default function AIInventoryIntelligenceEnginePage() {
             <>
               <section className="grid grid-cols-1 md:grid-cols-4 gap-4">
 
-                <div className="rounded-2xl bg-slate-900 border border-slate-800 p-5">
+                <a
+                  href="#total-inventory-value"
+                  className="block rounded-2xl bg-slate-900 border border-slate-800 p-5 transition hover:-translate-y-1 hover:border-indigo-400/40"
+                >
 
                   <p className="text-slate-400 text-sm">
                     Total Inventory Value
@@ -238,9 +244,12 @@ export default function AIInventoryIntelligenceEnginePage() {
                     {intelligence.totalStockValue.toLocaleString()}
                   </h2>
 
-                </div>
+                </a>
 
-                <div className="rounded-2xl border border-red-700/40 bg-red-950/20 p-5">
+                <a
+                  href="#critical-inventory-risks"
+                  className="block rounded-2xl border border-red-700/40 bg-red-950/20 p-5 transition hover:-translate-y-1 hover:border-red-400/40"
+                >
 
                   <p className="text-red-300 text-sm">
                     Critical Inventory Risks
@@ -250,9 +259,12 @@ export default function AIInventoryIntelligenceEnginePage() {
                     {intelligence.criticalItems}
                   </h2>
 
-                </div>
+                </a>
 
-                <div className="rounded-2xl border border-orange-700/40 bg-orange-950/20 p-5">
+                <a
+                  href="#high-risk-inventory"
+                  className="block rounded-2xl border border-orange-700/40 bg-orange-950/20 p-5 transition hover:-translate-y-1 hover:border-orange-400/40"
+                >
 
                   <p className="text-orange-300 text-sm">
                     High Risk Inventory
@@ -262,9 +274,12 @@ export default function AIInventoryIntelligenceEnginePage() {
                     {intelligence.highRiskItems}
                   </h2>
 
-                </div>
+                </a>
 
-                <div className="rounded-2xl border border-yellow-700/40 bg-yellow-950/20 p-5">
+                <a
+                  href="#shortage-risk-items"
+                  className="block rounded-2xl border border-yellow-700/40 bg-yellow-950/20 p-5 transition hover:-translate-y-1 hover:border-yellow-400/40"
+                >
 
                   <p className="text-yellow-300 text-sm">
                     Shortage Risk Items
@@ -274,7 +289,7 @@ export default function AIInventoryIntelligenceEnginePage() {
                     {intelligence.shortageItems}
                   </h2>
 
-                </div>
+                </a>
 
               </section>
 
@@ -352,11 +367,17 @@ export default function AIInventoryIntelligenceEnginePage() {
                       {records.map((record) => (
                         <tr
                           key={record.id}
-                          className="border-b border-slate-800"
+                          id={slugify(record.material)}
+                          className="border-b border-slate-800 transition hover:bg-indigo-900/20"
                         >
 
                           <td className="p-4">
-                            {record.material}
+                            <a
+                              href={`#${slugify(record.material)}`}
+                              className="text-cyan-300 underline hover:text-cyan-200"
+                            >
+                              {record.material}
+                            </a>
                           </td>
 
                           <td className="p-4">
@@ -398,9 +419,10 @@ export default function AIInventoryIntelligenceEnginePage() {
               <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
                 {records.map((record) => (
-                  <div
+                  <a
                     key={record.id}
-                    className={`rounded-2xl border p-5 ${getRiskColor(
+                    href={`#${slugify(record.material)}`}
+                    className={`block rounded-2xl border p-5 transition hover:-translate-y-1 hover:border-indigo-400/40 ${getRiskColor(
                       record.riskLevel
                     )}`}
                   >
@@ -433,7 +455,109 @@ export default function AIInventoryIntelligenceEnginePage() {
 
                     </div>
 
-                  </div>
+                  </a>
+                ))}
+
+              </section>
+
+              <section className="space-y-5">
+
+                {records.map((record) => (
+                  <section
+                    key={record.id}
+                    id={slugify(record.material)}
+                    className="scroll-mt-28 rounded-2xl border border-slate-800 bg-slate-900/70 p-6"
+                  >
+
+                    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+
+                      <div>
+
+                        <p className="text-sm uppercase tracking-widest text-indigo-300">
+                          {record.category} · {record.id}
+                        </p>
+
+                        <h2 className="text-2xl font-bold mt-2">
+                          {record.material}
+                        </h2>
+
+                      </div>
+
+                      <div
+                        className={`rounded-full border px-4 py-2 text-sm font-semibold ${getRiskColor(
+                          record.riskLevel
+                        )}`}
+                      >
+                        {record.riskLevel} Risk
+                      </div>
+
+                    </div>
+
+                    <div className="mt-6 grid gap-4 md:grid-cols-4">
+
+                      <div className="rounded-xl bg-slate-950/70 p-4">
+
+                        <p className="text-sm text-slate-400">
+                          Current Stock
+                        </p>
+
+                        <p className="mt-2 font-semibold">
+                          {record.currentStock.toLocaleString()}
+                        </p>
+
+                      </div>
+
+                      <div className="rounded-xl bg-slate-950/70 p-4">
+
+                        <p className="text-sm text-slate-400">
+                          Minimum Required
+                        </p>
+
+                        <p className="mt-2 font-semibold">
+                          {record.minimumRequired.toLocaleString()}
+                        </p>
+
+                      </div>
+
+                      <div className="rounded-xl bg-slate-950/70 p-4">
+
+                        <p className="text-sm text-slate-400">
+                          Ageing Days
+                        </p>
+
+                        <p className="mt-2 font-semibold text-orange-300">
+                          {record.ageingDays} days
+                        </p>
+
+                      </div>
+
+                      <div className="rounded-xl bg-slate-950/70 p-4">
+
+                        <p className="text-sm text-slate-400">
+                          Stock Value
+                        </p>
+
+                        <p className="mt-2 font-semibold text-indigo-300">
+                          £{record.stockValue.toLocaleString()}
+                        </p>
+
+                      </div>
+
+                    </div>
+
+                    <div className="mt-6 rounded-xl border border-indigo-700/30 bg-indigo-950/20 p-5">
+
+                      <p className="text-sm uppercase tracking-widest text-indigo-300">
+                        AI Recommendation
+                      </p>
+
+                      <p className="mt-3 text-slate-200">
+                        {getRecommendation(record)}
+                      </p>
+
+                    </div>
+
+                  </section>
                 ))}
 
               </section>

@@ -102,7 +102,12 @@ function getWarRoomAssessment(
 
   return "Factory Operations Stable";
 }
-
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
 export default function AIFactoryWarRoomCommandCentrePage() {
   const [loading, setLoading] = useState(true);
 
@@ -287,70 +292,71 @@ export default function AIFactoryWarRoomCommandCentrePage() {
 
               <section className="space-y-4">
 
-                {alerts.map((alert) => (
-                  <div
-                    key={alert.id}
-                    className={`rounded-2xl border p-6 ${getSeverityColor(
-                      alert.severity
-                    )}`}
-                  >
+  {alerts.map((alert) => (
+    <a
+      key={alert.id}
+      href={`#${slugify(alert.title)}`}
+      className={`block rounded-2xl border p-6 transition hover:-translate-y-1 hover:border-red-400/40 ${getSeverityColor(
+        alert.severity
+      )}`}
+    >
 
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 
-                      <div>
+        <div>
 
-                        <p className="text-sm opacity-80">
-                          {alert.category} · {alert.department}
-                        </p>
+          <p className="text-sm opacity-80">
+            {alert.category} · {alert.department}
+          </p>
 
-                        <h3 className="text-2xl font-bold mt-2">
-                          {alert.title}
-                        </h3>
+          <h3 className="text-2xl font-bold mt-2">
+            {alert.title}
+          </h3>
 
-                      </div>
+        </div>
 
-                      <div className="text-right">
+        <div className="text-right">
 
-                        <p className="text-sm opacity-70">
-                          Severity
-                        </p>
+          <p className="text-sm opacity-70">
+            Severity
+          </p>
 
-                        <h4 className="text-2xl font-bold">
-                          {alert.severity}
-                        </h4>
+          <h4 className="text-2xl font-bold">
+            {alert.severity}
+          </h4>
 
-                      </div>
+        </div>
 
-                    </div>
+      </div>
 
-                    <div className="mt-5">
+      <div className="mt-5">
 
-                      <p className="text-slate-200">
-                        <span className="font-semibold">
-                          Operational Impact:
-                        </span>
-                        {" "}
-                        {alert.impact}
-                      </p>
+        <p className="text-slate-200">
+          <span className="font-semibold">
+            Operational Impact:
+          </span>
+          {" "}
+          {alert.impact}
+        </p>
 
-                    </div>
+      </div>
 
-                    <div className="mt-4">
+      <div className="mt-4">
 
-                      <p className="text-slate-200">
-                        <span className="font-semibold">
-                          AI Recommended Action:
-                        </span>
-                        {" "}
-                        {alert.recommendedAction}
-                      </p>
+        <p className="text-slate-200">
+          <span className="font-semibold">
+            AI Recommended Action:
+          </span>
+          {" "}
+          {alert.recommendedAction}
+        </p>
 
-                    </div>
+      </div>
 
-                  </div>
-                ))}
+    </a>
+  ))}
 
-              </section>
+</section>
 
             </>
           )}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import DashboardShell from "@/components/software/DashboardShell";
 import { useLanguage } from "@/components/software/LanguageProvider";
 
@@ -68,6 +68,27 @@ const content = {
   },
 };
 
+function toNumber(value: string) {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function getProfitAssessment(margin: number, leakage: number) {
+  if (margin < 5 || leakage > 10000) {
+    return "Critical Profitability Exposure";
+  }
+
+  if (margin < 12 || leakage > 5000) {
+    return "High Margin Pressure";
+  }
+
+  if (margin < 20 || leakage > 1000) {
+    return "Moderate Profitability Monitoring Required";
+  }
+
+  return "Profitability Position Stable";
+}
+
 export default function CostingProfitabilityEntryPage() {
   const { language } = useLanguage();
   const t = content[language];
@@ -96,6 +117,61 @@ export default function CostingProfitabilityEntryPage() {
     riskLevel: "",
     remarks: "",
   });
+
+  const orderQty = toNumber(form.orderQty);
+  const sellingPrice = toNumber(form.sellingPrice);
+  const materialCost = toNumber(form.materialCost);
+  const labourCost = toNumber(form.labourCost);
+  const utilityCost = toNumber(form.utilityCost);
+  const transportCost = toNumber(form.transportCost);
+  const complianceCost = toNumber(form.complianceCost);
+  const overheadCost = toNumber(form.overheadCost);
+  const profitLeakage = toNumber(form.profitLeakage);
+
+  const calculatedRevenue = orderQty * sellingPrice;
+
+  const calculatedTotalCost =
+    materialCost +
+    labourCost +
+    utilityCost +
+    transportCost +
+    complianceCost +
+    overheadCost;
+
+  const calculatedExpectedProfit = calculatedRevenue - calculatedTotalCost;
+
+  const calculatedMargin =
+    calculatedRevenue > 0
+      ? (calculatedExpectedProfit / calculatedRevenue) * 100
+      : 0;
+
+  const executiveAssessment = useMemo(
+    () => getProfitAssessment(calculatedMargin, profitLeakage),
+    [calculatedMargin, profitLeakage]
+  );
+
+  const kpiCards = [
+    {
+      title: "Revenue",
+      value: calculatedRevenue.toFixed(0),
+      href: "#financial-summary",
+    },
+    {
+      title: "Total Cost",
+      value: calculatedTotalCost.toFixed(0),
+      href: "#financial-summary",
+    },
+    {
+      title: "Expected Profit",
+      value: calculatedExpectedProfit.toFixed(0),
+      href: "#executive-profitability-assessment",
+    },
+    {
+      title: "Margin %",
+      value: `${calculatedMargin.toFixed(1)}%`,
+      href: "#executive-profitability-assessment",
+    },
+  ];
 
   const updateField = (field: string, value: string) => {
     setForm((prev) => ({
@@ -153,12 +229,70 @@ export default function CostingProfitabilityEntryPage() {
           </h1>
 
           <p className="mt-4 max-w-4xl text-slate-600">{t.subtitle}</p>
+
+          <section
+            id="enterprise-kpis"
+            className="mt-8 grid scroll-mt-28 grid-cols-1 gap-4 md:grid-cols-4"
+          >
+            {kpiCards.map((card) => (
+              <a
+                key={card.title}
+                href={card.href}
+                className="rounded-2xl border border-cyan-100 bg-cyan-50 p-5 transition hover:-translate-y-1 hover:border-cyan-400 hover:shadow-xl"
+              >
+                <p className="text-sm text-slate-500">{card.title}</p>
+
+                <h2 className="mt-3 text-3xl font-bold text-cyan-700">
+                  {card.value}
+                </h2>
+
+                <p className="mt-3 text-xs text-slate-500">
+                  Click to review costing intelligence
+                </p>
+              </a>
+            ))}
+          </section>
+
+          <section
+            id="executive-profitability-assessment"
+            className="mt-8 scroll-mt-28 rounded-3xl border border-cyan-200 bg-cyan-50 p-6"
+          >
+            <p className="text-sm uppercase tracking-widest text-cyan-700">
+              Executive Profitability Assessment
+            </p>
+
+            <h2 className="mt-2 text-3xl font-bold text-slate-900">
+              {executiveAssessment}
+            </h2>
+
+            <p className="mt-4 text-slate-700">
+              AI evaluates order revenue, material cost, labour cost, utility
+              cost, transport cost, compliance cost, overhead cost, profit
+              leakage, and margin exposure before management approval.
+            </p>
+          </section>
         </div>
 
         <form
           onSubmit={handleSubmit}
           className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm"
         >
+          <section
+            id="financial-summary"
+            className="mb-8 scroll-mt-28 rounded-3xl border border-cyan-100 bg-cyan-50 p-6"
+          >
+            <p className="text-sm uppercase tracking-widest text-cyan-700">
+              Financial Summary
+            </p>
+
+            <div className="mt-4 grid gap-4 md:grid-cols-4">
+              <ReadOnly label="Calculated Revenue" value={calculatedRevenue.toFixed(2)} />
+              <ReadOnly label="Calculated Total Cost" value={calculatedTotalCost.toFixed(2)} />
+              <ReadOnly label="Calculated Profit" value={calculatedExpectedProfit.toFixed(2)} />
+              <ReadOnly label="Calculated Margin %" value={`${calculatedMargin.toFixed(2)}%`} />
+            </div>
+          </section>
+
           <div className="grid gap-6 md:grid-cols-2">
             {Object.entries(t.fields).map(([key, label]) => (
               <div key={key} className="space-y-2">
@@ -175,7 +309,16 @@ export default function CostingProfitabilityEntryPage() {
                   />
                 ) : (
                   <input
-                    type="text"
+                    type={
+                      key === "period" ||
+                      key === "buyer" ||
+                      key === "orderNo" ||
+                      key === "product" ||
+                      key === "riskLevel"
+                        ? "text"
+                        : "number"
+                    }
+                    step="any"
                     value={form[key as keyof typeof form]}
                     onChange={(e) => updateField(key, e.target.value)}
                     className="w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-cyan-500"
@@ -184,6 +327,22 @@ export default function CostingProfitabilityEntryPage() {
               </div>
             ))}
           </div>
+
+          <section
+            id="ai-recommendation"
+            className="mt-10 scroll-mt-28 rounded-3xl border border-cyan-200 bg-cyan-50 p-6"
+          >
+            <p className="text-sm uppercase tracking-widest text-cyan-700">
+              AI Recommendation
+            </p>
+
+            <p className="mt-3 text-slate-700">
+              Management should compare calculated cost with quoted cost,
+              review profit leakage, validate overhead recovery, monitor
+              discount pressure, and ensure weak-margin orders receive
+              executive approval before production continuation.
+            </p>
+          </section>
 
           <div className="mt-8 flex items-center gap-4">
             <button
@@ -203,5 +362,19 @@ export default function CostingProfitabilityEntryPage() {
         </form>
       </div>
     </DashboardShell>
+  );
+}
+
+function ReadOnly({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="space-y-2">
+      <label className="text-sm font-semibold text-slate-700">
+        {label}
+      </label>
+
+      <div className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 font-semibold text-slate-800">
+        {value}
+      </div>
+    </div>
   );
 }

@@ -40,8 +40,11 @@ export default function ScoreRing({ label, score }: ScoreRingProps) {
   }
 
   return (
-    <div className="rounded-3xl border border-neutral-200 bg-white p-6 text-center shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-      <div className="mx-auto flex h-32 w-32 flex-col items-center justify-center rounded-full border-[14px] border-cyan-500 bg-cyan-50">
+    <a
+  href={`#${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
+  className="block rounded-3xl border border-neutral-200 bg-white p-6 text-center shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-cyan-400/40"
+>
+      <div className="mx-auto flex h-32 w-32 flex-col items-center justify-center rounded-full border-14 border-cyan-500 bg-cyan-50">
         <span className="text-3xl font-bold text-neutral-950">
           {safeScore}%
         </span>
@@ -54,6 +57,6 @@ export default function ScoreRing({ label, score }: ScoreRingProps) {
       <p className="mt-5 text-sm font-semibold uppercase tracking-widest text-neutral-500">
         {label}
       </p>
-    </div>
+    </a>
   );
 }

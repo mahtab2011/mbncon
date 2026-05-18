@@ -112,7 +112,12 @@ function getExecutiveAssessment(score: number) {
 
   return "Executive Intervention Required";
 }
-
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
 export default function AIExecutiveKPICommandCenterPage() {
   const [loading, setLoading] = useState(true);
   const [kpis, setKpis] = useState<KPIRecord[]>([]);
@@ -215,57 +220,72 @@ export default function AIExecutiveKPICommandCenterPage() {
             <>
               <section className="grid grid-cols-1 md:grid-cols-5 gap-4">
 
-                <div className="rounded-2xl border border-cyan-700/30 bg-cyan-950/20 p-5">
-                  <p className="text-cyan-300 text-sm">
-                    Factory Health Score
-                  </p>
+  <a
+    href="#factory-health-score"
+    className="block rounded-2xl border border-cyan-700/30 bg-cyan-950/20 p-5 transition hover:-translate-y-1 hover:border-cyan-400/40"
+  >
+    <p className="text-cyan-300 text-sm">
+      Factory Health Score
+    </p>
 
-                  <h2 className="text-5xl font-bold mt-3">
-                    {intelligence.factoryHealthScore}
-                  </h2>
-                </div>
+    <h2 className="text-5xl font-bold mt-3">
+      {intelligence.factoryHealthScore}
+    </h2>
+  </a>
 
-                <div className="rounded-2xl border border-green-700/30 bg-green-950/20 p-5">
-                  <p className="text-green-300 text-sm">
-                    Excellent KPIs
-                  </p>
+  <a
+    href="#excellent-kpis"
+    className="block rounded-2xl border border-green-700/30 bg-green-950/20 p-5 transition hover:-translate-y-1 hover:border-green-400/40"
+  >
+    <p className="text-green-300 text-sm">
+      Excellent KPIs
+    </p>
 
-                  <h2 className="text-5xl font-bold mt-3">
-                    {intelligence.excellentCount}
-                  </h2>
-                </div>
+    <h2 className="text-5xl font-bold mt-3">
+      {intelligence.excellentCount}
+    </h2>
+  </a>
 
-                <div className="rounded-2xl border border-yellow-700/30 bg-yellow-950/20 p-5">
-                  <p className="text-yellow-300 text-sm">
-                    Warning KPIs
-                  </p>
+  <a
+    href="#warning-kpis"
+    className="block rounded-2xl border border-yellow-700/30 bg-yellow-950/20 p-5 transition hover:-translate-y-1 hover:border-yellow-400/40"
+  >
+    <p className="text-yellow-300 text-sm">
+      Warning KPIs
+    </p>
 
-                  <h2 className="text-5xl font-bold mt-3">
-                    {intelligence.warningCount}
-                  </h2>
-                </div>
+    <h2 className="text-5xl font-bold mt-3">
+      {intelligence.warningCount}
+    </h2>
+  </a>
 
-                <div className="rounded-2xl border border-red-700/30 bg-red-950/20 p-5">
-                  <p className="text-red-300 text-sm">
-                    Critical KPIs
-                  </p>
+  <a
+    href="#critical-kpis"
+    className="block rounded-2xl border border-red-700/30 bg-red-950/20 p-5 transition hover:-translate-y-1 hover:border-red-400/40"
+  >
+    <p className="text-red-300 text-sm">
+      Critical KPIs
+    </p>
 
-                  <h2 className="text-5xl font-bold mt-3">
-                    {intelligence.criticalCount}
-                  </h2>
-                </div>
+    <h2 className="text-5xl font-bold mt-3">
+      {intelligence.criticalCount}
+    </h2>
+  </a>
 
-                <div className="rounded-2xl border border-slate-700 bg-slate-900 p-5">
-                  <p className="text-slate-400 text-sm">
-                    Executive Assessment
-                  </p>
+  <a
+    href="#executive-assessment"
+    className="block rounded-2xl border border-slate-700 bg-slate-900 p-5 transition hover:-translate-y-1 hover:border-cyan-400/40"
+  >
+    <p className="text-slate-400 text-sm">
+      Executive Assessment
+    </p>
 
-                  <h2 className="text-xl font-bold mt-3">
-                    {intelligence.assessment}
-                  </h2>
-                </div>
+    <h2 className="text-xl font-bold mt-3">
+      {intelligence.assessment}
+    </h2>
+  </a>
 
-              </section>
+</section>
 
               <section className="rounded-2xl border border-cyan-700/30 bg-cyan-950/10 p-6">
 
@@ -290,71 +310,78 @@ export default function AIExecutiveKPICommandCenterPage() {
 
               <section className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-                {kpis.map((kpi) => (
-                  <div
-                    key={kpi.title}
-                    className={`rounded-2xl border p-5 ${getStatusColor(
-                      kpi.status
-                    )}`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm opacity-80">
-                          KPI Indicator
-                        </p>
+  {kpis.map((kpi) => (
+    <a
+      key={kpi.title}
+      href={`#${slugify(kpi.title)}`}
+      className={`block rounded-2xl border p-5 transition hover:-translate-y-1 hover:border-cyan-400/40 ${getStatusColor(
+        kpi.status
+      )}`}
+    >
+      <div className="flex items-center justify-between">
 
-                        <h3 className="text-2xl font-bold mt-1">
-                          {kpi.title}
-                        </h3>
-                      </div>
+        <div>
+          <p className="text-sm opacity-80">
+            KPI Indicator
+          </p>
 
-                      <span className="text-sm font-semibold">
-                        {kpi.status}
-                      </span>
-                    </div>
+          <h3 className="text-2xl font-bold mt-1">
+            {kpi.title}
+          </h3>
+        </div>
 
-                    <div className="mt-6 flex items-end justify-between">
-                      <div>
-                        <p className="text-sm opacity-80">
-                          Current
-                        </p>
+        <span className="text-sm font-semibold">
+          {kpi.status}
+        </span>
 
-                        <h2 className="text-5xl font-bold">
-                          {kpi.value}
-                          {kpi.unit}
-                        </h2>
-                      </div>
+      </div>
 
-                      <div className="text-right">
-                        <p className="text-sm opacity-80">
-                          Target
-                        </p>
+      <div className="mt-6 flex items-end justify-between">
 
-                        <p className="text-2xl font-semibold">
-                          {kpi.target}
-                          {kpi.unit}
-                        </p>
-                      </div>
-                    </div>
+        <div>
+          <p className="text-sm opacity-80">
+            Current
+          </p>
 
-                    <div className="mt-6">
-                      <div className="h-3 w-full rounded-full bg-black/30 overflow-hidden">
-                        <div
-                          className="h-full rounded-full bg-white"
-                          style={{
-                            width: `${Math.min(
-                              (kpi.value / kpi.target) * 100,
-                              100
-                            )}%`,
-                          }}
-                        />
-                      </div>
-                    </div>
+          <h2 className="text-5xl font-bold">
+            {kpi.value}
+            {kpi.unit}
+          </h2>
+        </div>
 
-                  </div>
-                ))}
+        <div className="text-right">
+          <p className="text-sm opacity-80">
+            Target
+          </p>
 
-              </section>
+          <p className="text-2xl font-semibold">
+            {kpi.target}
+            {kpi.unit}
+          </p>
+        </div>
+
+      </div>
+
+      <div className="mt-6">
+        <div className="h-3 w-full rounded-full bg-black/30 overflow-hidden">
+
+          <div
+            className="h-full rounded-full bg-white"
+            style={{
+              width: `${Math.min(
+                (kpi.value / kpi.target) * 100,
+                100
+              )}%`,
+            }}
+          />
+
+        </div>
+      </div>
+
+    </a>
+  ))}
+
+</section>
 
               <section className="rounded-2xl border border-slate-800 bg-slate-900 overflow-hidden">
 
@@ -394,42 +421,48 @@ export default function AIExecutiveKPICommandCenterPage() {
 
                     <tbody>
 
-                      {kpis.map((kpi) => {
-                        const achievement = Math.round(
-                          (kpi.value / kpi.target) * 100
-                        );
+  {kpis.map((kpi) => {
+    const achievement = Math.round(
+      (kpi.value / kpi.target) * 100
+    );
 
-                        return (
-                          <tr
-                            key={kpi.title}
-                            className="border-b border-slate-800"
-                          >
-                            <td className="p-4 font-medium">
-                              {kpi.title}
-                            </td>
+    return (
+      <tr
+        key={kpi.title}
+        id={slugify(kpi.title)}
+        className="border-b border-slate-800 transition hover:bg-cyan-900/20"
+      >
+        <td className="p-4 font-medium">
+          <a
+            href={`#${slugify(kpi.title)}`}
+            className="text-cyan-300 underline hover:text-cyan-200"
+          >
+            {kpi.title}
+          </a>
+        </td>
 
-                            <td className="p-4">
-                              {kpi.value}
-                              {kpi.unit}
-                            </td>
+        <td className="p-4">
+          {kpi.value}
+          {kpi.unit}
+        </td>
 
-                            <td className="p-4">
-                              {kpi.target}
-                              {kpi.unit}
-                            </td>
+        <td className="p-4">
+          {kpi.target}
+          {kpi.unit}
+        </td>
 
-                            <td className="p-4">
-                              {achievement}%
-                            </td>
+        <td className="p-4">
+          {achievement}%
+        </td>
 
-                            <td className="p-4">
-                              {kpi.status}
-                            </td>
-                          </tr>
-                        );
-                      })}
+        <td className="p-4">
+          {kpi.status}
+        </td>
+      </tr>
+    );
+  })}
 
-                    </tbody>
+</tbody>
 
                   </table>
 

@@ -55,9 +55,7 @@ const demoWarRoomData: WarRoomRecord[] = [
   },
 ];
 
-function getSeverityScore(
-  severity: WarRoomRecord["severity"]
-): number {
+function getSeverityScore(severity: WarRoomRecord["severity"]): number {
   if (severity === "Critical") return 100;
   if (severity === "High") return 75;
   if (severity === "Medium") return 45;
@@ -71,6 +69,13 @@ function getExecutivePriority(score: number) {
   return "Controlled";
 }
 
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
 export default function AIFactoryWarRoomDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [records, setRecords] = useState<WarRoomRecord[]>([]);
@@ -82,8 +87,6 @@ export default function AIFactoryWarRoomDashboardPage() {
       try {
         setLoading(true);
 
-        // Enterprise-safe async block
-        // Later connect with Firestore live intelligence feeds
         const data = demoWarRoomData;
 
         if (active) {
@@ -116,14 +119,9 @@ export default function AIFactoryWarRoomDashboardPage() {
       (r) => r.severity === "Critical"
     ).length;
 
-    const highIssues = records.filter(
-      (r) => r.severity === "High"
-    ).length;
+    const highIssues = records.filter((r) => r.severity === "High").length;
 
-    const totalImpact = records.reduce(
-      (sum, r) => sum + r.impact,
-      0
-    );
+    const totalImpact = records.reduce((sum, r) => sum + r.impact, 0);
 
     const averageRisk =
       totalIssues === 0
@@ -149,8 +147,7 @@ export default function AIFactoryWarRoomDashboardPage() {
     <DashboardShell title="AI Factory War Room Dashboard">
       <main className="min-h-screen bg-black text-white p-6">
         <div className="max-w-7xl mx-auto space-y-6">
-
-          <section className="rounded-2xl border border-red-700/40 bg-linear-to-r from-red-950 via-slate-950 to-black p-6 shadow-2xl">
+          <section className="rounded-2xl border border-red-700/40 bg-[linear-gradient(to_right,#450a0a,#020617,#000000)] p-6 shadow-2xl">
             <p className="text-red-300 uppercase tracking-widest text-sm">
               Module 25 · AI Factory War Room Dashboard
             </p>
@@ -160,11 +157,10 @@ export default function AIFactoryWarRoomDashboardPage() {
             </h1>
 
             <p className="text-slate-300 mt-4 max-w-4xl">
-              Centralized AI-powered war room for monitoring
-              production disruption, shipment risks, compliance
-              exposure, maintenance escalation, utility spikes,
-              manpower instability, bottlenecks, and executive
-              emergency conditions in real time.
+              Centralized AI-powered war room for monitoring production
+              disruption, shipment risks, compliance exposure, maintenance
+              escalation, utility spikes, manpower instability, bottlenecks, and
+              executive emergency conditions in real time.
             </p>
           </section>
 
@@ -175,8 +171,10 @@ export default function AIFactoryWarRoomDashboardPage() {
           ) : (
             <>
               <section className="grid grid-cols-1 md:grid-cols-5 gap-4">
-
-                <div className="rounded-2xl bg-slate-900 border border-slate-800 p-5">
+                <a
+                  href="#total-active-risks"
+                  className="block rounded-2xl bg-slate-900 border border-slate-800 p-5 transition hover:-translate-y-1 hover:border-red-400/40"
+                >
                   <p className="text-slate-400 text-sm">
                     Total Active Risks
                   </p>
@@ -184,29 +182,34 @@ export default function AIFactoryWarRoomDashboardPage() {
                   <h2 className="text-4xl font-bold mt-2">
                     {intelligence.totalIssues}
                   </h2>
-                </div>
+                </a>
 
-                <div className="rounded-2xl bg-red-950/40 border border-red-700/40 p-5">
-                  <p className="text-red-300 text-sm">
-                    Critical Alerts
-                  </p>
+                <a
+                  href="#critical-alerts"
+                  className="block rounded-2xl bg-red-950/40 border border-red-700/40 p-5 transition hover:-translate-y-1 hover:border-red-400/40"
+                >
+                  <p className="text-red-300 text-sm">Critical Alerts</p>
 
                   <h2 className="text-4xl font-bold mt-2 text-red-400">
                     {intelligence.criticalIssues}
                   </h2>
-                </div>
+                </a>
 
-                <div className="rounded-2xl bg-yellow-950/30 border border-yellow-700/40 p-5">
-                  <p className="text-yellow-300 text-sm">
-                    High Risks
-                  </p>
+                <a
+                  href="#high-risks"
+                  className="block rounded-2xl bg-yellow-950/30 border border-yellow-700/40 p-5 transition hover:-translate-y-1 hover:border-yellow-400/40"
+                >
+                  <p className="text-yellow-300 text-sm">High Risks</p>
 
                   <h2 className="text-4xl font-bold mt-2 text-yellow-300">
                     {intelligence.highIssues}
                   </h2>
-                </div>
+                </a>
 
-                <div className="rounded-2xl bg-slate-900 border border-slate-800 p-5">
+                <a
+                  href="#ai-executive-risk-score"
+                  className="block rounded-2xl bg-slate-900 border border-slate-800 p-5 transition hover:-translate-y-1 hover:border-cyan-400/40"
+                >
                   <p className="text-slate-400 text-sm">
                     AI Executive Risk Score
                   </p>
@@ -214,9 +217,12 @@ export default function AIFactoryWarRoomDashboardPage() {
                   <h2 className="text-4xl font-bold mt-2">
                     {intelligence.averageRisk}
                   </h2>
-                </div>
+                </a>
 
-                <div className="rounded-2xl bg-slate-900 border border-slate-800 p-5">
+                <a
+                  href="#financial-exposure"
+                  className="block rounded-2xl bg-slate-900 border border-slate-800 p-5 transition hover:-translate-y-1 hover:border-red-400/40"
+                >
                   <p className="text-slate-400 text-sm">
                     Financial Exposure
                   </p>
@@ -224,8 +230,7 @@ export default function AIFactoryWarRoomDashboardPage() {
                   <h2 className="text-4xl font-bold mt-2 text-red-300">
                     £{intelligence.totalImpact.toLocaleString()}
                   </h2>
-                </div>
-
+                </a>
               </section>
 
               <section className="rounded-2xl border border-red-700/40 bg-red-950/20 p-6">
@@ -238,14 +243,13 @@ export default function AIFactoryWarRoomDashboardPage() {
                 </h2>
 
                 <p className="text-slate-300 mt-4">
-                  AI has detected factory-level operational
-                  instability requiring leadership monitoring
-                  and cross-department escalation management.
+                  AI has detected factory-level operational instability
+                  requiring leadership monitoring and cross-department
+                  escalation management.
                 </p>
               </section>
 
               <section className="rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden">
-
                 <div className="border-b border-slate-800 p-5">
                   <h2 className="text-2xl font-bold">
                     Live War Room Intelligence Feed
@@ -254,7 +258,6 @@ export default function AIFactoryWarRoomDashboardPage() {
 
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
-
                     <thead className="bg-slate-800 text-slate-300">
                       <tr>
                         <th className="text-left p-4">ID</th>
@@ -270,18 +273,20 @@ export default function AIFactoryWarRoomDashboardPage() {
                       {records.map((record) => (
                         <tr
                           key={record.id}
-                          className="border-b border-slate-800"
+                          id={slugify(record.issue)}
+                          className="border-b border-slate-800 transition hover:bg-red-900/20"
                         >
-                          <td className="p-4">
-                            {record.id}
-                          </td>
+                          <td className="p-4">{record.id}</td>
 
-                          <td className="p-4">
-                            {record.area}
-                          </td>
+                          <td className="p-4">{record.area}</td>
 
                           <td className="p-4 text-slate-300">
-                            {record.issue}
+                            <a
+                              href={`#${slugify(record.issue)}`}
+                              className="text-cyan-300 underline hover:text-cyan-200"
+                            >
+                              {record.issue}
+                            </a>
                           </td>
 
                           <td className="p-4">
@@ -290,9 +295,7 @@ export default function AIFactoryWarRoomDashboardPage() {
                             </span>
                           </td>
 
-                          <td className="p-4">
-                            {record.status}
-                          </td>
+                          <td className="p-4">{record.status}</td>
 
                           <td className="p-4 text-red-300">
                             £{record.impact.toLocaleString()}
@@ -300,31 +303,25 @@ export default function AIFactoryWarRoomDashboardPage() {
                         </tr>
                       ))}
                     </tbody>
-
                   </table>
                 </div>
-
               </section>
 
               <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
                 {records.map((record) => (
-                  <div
+                  <a
                     key={record.id}
-                    className="rounded-2xl border border-slate-800 bg-slate-900 p-5"
+                    href={`#${slugify(record.issue)}`}
+                    className="block rounded-2xl border border-slate-800 bg-slate-900 p-5 transition hover:-translate-y-1 hover:border-red-400/40 hover:bg-red-950/20"
                   >
-                    <p className="text-sm text-slate-400">
-                      {record.area}
-                    </p>
+                    <p className="text-sm text-slate-400">{record.area}</p>
 
-                    <h3 className="text-xl font-bold mt-2">
-                      {record.issue}
-                    </h3>
+                    <h3 className="text-xl font-bold mt-2">{record.issue}</h3>
 
                     <p className="mt-4 text-slate-300">
                       AI recommends immediate operational review,
-                      accountability assignment, and executive
-                      monitoring until this issue is stabilized.
+                      accountability assignment, and executive monitoring until
+                      this issue is stabilized.
                     </p>
 
                     <div className="mt-4 flex items-center justify-between">
@@ -333,14 +330,74 @@ export default function AIFactoryWarRoomDashboardPage() {
                       </span>
 
                       <span className="text-slate-400 text-sm">
-                        Estimated Impact:
-                        {" "}
-                        £{record.impact.toLocaleString()}
+                        Estimated Impact: £{record.impact.toLocaleString()}
                       </span>
                     </div>
-                  </div>
+                  </a>
                 ))}
+              </section>
 
+              <section className="space-y-5">
+                {records.map((record) => (
+                  <section
+                    key={record.id}
+                    id={slugify(record.issue)}
+                    className="scroll-mt-28 rounded-2xl border border-slate-800 bg-slate-900/70 p-6"
+                  >
+                    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                      <div>
+                        <p className="text-sm uppercase tracking-widest text-red-300">
+                          {record.area} · {record.id}
+                        </p>
+
+                        <h2 className="text-2xl font-bold mt-2">
+                          {record.issue}
+                        </h2>
+                      </div>
+
+                      <div className="rounded-full border border-red-700/40 bg-red-950/30 px-4 py-2 text-sm font-semibold text-red-300">
+                        {record.severity}
+                      </div>
+                    </div>
+
+                    <div className="mt-6 grid gap-4 md:grid-cols-3">
+                      <div className="rounded-xl bg-slate-950/70 p-4">
+                        <p className="text-sm text-slate-400">Status</p>
+                        <p className="mt-2 font-semibold">{record.status}</p>
+                      </div>
+
+                      <div className="rounded-xl bg-slate-950/70 p-4">
+                        <p className="text-sm text-slate-400">
+                          Financial Impact
+                        </p>
+                        <p className="mt-2 font-semibold text-red-300">
+                          £{record.impact.toLocaleString()}
+                        </p>
+                      </div>
+
+                      <div className="rounded-xl bg-slate-950/70 p-4">
+                        <p className="text-sm text-slate-400">
+                          Executive Risk Score
+                        </p>
+                        <p className="mt-2 font-semibold">
+                          {getSeverityScore(record.severity)}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="mt-6 rounded-xl border border-red-700/30 bg-red-950/20 p-5">
+                      <p className="text-sm uppercase tracking-widest text-red-300">
+                        Recommended Executive Action
+                      </p>
+
+                      <p className="mt-3 text-slate-200">
+                        Assign one accountable owner, agree a same-day recovery
+                        action, monitor impact daily, and escalate unresolved
+                        exposure to the factory leadership review.
+                      </p>
+                    </div>
+                  </section>
+                ))}
               </section>
             </>
           )}

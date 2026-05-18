@@ -1,3 +1,33 @@
+export const metadata = {
+  title:
+    "MBNCON | Manufacturing Intelligence, Productivity & AI Business Systems",
+
+  description:
+  "MBNCON provides AI-assisted manufacturing intelligence, executive dashboards, operational excellence systems, productivity improvement, Lean manufacturing support, KPI visibility, business analytics, risk analysis, and enterprise transformation consultancy for manufacturing, logistics, retail, hospitality, supply chain, and business operations worldwide.",
+
+keywords: [
+  "manufacturing intelligence",
+  "AI manufacturing software",
+  "executive dashboard",
+  "business excellence",
+  "operational excellence",
+  "factory productivity",
+  "lean manufacturing",
+  "kaizen system",
+  "TQM manufacturing",
+  "business analytics",
+  "manufacturing consultancy",
+  "factory efficiency improvement",
+  "AI business systems",
+  "supply chain intelligence",
+  "production planning software",
+  "manufacturing KPI dashboard",
+  "industrial engineering",
+  "risk management intelligence",
+  "enterprise productivity",
+  "MBNCON",
+],
+};
 type SoftwareCard = {
   title: string;
   href: string;
@@ -119,6 +149,40 @@ export default function HomePage() {
             >
               Explore Services
             </a>
+<div className="mt-10 grid gap-4 md:grid-cols-3">
+  <div className="rounded-2xl border border-white/20 bg-white/10 p-5">
+    <h3 className="text-xl font-bold text-yellow-300">
+      AI Manufacturing Intelligence
+    </h3>
+
+    <p className="mt-3 text-sm text-white/90">
+      Executive dashboards, productivity intelligence,
+      risk analysis, forecasting, and operational visibility.
+    </p>
+  </div>
+
+  <div className="rounded-2xl border border-white/20 bg-white/10 p-5">
+    <h3 className="text-xl font-bold text-cyan-300">
+      Consultancy & Transformation
+    </h3>
+
+    <p className="mt-3 text-sm text-white/90">
+      Lean systems, Kaizen, TQM, operational excellence,
+      cost reduction, and workflow improvement support.
+    </p>
+  </div>
+
+  <div className="rounded-2xl border border-white/20 bg-white/10 p-5">
+    <h3 className="text-xl font-bold text-emerald-300">
+      Enterprise Productivity Systems
+    </h3>
+
+    <p className="mt-3 text-sm text-white/90">
+      Practical software environments for manufacturing,
+      logistics, hospitality, retail, and office operations.
+    </p>
+  </div>
+</div>
           </div>
         </div>
       </section>

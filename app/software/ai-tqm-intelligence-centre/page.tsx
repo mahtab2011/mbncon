@@ -69,6 +69,15 @@ const demoTQMData: TQMRecord[] = [
   },
 ];
 
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 function getRiskColor(
   risk: TQMRecord["riskLevel"]
 ) {
@@ -138,6 +147,7 @@ export default function AITQMIntelligenceCentrePage() {
 
         // Enterprise-safe async loading block
         // Future Firestore + AI integration goes here
+
         const data = demoTQMData;
 
         if (active) {
@@ -210,15 +220,42 @@ export default function AITQMIntelligenceCentrePage() {
     };
   }, [records]);
 
+  const kpiCards = [
+    {
+      title: "Critical Quality Risks",
+      value: intelligence.criticalRisks,
+      href: "#tqm-intelligence-feed",
+      className:
+        "border-red-700/40 bg-red-950/20",
+    },
+    {
+      title: "High TQM Risks",
+      value: intelligence.highRisks,
+      href: "#executive-tqm-assessment",
+      className:
+        "border-orange-700/40 bg-orange-950/20",
+    },
+    {
+      title: "Avg Compliance",
+      value: `${intelligence.averageCompliance}%`,
+      href: "#quality-system-analysis",
+      className:
+        "border-fuchsia-700/40 bg-fuchsia-950/20",
+    },
+    {
+      title: "Avg Progress",
+      value: `${intelligence.averageProgress}%`,
+      href: "#quality-system-analysis",
+      className:
+        "border-cyan-700/40 bg-cyan-950/20",
+    },
+  ];
+
   return (
     <DashboardShell title="AI TQM Intelligence Centre">
-
       <main className="min-h-screen bg-slate-950 text-white p-6">
-
         <div className="max-w-7xl mx-auto space-y-6">
-
           <section className="rounded-2xl border border-fuchsia-700/40 bg-slate-900 p-6 shadow-xl">
-
             <p className="text-fuchsia-300 uppercase tracking-widest text-sm">
               Module 41 · AI TQM Intelligence Centre
             </p>
@@ -235,7 +272,6 @@ export default function AITQMIntelligenceCentrePage() {
               quality culture maturity,
               and enterprise-wide continuous quality improvement.
             </p>
-
           </section>
 
           {loading ? (
@@ -244,60 +280,35 @@ export default function AITQMIntelligenceCentrePage() {
             </div>
           ) : (
             <>
-              <section className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <section
+                id="enterprise-kpis"
+                className="grid grid-cols-1 md:grid-cols-4 gap-4 scroll-mt-28"
+              >
+                {kpiCards.map((card) => (
+                  <a
+                    key={card.title}
+                    href={card.href}
+                    className={`rounded-2xl border p-5 transition hover:-translate-y-1 hover:border-fuchsia-400/70 hover:shadow-xl ${card.className}`}
+                  >
+                    <p className="text-sm opacity-80">
+                      {card.title}
+                    </p>
 
-                <div className="rounded-2xl border border-red-700/40 bg-red-950/20 p-5">
+                    <h2 className="text-5xl font-bold mt-3">
+                      {card.value}
+                    </h2>
 
-                  <p className="text-red-300 text-sm">
-                    Critical Quality Risks
-                  </p>
-
-                  <h2 className="text-5xl font-bold mt-3">
-                    {intelligence.criticalRisks}
-                  </h2>
-
-                </div>
-
-                <div className="rounded-2xl border border-orange-700/40 bg-orange-950/20 p-5">
-
-                  <p className="text-orange-300 text-sm">
-                    High TQM Risks
-                  </p>
-
-                  <h2 className="text-5xl font-bold mt-3">
-                    {intelligence.highRisks}
-                  </h2>
-
-                </div>
-
-                <div className="rounded-2xl border border-fuchsia-700/40 bg-fuchsia-950/20 p-5">
-
-                  <p className="text-fuchsia-300 text-sm">
-                    Avg Compliance
-                  </p>
-
-                  <h2 className="text-5xl font-bold mt-3">
-                    {intelligence.averageCompliance}%
-                  </h2>
-
-                </div>
-
-                <div className="rounded-2xl border border-cyan-700/40 bg-cyan-950/20 p-5">
-
-                  <p className="text-cyan-300 text-sm">
-                    Avg Progress
-                  </p>
-
-                  <h2 className="text-5xl font-bold mt-3">
-                    {intelligence.averageProgress}%
-                  </h2>
-
-                </div>
-
+                    <p className="text-xs opacity-60 mt-3">
+                      Click to review intelligence
+                    </p>
+                  </a>
+                ))}
               </section>
 
-              <section className="rounded-2xl border border-fuchsia-700/40 bg-fuchsia-950/10 p-6">
-
+              <section
+                id="executive-tqm-assessment"
+                className="scroll-mt-28 rounded-2xl border border-fuchsia-700/40 bg-fuchsia-950/10 p-6"
+              >
                 <p className="text-fuchsia-300 uppercase tracking-widest text-sm">
                   Executive TQM Assessment
                 </p>
@@ -313,25 +324,21 @@ export default function AITQMIntelligenceCentrePage() {
                   and preventive quality systems
                   to strengthen enterprise operational excellence.
                 </p>
-
               </section>
 
-              <section className="rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden">
-
+              <section
+                id="tqm-intelligence-feed"
+                className="scroll-mt-28 rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden"
+              >
                 <div className="border-b border-slate-800 p-5">
-
                   <h2 className="text-2xl font-bold">
                     TQM Intelligence Feed
                   </h2>
-
                 </div>
 
                 <div className="overflow-x-auto">
-
                   <table className="w-full text-sm">
-
                     <thead className="bg-slate-800 text-slate-300">
-
                       <tr>
                         <th className="text-left p-4">
                           Department
@@ -353,98 +360,129 @@ export default function AITQMIntelligenceCentrePage() {
                           Risk
                         </th>
                       </tr>
-
                     </thead>
 
                     <tbody>
+                      {records.map((record) => {
+                        const sectionId = slugify(
+                          record.department
+                        );
 
-                      {records.map((record) => (
-                        <tr
-                          key={record.id}
-                          className="border-b border-slate-800"
-                        >
+                        return (
+                          <tr
+                            key={record.id}
+                            onClick={() => {
+                              document
+                                .getElementById(sectionId)
+                                ?.scrollIntoView({
+                                  behavior: "smooth",
+                                  block: "start",
+                                });
+                            }}
+                            className="border-b border-slate-800 cursor-pointer transition hover:bg-slate-800/70"
+                          >
+                            <td className="p-4 font-semibold">
+                              {record.department}
+                            </td>
 
-                          <td className="p-4">
-                            {record.department}
-                          </td>
+                            <td className="p-4">
+                              {record.auditFinding}
+                            </td>
 
-                          <td className="p-4">
-                            {record.auditFinding}
-                          </td>
+                            <td className="p-4 text-fuchsia-300">
+                              {record.complianceScore}%
+                            </td>
 
-                          <td className="p-4 text-fuchsia-300">
-                            {record.complianceScore}%
-                          </td>
+                            <td className="p-4 text-cyan-300">
+                              {record.implementationProgress}%
+                            </td>
 
-                          <td className="p-4 text-cyan-300">
-                            {record.implementationProgress}%
-                          </td>
-
-                          <td className="p-4">
-                            {record.riskLevel}
-                          </td>
-
-                        </tr>
-                      ))}
-
+                            <td className="p-4">
+                              {record.riskLevel}
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
-
                   </table>
-
                 </div>
-
               </section>
 
-              <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <section
+                id="quality-system-analysis"
+                className="grid grid-cols-1 md:grid-cols-2 gap-4 scroll-mt-28"
+              >
+                {records.map((record) => {
+                  const sectionId = slugify(
+                    record.department
+                  );
 
-                {records.map((record) => (
-                  <div
-                    key={record.id}
-                    className={`rounded-2xl border p-5 ${getRiskColor(
-                      record.riskLevel
-                    )}`}
-                  >
+                  return (
+                    <a
+                      key={record.id}
+                      id={sectionId}
+                      href="#tqm-intelligence-feed"
+                      className={`rounded-2xl border p-5 transition hover:-translate-y-1 hover:shadow-xl ${getRiskColor(
+                        record.riskLevel
+                      )}`}
+                    >
+                      <p className="text-sm opacity-80">
+                        {record.department}
+                      </p>
 
-                    <p className="text-sm opacity-80">
-                      {record.department}
-                    </p>
+                      <h3 className="text-2xl font-bold mt-2">
+                        Quality System Analysis
+                      </h3>
 
-                    <h3 className="text-2xl font-bold mt-2">
-                      Quality System Analysis
-                    </h3>
+                      <p className="mt-4 text-slate-200">
+                        {getRecommendation(record)}
+                      </p>
 
-                    <p className="mt-4 text-slate-200">
-                      {getRecommendation(record)}
-                    </p>
+                      <div className="mt-5 grid grid-cols-2 gap-3 text-sm">
+                        <div>
+                          <p className="opacity-70">
+                            Compliance
+                          </p>
 
-                    <div className="mt-5 flex justify-between">
+                          <p className="font-semibold">
+                            {record.complianceScore}%
+                          </p>
+                        </div>
 
-                      <span>
-                        Compliance:
-                        {" "}
-                        {record.complianceScore}%
-                      </span>
+                        <div>
+                          <p className="opacity-70">
+                            Progress
+                          </p>
 
-                      <span>
-                        Progress:
-                        {" "}
-                        {record.implementationProgress}%
-                      </span>
+                          <p className="font-semibold">
+                            {record.implementationProgress}%
+                          </p>
+                        </div>
+                      </div>
 
-                    </div>
+                      <div className="mt-5 rounded-xl border border-white/10 bg-black/20 p-4">
+                        <p className="text-sm uppercase tracking-widest opacity-70">
+                          AI Recommendation
+                        </p>
 
-                  </div>
-                ))}
+                        <p className="mt-2 text-sm text-slate-200">
+                          {record.correctiveAction}
+                        </p>
 
+                        <p className="mt-3 text-sm text-slate-300">
+                          Preventive Action:
+                          {" "}
+                          {record.preventiveAction}
+                        </p>
+                      </div>
+                    </a>
+                  );
+                })}
               </section>
-
             </>
           )}
-
         </div>
-
       </main>
-
     </DashboardShell>
   );
 }

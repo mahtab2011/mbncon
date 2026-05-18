@@ -114,7 +114,12 @@ function getExecutiveSummary(score: number, highRiskAreas: number) {
 
   return "Factory health is stable. Leadership should continue daily monitoring, preventive action, and continuous improvement discipline.";
 }
-
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
 export default function AIFactoryHealthScoreEnginePage() {
   const [loading, setLoading] = useState(true);
   const [records, setRecords] = useState<HealthArea[]>([]);
@@ -263,49 +268,53 @@ export default function AIFactoryHealthScoreEnginePage() {
               </section>
 
               <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {records.map((record) => (
-                  <div
-                    key={record.id}
-                    className={`rounded-2xl border p-5 ${getRiskStyle(
-                      record.risk
-                    )}`}
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <p className="text-sm opacity-80">{record.id}</p>
-                        <h3 className="text-2xl font-bold mt-1">
-                          {record.area}
-                        </h3>
-                      </div>
+  {records.map((record) => (
+    <a
+      key={record.id}
+      href={`#${slugify(record.area)}`}
+      className={`block rounded-2xl border p-5 transition hover:-translate-y-1 hover:border-cyan-400/40 ${getRiskStyle(
+        record.risk
+      )}`}
+    >
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-sm opacity-80">{record.id}</p>
 
-                      <div className="text-right">
-                        <p className="text-sm opacity-80">Score</p>
-                        <p className="text-3xl font-bold">{record.score}</p>
-                      </div>
-                    </div>
+          <h3 className="text-2xl font-bold mt-1">
+            {record.area}
+          </h3>
+        </div>
 
-                    <div className="mt-5 h-3 rounded-full bg-slate-800 overflow-hidden">
-                      <div
-                        className="h-full bg-current"
-                        style={{ width: `${record.score}%` }}
-                      />
-                    </div>
+        <div className="text-right">
+          <p className="text-sm opacity-80">Score</p>
 
-                    <p className="mt-5 text-slate-200">
-                      {record.finding}
-                    </p>
+          <p className="text-3xl font-bold">{record.score}</p>
+        </div>
+      </div>
 
-                    <div className="mt-4 rounded-xl border border-slate-700/60 bg-slate-950/60 p-4">
-                      <p className="text-xs uppercase tracking-widest opacity-70">
-                        AI Recommendation
-                      </p>
-                      <p className="text-sm text-slate-200 mt-2">
-                        {record.recommendation}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </section>
+      <div className="mt-5 h-3 rounded-full bg-slate-800 overflow-hidden">
+        <div
+          className="h-full bg-current"
+          style={{ width: `${record.score}%` }}
+        />
+      </div>
+
+      <p className="mt-5 text-slate-200">
+        {record.finding}
+      </p>
+
+      <div className="mt-4 rounded-xl border border-slate-700/60 bg-slate-950/60 p-4">
+        <p className="text-xs uppercase tracking-widest opacity-70">
+          AI Recommendation
+        </p>
+
+        <p className="text-sm text-slate-200 mt-2">
+          {record.recommendation}
+        </p>
+      </div>
+    </a>
+  ))}
+</section>
             </>
           )}
         </div>

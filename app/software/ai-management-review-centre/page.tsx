@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-
 import DashboardShell from "@/components/software/DashboardShell";
 
 import {
@@ -23,9 +22,29 @@ type ReviewItem = {
   action: string;
 };
 
+const agendaItems = [
+  ["01", "Production bottleneck review", "Review line bottlenecks, slow operations, operator imbalance, machine waiting time, and production recovery actions."],
+  ["02", "Buyer delivery commitment review", "Review buyer delivery promises, shipment commitments, late order exposure, and customer confidence protection."],
+  ["03", "Wastage and rejection analysis", "Review material wastage, rejection trends, rework causes, quality loss, and recovery opportunities."],
+  ["04", "Utility and energy cost escalation", "Review electricity, generator fuel, gas, water, abnormal spikes, and energy dependency risks."],
+  ["05", "Factory risk escalation tracking", "Review open risks, unresolved escalations, accountable owners, deadlines, and management follow-up status."],
+  ["06", "Corrective action accountability", "Review corrective actions, assigned responsibility, completion status, evidence, and overdue follow-up."],
+  ["07", "Manpower attendance review", "Review absenteeism, overtime, manpower shortage, shift planning, and department attendance discipline."],
+  ["08", "Machine downtime governance", "Review machine breakdowns, downtime hours, repair cost, preventive maintenance, and spare readiness."],
+  ["09", "Cashflow and profitability review", "Review receivables, overdue amounts, order margin, cost leakage, cash pressure, and recovery planning."],
+];
+
 function toNumber(value: any): number {
   const n = Number(value);
   return Number.isFinite(n) ? n : 0;
+}
+
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
 }
 
 function getStatus(score: number): ReviewItem["status"] {
@@ -36,18 +55,9 @@ function getStatus(score: number): ReviewItem["status"] {
 }
 
 function statusStyle(status: ReviewItem["status"]) {
-  if (status === "Excellent") {
-    return "border-emerald-500 bg-emerald-500/10 text-emerald-300";
-  }
-
-  if (status === "Stable") {
-    return "border-cyan-500 bg-cyan-500/10 text-cyan-300";
-  }
-
-  if (status === "Attention") {
-    return "border-yellow-500 bg-yellow-500/10 text-yellow-300";
-  }
-
+  if (status === "Excellent") return "border-emerald-500 bg-emerald-500/10 text-emerald-300";
+  if (status === "Stable") return "border-cyan-500 bg-cyan-500/10 text-cyan-300";
+  if (status === "Attention") return "border-yellow-500 bg-yellow-500/10 text-yellow-300";
   return "border-red-500 bg-red-500/10 text-red-300";
 }
 
@@ -85,59 +95,21 @@ export default function AIManagementReviewCentrePage() {
 
         if (!active) return;
 
-        setProductionLogs(
-          results[0].status === "fulfilled" && Array.isArray(results[0].value)
-            ? results[0].value
-            : []
-        );
-
-        setManpowerLogs(
-          results[1].status === "fulfilled" && Array.isArray(results[1].value)
-            ? results[1].value
-            : []
-        );
-
-        setWastageLogs(
-          results[2].status === "fulfilled" && Array.isArray(results[2].value)
-            ? results[2].value
-            : []
-        );
-
-        setExportLogs(
-          results[3].status === "fulfilled" && Array.isArray(results[3].value)
-            ? results[3].value
-            : []
-        );
-
-        setMaintenanceLogs(
-          results[4].status === "fulfilled" && Array.isArray(results[4].value)
-            ? results[4].value
-            : []
-        );
-
-        setUtilitiesLogs(
-          results[5].status === "fulfilled" && Array.isArray(results[5].value)
-            ? results[5].value
-            : []
-        );
-
-        setRiskReports(
-          results[6].status === "fulfilled" && Array.isArray(results[6].value)
-            ? results[6].value
-            : []
-        );
+        setProductionLogs(results[0].status === "fulfilled" && Array.isArray(results[0].value) ? results[0].value : []);
+        setManpowerLogs(results[1].status === "fulfilled" && Array.isArray(results[1].value) ? results[1].value : []);
+        setWastageLogs(results[2].status === "fulfilled" && Array.isArray(results[2].value) ? results[2].value : []);
+        setExportLogs(results[3].status === "fulfilled" && Array.isArray(results[3].value) ? results[3].value : []);
+        setMaintenanceLogs(results[4].status === "fulfilled" && Array.isArray(results[4].value) ? results[4].value : []);
+        setUtilitiesLogs(results[5].status === "fulfilled" && Array.isArray(results[5].value) ? results[5].value : []);
+        setRiskReports(results[6].status === "fulfilled" && Array.isArray(results[6].value) ? results[6].value : []);
       } catch (err) {
         console.error("Management review loading failed:", err);
 
         if (active) {
-          setError(
-            "Live Firestore management review data could not be loaded. Demo review is shown."
-          );
+          setError("Live Firestore management review data could not be loaded. Demo review is shown.");
         }
       } finally {
-        if (active) {
-          setLoading(false);
-        }
+        if (active) setLoading(false);
       }
     }
 
@@ -149,145 +121,84 @@ export default function AIManagementReviewCentrePage() {
   }, []);
 
   const reviewItems = useMemo<ReviewItem[]>(() => {
-    const productionValue =
-      productionLogs.reduce(
-        (sum, item) =>
-          sum +
-          toNumber(item.productionValue) +
-          toNumber(item.outputValue),
-        0
-      ) || 85000;
-
     const wastageValue =
       wastageLogs.reduce(
-        (sum, item) =>
-          sum +
-          toNumber(item.wastageCost) +
-          toNumber(item.rejectionCost),
+        (sum, item) => sum + toNumber(item.wastageCost) + toNumber(item.rejectionCost),
         0
       ) || 9000;
 
     const absenteeism =
       manpowerLogs.reduce(
-        (sum, item) =>
-          sum +
-          toNumber(item.absentWorkers) +
-          toNumber(item.absenteeism),
+        (sum, item) => sum + toNumber(item.absentWorkers) + toNumber(item.absenteeism),
         0
       ) || 12;
 
     const exportDelay =
       exportLogs.reduce(
-        (sum, item) =>
-          sum +
-          toNumber(item.delayDays) +
-          toNumber(item.shipmentDelayDays),
+        (sum, item) => sum + toNumber(item.delayDays) + toNumber(item.shipmentDelayDays),
         0
       ) || 8;
 
     const maintenanceRisk =
       maintenanceLogs.reduce(
-        (sum, item) =>
-          sum +
-          toNumber(item.breakdownCount) +
-          toNumber(item.downtimeHours),
+        (sum, item) => sum + toNumber(item.breakdownCount) + toNumber(item.downtimeHours),
         0
       ) || 10;
 
     const utilityPressure =
       utilitiesLogs.reduce(
-        (sum, item) =>
-          sum +
-          toNumber(item.utilityCost) +
-          toNumber(item.generatorFuelCost),
+        (sum, item) => sum + toNumber(item.utilityCost) + toNumber(item.generatorFuelCost),
         0
       ) || 15000;
 
-    const riskExposure =
-      riskReports.length || 6;
+    const riskExposure = riskReports.length || 6;
 
-    const productionScore = Math.max(
-      20,
-      Math.round(100 - wastageValue / 300)
-    );
-
-    const workforceScore = Math.max(
-      20,
-      Math.round(100 - absenteeism * 3)
-    );
-
-    const shipmentScore = Math.max(
-      20,
-      Math.round(100 - exportDelay * 5)
-    );
-
-    const maintenanceScore = Math.max(
-      20,
-      Math.round(100 - maintenanceRisk * 3)
-    );
-
-    const utilityScore = Math.max(
-      20,
-      Math.round(100 - utilityPressure / 700)
-    );
-
-    const governanceScore = Math.max(
-      20,
-      Math.round(100 - riskExposure * 6)
-    );
+    const productionScore = Math.max(20, Math.round(100 - wastageValue / 300));
+    const workforceScore = Math.max(20, Math.round(100 - absenteeism * 3));
+    const shipmentScore = Math.max(20, Math.round(100 - exportDelay * 5));
+    const maintenanceScore = Math.max(20, Math.round(100 - maintenanceRisk * 3));
+    const utilityScore = Math.max(20, Math.round(100 - utilityPressure / 700));
+    const governanceScore = Math.max(20, Math.round(100 - riskExposure * 6));
 
     return [
       {
         title: "Production Performance Review",
         status: getStatus(productionScore),
-        summary:
-          "Executive review of production efficiency, wastage and output trend.",
-        action:
-          "Review line balancing, bottlenecks and operator productivity.",
+        summary: "Executive review of production efficiency, wastage and output trend.",
+        action: "Review line balancing, bottlenecks and operator productivity.",
       },
       {
         title: "Workforce Stability Review",
         status: getStatus(workforceScore),
-        summary:
-          "Management visibility of absenteeism, overtime and manpower pressure.",
-        action:
-          "Review attendance discipline and shift allocation immediately.",
+        summary: "Management visibility of absenteeism, overtime and manpower pressure.",
+        action: "Review attendance discipline and shift allocation immediately.",
       },
       {
         title: "Shipment & Export Review",
         status: getStatus(shipmentScore),
-        summary:
-          "Tracks export delay exposure and shipment execution risk.",
-        action:
-          "Escalate delayed orders and protect buyer confidence.",
+        summary: "Tracks export delay exposure and shipment execution risk.",
+        action: "Escalate delayed orders and protect buyer confidence.",
       },
       {
         title: "Maintenance Governance Review",
         status: getStatus(maintenanceScore),
-        summary:
-          "Reviews downtime trend, breakdown frequency and repair impact.",
-        action:
-          "Strengthen preventive maintenance and spare readiness.",
+        summary: "Reviews downtime trend, breakdown frequency and repair impact.",
+        action: "Strengthen preventive maintenance and spare readiness.",
       },
       {
         title: "Utility Cost Review",
         status: getStatus(utilityScore),
-        summary:
-          "Monitors electricity, generator fuel and utilities cash pressure.",
-        action:
-          "Separate abnormal energy spikes and investigate immediately.",
+        summary: "Monitors electricity, generator fuel and utilities cash pressure.",
+        action: "Separate abnormal energy spikes and investigate immediately.",
       },
       {
         title: "Enterprise Risk Governance",
         status: getStatus(governanceScore),
-        summary:
-          "Executive review of operational, financial and compliance exposure.",
-        action:
-          "Conduct cross-functional risk escalation review meeting.",
+        summary: "Executive review of operational, financial and compliance exposure.",
+        action: "Conduct cross-functional risk escalation review meeting.",
       },
     ];
   }, [
-    productionLogs,
     manpowerLogs,
     wastageLogs,
     exportLogs,
@@ -304,11 +215,7 @@ export default function AIManagementReviewCentrePage() {
       Critical: 32,
     };
 
-    const total = reviewItems.reduce(
-      (sum, item) => sum + map[item.status],
-      0
-    );
-
+    const total = reviewItems.reduce((sum, item) => sum + map[item.status], 0);
     return Math.round(total / reviewItems.length);
   }, [reviewItems]);
 
@@ -316,12 +223,12 @@ export default function AIManagementReviewCentrePage() {
     <DashboardShell title="AI Management Review Centre">
       <main className="min-h-screen bg-slate-950 text-white">
         <section className="border-b border-white/10 bg-[linear(#0f172a,#020617)] px-6 py-8">
-          <div className="max-w-7xl mx-auto">
+          <div className="mx-auto max-w-7xl">
             <p className="text-sm uppercase tracking-[0.3em] text-cyan-300">
               Module 106
             </p>
 
-            <h1 className="mt-3 text-3xl md:text-5xl font-bold">
+            <h1 className="mt-3 text-3xl font-bold md:text-5xl">
               AI Management Review Centre
             </h1>
 
@@ -346,84 +253,145 @@ export default function AIManagementReviewCentrePage() {
               </div>
             </div>
 
-            {loading && (
+            {loading ? (
               <p className="mt-5 text-sm text-cyan-200">
                 Loading live management review intelligence...
               </p>
-            )}
+            ) : null}
 
-            {error && (
+            {error ? (
               <p className="mt-5 text-sm text-yellow-300">{error}</p>
-            )}
+            ) : null}
           </div>
         </section>
 
-        <section className="max-w-7xl mx-auto px-6 py-8">
+        <section className="mx-auto max-w-7xl px-6 py-8">
           <div className="grid gap-6 md:grid-cols-2">
-            {reviewItems.map((item) => (
-              <div
-                key={item.title}
-                className="rounded-2xl border border-white/10 bg-white/5 p-6 shadow-xl"
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <h2 className="text-2xl font-semibold">
-                      {item.title}
-                    </h2>
+            {reviewItems.map((item, index) => {
+              const id = slugify(item.title);
 
-                    <p className="mt-3 text-sm text-slate-300">
+              return (
+                <a
+                  key={item.title}
+                  href={`#${id}`}
+                  className="rounded-2xl border border-white/10 bg-white/5 p-6 shadow-xl transition hover:-translate-y-1 hover:border-cyan-400 hover:bg-cyan-500/10"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.2em] text-cyan-300">
+                        {String(index + 1).padStart(2, "0")} Review Area
+                      </p>
+
+                      <h2 className="mt-2 text-2xl font-semibold">
+                        {item.title}
+                      </h2>
+
+                      <p className="mt-3 text-sm text-slate-300">
+                        {item.summary}
+                      </p>
+                    </div>
+
+                    <div
+                      className={`rounded-full border px-4 py-1 text-xs font-semibold ${statusStyle(
+                        item.status
+                      )}`}
+                    >
+                      {item.status}
+                    </div>
+                  </div>
+
+                  <p className="mt-6 text-sm font-semibold text-cyan-300">
+                    Open review detail →
+                  </p>
+                </a>
+              );
+            })}
+          </div>
+        </section>
+
+        <section className="mx-auto max-w-7xl px-6 pb-10">
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
+            <h2 className="text-2xl font-bold">
+              Management review detail sections
+            </h2>
+
+            <div className="mt-6 space-y-5">
+              {reviewItems.map((item, index) => {
+                const id = slugify(item.title);
+
+                return (
+                  <section
+                    key={item.title}
+                    id={id}
+                    className="scroll-mt-28 rounded-xl border border-white/10 bg-slate-900/70 p-5"
+                  >
+                    <h3 className="text-xl font-bold text-cyan-300">
+                      {String(index + 1).padStart(2, "0")} {item.title}
+                    </h3>
+
+                    <p className="mt-3 text-sm leading-7 text-slate-300">
                       {item.summary}
                     </p>
-                  </div>
 
-                  <div
-                    className={`rounded-full border px-4 py-1 text-xs font-semibold ${statusStyle(
-                      item.status
-                    )}`}
-                  >
-                    {item.status}
-                  </div>
-                </div>
+                    <p className="mt-4 text-sm font-semibold text-yellow-300">
+                      Recommended management action
+                    </p>
 
-                <div className="mt-6 rounded-xl border border-white/10 bg-slate-900/70 p-4">
-                  <p className="text-sm font-semibold text-cyan-300">
-                    Recommended management action
-                  </p>
-
-                  <p className="mt-2 text-sm text-slate-200">
-                    {item.action}
-                  </p>
-                </div>
-              </div>
-            ))}
+                    <p className="mt-2 text-sm leading-7 text-slate-200">
+                      {item.action}
+                    </p>
+                  </section>
+                );
+              })}
+            </div>
           </div>
         </section>
 
-        <section className="max-w-7xl mx-auto px-6 pb-10">
+        <section className="mx-auto max-w-7xl px-6 pb-10">
           <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
             <h2 className="text-2xl font-bold">
               Weekly executive review agenda
             </h2>
 
             <div className="mt-6 grid gap-4 md:grid-cols-3">
-              {[
-                "Production bottleneck review",
-                "Buyer delivery commitment review",
-                "Wastage and rejection analysis",
-                "Utility and energy cost escalation",
-                "Factory risk escalation tracking",
-                "Corrective action accountability",
-                "Manpower attendance review",
-                "Machine downtime governance",
-                "Cashflow and profitability review",
-              ].map((item) => (
-                <div
-                  key={item}
-                  className="rounded-xl border border-white/10 bg-slate-900/70 p-4 text-sm text-slate-200"
-                >
-                  {item}
-                </div>
-              ))}
+              {agendaItems.map(([number, title, detail]) => {
+                const id = slugify(title);
+
+                return (
+                  <a
+                    key={title}
+                    href={`#${id}`}
+                    className="rounded-xl border border-white/10 bg-slate-900/70 p-4 text-sm text-slate-200 transition hover:-translate-y-1 hover:border-cyan-400 hover:bg-cyan-500/10"
+                  >
+                    <span className="mr-2 font-extrabold text-cyan-300">
+                      {number}
+                    </span>
+                    {title}
+                  </a>
+                );
+              })}
+            </div>
+
+            <div className="mt-8 space-y-5">
+              {agendaItems.map(([number, title, detail]) => {
+                const id = slugify(title);
+
+                return (
+                  <section
+                    key={title}
+                    id={id}
+                    className="scroll-mt-28 rounded-xl border border-white/10 bg-slate-900/70 p-5"
+                  >
+                    <h3 className="text-xl font-bold text-cyan-300">
+                      {number} {title}
+                    </h3>
+
+                    <p className="mt-3 text-sm leading-7 text-slate-300">
+                      {detail}
+                    </p>
+                  </section>
+                );
+              })}
             </div>
           </div>
         </section>

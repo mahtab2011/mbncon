@@ -27,7 +27,12 @@ function toNumber(value: any): number {
   const n = Number(value);
   return Number.isFinite(n) ? n : 0;
 }
-
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
 function statusStyle(status: ReportSection["status"]) {
   if (status === "Strong") {
     return "border-emerald-500 bg-emerald-500/10 text-emerald-300";
@@ -332,74 +337,109 @@ export default function AIEnterpriseReportGeneratorPage() {
         </section>
 
         <section className="mx-auto max-w-7xl px-6 py-8">
-          <div className="grid gap-6 md:grid-cols-2">
-            {reportSections.map((item) => (
-              <div
-                key={item.title}
-                className="rounded-2xl border border-white/10 bg-white/5 p-6 shadow-xl"
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <h2 className="text-2xl font-semibold">{item.title}</h2>
+  <div className="grid gap-6 md:grid-cols-2">
+    {reportSections.map((item) => (
+      <a
+        key={item.title}
+        href={`#${slugify(item.title)}`}
+        className="block rounded-2xl border border-white/10 bg-white/5 p-6 shadow-xl transition hover:-translate-y-1 hover:border-cyan-400/40 hover:bg-cyan-500/10"
+      >
+        <div className="flex items-start justify-between gap-4">
+          <h2 className="text-2xl font-semibold">{item.title}</h2>
 
-                  <div
-                    className={`rounded-full border px-4 py-1 text-xs font-semibold ${statusStyle(
-                      item.status
-                    )}`}
-                  >
-                    {item.status}
-                  </div>
-                </div>
-
-                <div className="mt-5 rounded-xl border border-white/10 bg-slate-900/70 p-4">
-                  <p className="text-sm font-semibold text-cyan-300">
-                    Report summary
-                  </p>
-
-                  <p className="mt-2 text-sm text-slate-200">{item.summary}</p>
-                </div>
-
-                <div className="mt-4 rounded-xl border border-white/10 bg-slate-900/70 p-4">
-                  <p className="text-sm font-semibold text-yellow-300">
-                    Recommendation
-                  </p>
-
-                  <p className="mt-2 text-sm text-slate-200">
-                    {item.recommendation}
-                  </p>
-                </div>
-              </div>
-            ))}
+          <div
+            className={`rounded-full border px-4 py-1 text-xs font-semibold ${statusStyle(
+              item.status
+            )}`}
+          >
+            {item.status}
           </div>
-        </section>
+        </div>
+
+        <div className="mt-5 rounded-xl border border-white/10 bg-slate-900/70 p-4">
+          <p className="text-sm font-semibold text-cyan-300">
+            Report summary
+          </p>
+
+          <p className="mt-2 text-sm text-slate-200">
+            {item.summary}
+          </p>
+        </div>
+
+        <div className="mt-4 rounded-xl border border-white/10 bg-slate-900/70 p-4">
+          <p className="text-sm font-semibold text-yellow-300">
+            Recommendation
+          </p>
+
+          <p className="mt-2 text-sm text-slate-200">
+            {item.recommendation}
+          </p>
+        </div>
+      </a>
+    ))}
+  </div>
+</section>
 
         <section className="mx-auto max-w-7xl px-6 pb-10">
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-            <h2 className="text-2xl font-bold">
-              Future report generator functions
-            </h2>
+  <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
+    <h2 className="text-2xl font-bold">
+      Future report generator functions
+    </h2>
 
-            <div className="mt-6 grid gap-4 md:grid-cols-3">
-              {[
-                "PDF board report export",
-                "Buyer-facing summary report",
-                "Department accountability report",
-                "Weekly management review report",
-                "Profit recovery action report",
-                "Risk escalation report",
-                "Audit evidence report",
-                "Bangla report generation",
-                "Email report distribution",
-              ].map((item) => (
-                <div
-                  key={item}
-                  className="rounded-xl border border-white/10 bg-slate-900/70 p-4 text-sm text-slate-200"
-                >
-                  {item}
-                </div>
-              ))}
-            </div>
-          </div>
+    <div className="mt-6 grid gap-4 md:grid-cols-3">
+      {[
+        "PDF board report export",
+        "Buyer-facing summary report",
+        "Department accountability report",
+        "Weekly management review report",
+        "Profit recovery action report",
+        "Risk escalation report",
+        "Audit evidence report",
+        "Bangla report generation",
+        "Email report distribution",
+      ].map((item) => (
+        <a
+          key={item}
+          href={`#future-${slugify(item)}`}
+          className="block rounded-xl border border-white/10 bg-slate-900/70 p-4 text-sm text-slate-200 transition hover:-translate-y-1 hover:border-cyan-400/40 hover:bg-cyan-500/10"
+        >
+          {item}
+        </a>
+      ))}
+    </div>
+
+    <div className="mt-8 space-y-5">
+      {[
+        "PDF board report export",
+        "Buyer-facing summary report",
+        "Department accountability report",
+        "Weekly management review report",
+        "Profit recovery action report",
+        "Risk escalation report",
+        "Audit evidence report",
+        "Bangla report generation",
+        "Email report distribution",
+      ].map((item) => (
+        <section
+          key={item}
+          id={`future-${slugify(item)}`}
+          className="scroll-mt-28 rounded-xl border border-white/10 bg-slate-900/70 p-5"
+        >
+          <h3 className="text-xl font-bold text-cyan-300">
+            {item}
+          </h3>
+
+          <p className="mt-3 text-sm leading-7 text-slate-300">
+            This future function will strengthen enterprise reporting,
+            management accountability, board-level visibility, audit
+            readiness, buyer communication, and evidence-based decision
+            making across the manufacturing intelligence platform.
+          </p>
         </section>
+      ))}
+    </div>
+  </div>
+</section>
       </main>
     </DashboardShell>
   );

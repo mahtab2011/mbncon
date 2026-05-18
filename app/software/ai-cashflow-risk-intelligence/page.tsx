@@ -70,6 +70,12 @@ function riskStyle(risk: CashflowSignal["risk"]) {
   if (risk === "Medium") return "border-yellow-500 bg-yellow-50 text-yellow-800";
   return "border-emerald-500 bg-emerald-50 text-emerald-800";
 }
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
 
 export default function AICashflowRiskIntelligencePage() {
   const [loading, setLoading] = useState(true);
@@ -284,44 +290,107 @@ const results = await Promise.allSettled([
           </div>
         </section>
 
-        <section className="max-w-7xl mx-auto px-6 py-8">
-          <div className="grid gap-5 md:grid-cols-2">
-            {signals.map((item) => (
-              <div
-                key={item.area}
-                className="rounded-2xl border border-white/10 bg-white/5 p-6 shadow-xl"
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <h2 className="text-xl font-semibold">{item.area}</h2>
-                    <p className="mt-2 text-sm text-slate-300">{item.reason}</p>
-                  </div>
+       <section className="max-w-7xl mx-auto px-6 py-8">
+  <div className="grid gap-5 md:grid-cols-2">
+    {signals.map((item) => (
+      <a
+        key={item.area}
+        href={`#${slugify(item.area)}`}
+        className="block rounded-2xl border border-white/10 bg-white/5 p-6 shadow-xl transition hover:-translate-y-1 hover:border-cyan-400/40 hover:bg-cyan-400/10"
+      >
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 className="text-xl font-semibold">{item.area}</h2>
 
-                  <span
-                    className={`rounded-full border px-3 py-1 text-xs font-semibold ${riskStyle(
-                      item.risk
-                    )}`}
-                  >
-                    {item.risk}
-                  </span>
-                </div>
-
-                <div className="mt-5 rounded-xl bg-slate-900/80 p-4">
-                  <p className="text-sm text-slate-400">Risk value</p>
-                  <p className="text-4xl font-bold text-cyan-300">{item.value}</p>
-                </div>
-
-                <div className="mt-5 rounded-xl border border-cyan-400/20 bg-cyan-400/10 p-4">
-                  <p className="text-sm font-semibold text-cyan-200">
-                    Recommended management action
-                  </p>
-                  <p className="mt-2 text-sm text-slate-200">{item.action}</p>
-                </div>
-              </div>
-            ))}
+            <p className="mt-2 text-sm text-slate-300">
+              {item.reason}
+            </p>
           </div>
-        </section>
 
+          <span
+            className={`rounded-full border px-3 py-1 text-xs font-semibold ${riskStyle(
+              item.risk
+            )}`}
+          >
+            {item.risk}
+          </span>
+        </div>
+
+        <div className="mt-5 rounded-xl bg-slate-900/80 p-4">
+          <p className="text-sm text-slate-400">Risk value</p>
+
+          <p className="text-4xl font-bold text-cyan-300">
+            {item.value}
+          </p>
+        </div>
+
+        <div className="mt-5 rounded-xl border border-cyan-400/20 bg-cyan-400/10 p-4">
+          <p className="text-sm font-semibold text-cyan-200">
+            Recommended management action
+          </p>
+
+          <p className="mt-2 text-sm text-slate-200">
+            {item.action}
+          </p>
+        </div>
+      </a>
+    ))}
+  </div>
+</section>
+<section className="max-w-7xl mx-auto px-6 pb-10 space-y-6">
+  {signals.map((item) => (
+    <section
+      key={item.area}
+      id={slugify(item.area)}
+      className="scroll-mt-28 rounded-2xl border border-white/10 bg-white/5 p-6"
+    >
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-white">
+            {item.area}
+          </h2>
+
+          <p className="mt-2 text-slate-300 max-w-3xl">
+            {item.reason}
+          </p>
+        </div>
+
+        <div
+          className={`rounded-full border px-4 py-2 text-sm font-semibold ${riskStyle(
+            item.risk
+          )}`}
+        >
+          {item.risk} Risk
+        </div>
+      </div>
+
+      <div className="mt-6 grid gap-5 md:grid-cols-2">
+        <div className="rounded-xl bg-slate-900/80 p-5">
+          <p className="text-sm uppercase tracking-wide text-cyan-300">
+            Executive Intelligence
+          </p>
+
+          <p className="mt-3 text-slate-200 leading-relaxed">
+            This intelligence area helps management identify operational
+            cashflow pressure, hidden loss exposure, delayed recovery risk,
+            and working capital instability affecting profitability,
+            sustainability, and factory liquidity.
+          </p>
+        </div>
+
+        <div className="rounded-xl border border-cyan-400/20 bg-cyan-400/10 p-5">
+          <p className="text-sm uppercase tracking-wide text-cyan-200">
+            Recommended Action
+          </p>
+
+          <p className="mt-3 text-slate-100 leading-relaxed">
+            {item.action}
+          </p>
+        </div>
+      </div>
+    </section>
+  ))}
+</section>
         <section className="max-w-7xl mx-auto px-6 pb-10">
           <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
             <h2 className="text-2xl font-bold">Director review checklist</h2>

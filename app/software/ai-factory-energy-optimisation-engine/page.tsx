@@ -114,7 +114,12 @@ function getRecommendation(record: EnergyRecord) {
 
   return "Energy consumption currently within operational tolerance.";
 }
-
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
 export default function AIFactoryEnergyOptimisationEnginePage() {
   const [loading, setLoading] = useState(true);
 
@@ -234,76 +239,81 @@ export default function AIFactoryEnergyOptimisationEnginePage() {
             <>
               <section className="grid grid-cols-1 md:grid-cols-5 gap-4">
 
-                <div className="rounded-2xl border border-cyan-700/40 bg-cyan-950/20 p-5">
+  <a
+    href="#total-energy-cost"
+    className="block rounded-2xl border border-cyan-700/40 bg-cyan-950/20 p-5 transition hover:-translate-y-1 hover:border-cyan-400/40"
+  >
+    <p className="text-cyan-300 text-sm">
+      Total Energy Cost
+    </p>
 
-                  <p className="text-cyan-300 text-sm">
-                    Total Energy Cost
-                  </p>
+    <h2 className="text-4xl font-bold mt-3">
+      £
+      {intelligence.totalEnergyCost.toLocaleString()}
+    </h2>
+  </a>
 
-                  <h2 className="text-4xl font-bold mt-3">
-                    £
-                    {intelligence.totalEnergyCost.toLocaleString()}
-                  </h2>
+  <a
+    href="#electricity-usage"
+    className="block rounded-2xl border border-blue-700/40 bg-blue-950/20 p-5 transition hover:-translate-y-1 hover:border-blue-400/40"
+  >
+    <p className="text-blue-300 text-sm">
+      Electricity Usage
+    </p>
 
-                </div>
+    <h2 className="text-4xl font-bold mt-3">
+      {intelligence.totalElectricity.toLocaleString()}
+    </h2>
 
-                <div className="rounded-2xl border border-blue-700/40 bg-blue-950/20 p-5">
+    <p className="text-xs mt-1">
+      kWh
+    </p>
+  </a>
 
-                  <p className="text-blue-300 text-sm">
-                    Electricity Usage
-                  </p>
+  <a
+    href="#generator-fuel"
+    className="block rounded-2xl border border-orange-700/40 bg-orange-950/20 p-5 transition hover:-translate-y-1 hover:border-orange-400/40"
+  >
+    <p className="text-orange-300 text-sm">
+      Generator Fuel
+    </p>
 
-                  <h2 className="text-4xl font-bold mt-3">
-                    {intelligence.totalElectricity.toLocaleString()}
-                  </h2>
+    <h2 className="text-4xl font-bold mt-3">
+      {intelligence.totalFuel.toLocaleString()}
+    </h2>
 
-                  <p className="text-xs mt-1">
-                    kWh
-                  </p>
+    <p className="text-xs mt-1">
+      Litres
+    </p>
+  </a>
 
-                </div>
+  <a
+    href="#critical-risks"
+    className="block rounded-2xl border border-red-700/40 bg-red-950/20 p-5 transition hover:-translate-y-1 hover:border-red-400/40"
+  >
+    <p className="text-red-300 text-sm">
+      Critical Risks
+    </p>
 
-                <div className="rounded-2xl border border-orange-700/40 bg-orange-950/20 p-5">
+    <h2 className="text-5xl font-bold mt-3">
+      {intelligence.criticalRisks}
+    </h2>
+  </a>
 
-                  <p className="text-orange-300 text-sm">
-                    Generator Fuel
-                  </p>
+  <a
+    href="#high-risk-areas"
+    className="block rounded-2xl border border-yellow-700/40 bg-yellow-950/20 p-5 transition hover:-translate-y-1 hover:border-yellow-400/40"
+  >
+    <p className="text-yellow-300 text-sm">
+      High Risk Areas
+    </p>
 
-                  <h2 className="text-4xl font-bold mt-3">
-                    {intelligence.totalFuel.toLocaleString()}
-                  </h2>
+    <h2 className="text-5xl font-bold mt-3">
+      {intelligence.highRisks}
+    </h2>
+  </a>
 
-                  <p className="text-xs mt-1">
-                    Litres
-                  </p>
-
-                </div>
-
-                <div className="rounded-2xl border border-red-700/40 bg-red-950/20 p-5">
-
-                  <p className="text-red-300 text-sm">
-                    Critical Risks
-                  </p>
-
-                  <h2 className="text-5xl font-bold mt-3">
-                    {intelligence.criticalRisks}
-                  </h2>
-
-                </div>
-
-                <div className="rounded-2xl border border-yellow-700/40 bg-yellow-950/20 p-5">
-
-                  <p className="text-yellow-300 text-sm">
-                    High Risk Areas
-                  </p>
-
-                  <h2 className="text-5xl font-bold mt-3">
-                    {intelligence.highRisks}
-                  </h2>
-
-                </div>
-
-              </section>
+</section>
 
               <section className="rounded-2xl border border-cyan-700/40 bg-cyan-950/10 p-6">
 
@@ -375,48 +385,54 @@ export default function AIFactoryEnergyOptimisationEnginePage() {
 
                     <tbody>
 
-                      {records.map((record) => (
-                        <tr
-                          key={record.id}
-                          className="border-b border-slate-800"
-                        >
+  {records.map((record) => (
+    <tr
+      key={record.id}
+      id={slugify(record.department)}
+      className="border-b border-slate-800 transition hover:bg-cyan-900/20"
+    >
 
-                          <td className="p-4">
-                            {record.department}
-                          </td>
+      <td className="p-4">
+        <a
+          href={`#${slugify(record.department)}`}
+          className="text-cyan-300 underline hover:text-cyan-200"
+        >
+          {record.department}
+        </a>
+      </td>
 
-                          <td className="p-4">
-                            {record.electricityKwh.toLocaleString()} kWh
-                          </td>
+      <td className="p-4">
+        {record.electricityKwh.toLocaleString()} kWh
+      </td>
 
-                          <td className="p-4">
-                            {record.generatorFuelLitres.toLocaleString()} L
-                          </td>
+      <td className="p-4">
+        {record.generatorFuelLitres.toLocaleString()} L
+      </td>
 
-                          <td className="p-4">
-                            {record.productionUnits.toLocaleString()}
-                          </td>
+      <td className="p-4">
+        {record.productionUnits.toLocaleString()}
+      </td>
 
-                          <td className="p-4 text-red-300">
-                            £
-                            {record.energyCost.toLocaleString()}
-                          </td>
+      <td className="p-4 text-red-300">
+        £
+        {record.energyCost.toLocaleString()}
+      </td>
 
-                          <td className="p-4 text-cyan-300">
-                            £
-                            {record.costPerUnit}
-                          </td>
+      <td className="p-4 text-cyan-300">
+        £
+        {record.costPerUnit}
+      </td>
 
-                          <td className="p-4">
-                            {record.abnormalSpike
-                              ? "Yes"
-                              : "No"}
-                          </td>
+      <td className="p-4">
+        {record.abnormalSpike
+          ? "Yes"
+          : "No"}
+      </td>
 
-                        </tr>
-                      ))}
+    </tr>
+  ))}
 
-                    </tbody>
+</tbody>
 
                   </table>
 
@@ -426,49 +442,49 @@ export default function AIFactoryEnergyOptimisationEnginePage() {
 
               <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                {records.map((record) => (
-                  <div
-                    key={record.id}
-                    className={`rounded-2xl border p-5 ${getRiskColor(
-                      record.riskLevel
-                    )}`}
-                  >
+  {records.map((record) => (
+    <a
+      key={record.id}
+      href={`#${slugify(record.department)}`}
+      className={`block rounded-2xl border p-5 transition hover:-translate-y-1 hover:border-cyan-400/40 ${getRiskColor(
+        record.riskLevel
+      )}`}
+    >
 
-                    <p className="text-sm opacity-80">
-                      {record.department}
-                    </p>
+      <p className="text-sm opacity-80">
+        {record.department}
+      </p>
 
-                    <h3 className="text-2xl font-bold mt-2">
-                      Energy Optimisation Analysis
-                    </h3>
+      <h3 className="text-2xl font-bold mt-2">
+        Energy Optimisation Analysis
+      </h3>
 
-                    <p className="mt-4 text-slate-200">
-                      {getRecommendation(record)}
-                    </p>
+      <p className="mt-4 text-slate-200">
+        {getRecommendation(record)}
+      </p>
 
-                    <div className="mt-5 flex justify-between">
+      <div className="mt-5 flex justify-between">
 
-                      <span>
-                        Cost:
-                        {" "}
-                        £
-                        {record.energyCost.toLocaleString()}
-                      </span>
+        <span>
+          Cost:
+          {" "}
+          £
+          {record.energyCost.toLocaleString()}
+        </span>
 
-                      <span>
-                        Unit Cost:
-                        {" "}
-                        £
-                        {record.costPerUnit}
-                      </span>
+        <span>
+          Unit Cost:
+          {" "}
+          £
+          {record.costPerUnit}
+        </span>
 
-                    </div>
+      </div>
 
-                  </div>
-                ))}
+    </a>
+  ))}
 
-              </section>
-
+</section>
             </>
           )}
 

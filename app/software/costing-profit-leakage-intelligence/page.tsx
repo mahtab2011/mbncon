@@ -26,13 +26,45 @@ const profitRisks = [
   "Reduced competitiveness",
 ];
 
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 export default function CostingProfitLeakageIntelligencePage() {
+  const kpiCards = [
+    {
+      label: "Profit Leakage",
+      value: "Tracked",
+      href: "#leakage-areas",
+    },
+    {
+      label: "Margin Risk",
+      value: "High",
+      href: "#executive-profit-assessment",
+    },
+    {
+      label: "Cost Visibility",
+      value: "Improving",
+      href: "#profit-risks",
+    },
+    {
+      label: "Financial Exposure",
+      value: "Measured",
+      href: "#consultancy-application",
+    },
+  ];
+
   return (
     <main className="min-h-screen bg-slate-950 text-white">
       <section className="mx-auto max-w-7xl px-6 py-12">
         <Link
           href="/"
-          className="rounded-full border border-white/20 px-4 py-2 text-sm text-slate-200 hover:bg-white/10"
+          className="rounded-full border border-white/20 px-4 py-2 text-sm text-slate-200 transition hover:bg-white/10"
         >
           ← Back to Dashboard
         </Link>
@@ -53,73 +85,118 @@ export default function CostingProfitLeakageIntelligencePage() {
           </p>
         </div>
 
-        <section className="mt-10 grid gap-6 md:grid-cols-4">
-          {[
-            ["Profit Leakage", "Tracked"],
-            ["Margin Risk", "High"],
-            ["Cost Visibility", "Improving"],
-            ["Financial Exposure", "Measured"],
-          ].map(([label, value]) => (
-            <div
-              key={label}
-              className="rounded-2xl border border-white/10 bg-white/5 p-6"
+        <section
+          id="enterprise-kpis"
+          className="mt-10 grid scroll-mt-28 gap-6 md:grid-cols-4"
+        >
+          {kpiCards.map((card) => (
+            <a
+              key={card.label}
+              href={card.href}
+              className="rounded-2xl border border-white/10 bg-white/5 p-6 transition hover:-translate-y-1 hover:border-green-400/70 hover:shadow-xl"
             >
-              <p className="text-sm text-slate-400">{label}</p>
+              <p className="text-sm text-slate-400">{card.label}</p>
+
               <p className="mt-3 text-2xl font-bold text-green-300">
-                {value}
+                {card.value}
               </p>
-            </div>
+
+              <p className="mt-3 text-xs text-slate-500">
+                Click to review profit intelligence
+              </p>
+            </a>
           ))}
         </section>
 
+        <section
+          id="executive-profit-assessment"
+          className="mt-10 scroll-mt-28 rounded-3xl border border-green-400/30 bg-green-400/10 p-8"
+        >
+          <p className="text-sm uppercase tracking-widest text-green-300">
+            Executive Profit Assessment
+          </p>
+
+          <h2 className="mt-2 text-3xl font-bold text-green-100">
+            Margin Risk High · Leakage Control Required
+          </h2>
+
+          <p className="mt-4 text-slate-200">
+            AI assessment recommends active monitoring of costing accuracy,
+            overhead allocation, material wastage, overtime pressure, rework
+            cost, buyer discount pressure, shipment penalties, and underquoted
+            order exposure before profitability is damaged.
+          </p>
+        </section>
+
         <section className="mt-10 grid gap-6 md:grid-cols-2">
-          <div className="rounded-3xl border border-white/10 bg-slate-900 p-8">
+          <div
+            id="leakage-areas"
+            className="scroll-mt-28 rounded-3xl border border-white/10 bg-slate-900 p-8"
+          >
             <h2 className="text-2xl font-bold text-green-200">
               Leakage Areas
             </h2>
 
             <div className="mt-6 space-y-3">
-              {leakageAreas.map((item, index) => (
-                <div
-                  key={item}
-                  className="flex gap-3 rounded-xl border border-white/10 bg-white/5 p-3"
-                >
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-green-400 text-sm font-bold text-slate-950">
-                    {index + 1}
-                  </span>
+              {leakageAreas.map((item, index) => {
+                const sectionId = slugify(item);
 
-                  <span className="text-sm text-slate-200">{item}</span>
-                </div>
-              ))}
+                return (
+                  <a
+                    key={item}
+                    id={sectionId}
+                    href="#consultancy-application"
+                    className="scroll-mt-28 flex gap-3 rounded-xl border border-white/10 bg-white/5 p-3 transition hover:-translate-y-1 hover:border-green-400/70 hover:shadow-xl"
+                  >
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-green-400 text-sm font-bold text-slate-950">
+                      {index + 1}
+                    </span>
+
+                    <span className="text-sm text-slate-200">{item}</span>
+                  </a>
+                );
+              })}
             </div>
           </div>
 
-          <div className="rounded-3xl border border-white/10 bg-slate-900 p-8">
+          <div
+            id="profit-risks"
+            className="scroll-mt-28 rounded-3xl border border-white/10 bg-slate-900 p-8"
+          >
             <h2 className="text-2xl font-bold text-green-200">
               Profit Risks
             </h2>
 
             <div className="mt-6 space-y-4">
-              {profitRisks.map((item, index) => (
-                <div
-                  key={item}
-                  className="rounded-2xl border border-white/10 bg-white/5 p-5"
-                >
-                  <p className="font-semibold text-white">
-                    {index + 1}. {item}
-                  </p>
+              {profitRisks.map((item, index) => {
+                const sectionId = slugify(item);
 
-                  <p className="mt-2 text-sm text-slate-400">
-                    Measure financial impact, root cause, corrective action,
-                    management response, and recovery opportunity.
-                  </p>
-                </div>
-              ))}
+                return (
+                  <a
+                    key={item}
+                    id={sectionId}
+                    href="#consultancy-application"
+                    className="scroll-mt-28 block rounded-2xl border border-white/10 bg-white/5 p-5 transition hover:-translate-y-1 hover:border-green-400/70 hover:shadow-xl"
+                  >
+                    <p className="font-semibold text-white">
+                      {index + 1}. {item}
+                    </p>
+
+                    <p className="mt-2 text-sm text-slate-400">
+                      Measure financial impact, root cause, corrective action,
+                      management response, and recovery opportunity.
+                    </p>
+                  </a>
+                );
+              })}
             </div>
           </div>
         </section>
 
-        <section className="mt-10 rounded-3xl border border-green-400/30 bg-green-400/10 p-8">
+        <section
+          id="consultancy-application"
+          className="mt-10 scroll-mt-28 rounded-3xl border border-green-400/30 bg-green-400/10 p-8"
+        >
           <h2 className="text-2xl font-bold text-green-200">
             Consultancy Application
           </h2>
@@ -130,6 +207,20 @@ export default function CostingProfitLeakageIntelligencePage() {
             affects margins, and where corrective financial and operational
             action is needed.
           </p>
+
+          <div className="mt-6 rounded-2xl border border-white/10 bg-slate-950/60 p-5">
+            <p className="text-sm uppercase tracking-widest text-green-300">
+              AI Recommendation
+            </p>
+
+            <p className="mt-3 text-slate-200">
+              Management should review every order against costing accuracy,
+              actual production efficiency, material wastage, overtime, rework,
+              shipment penalties, buyer discount pressure, and overhead
+              recovery. Orders with weak margin should trigger executive review
+              before acceptance or continuation.
+            </p>
+          </div>
         </section>
       </section>
     </main>

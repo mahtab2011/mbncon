@@ -117,7 +117,12 @@ function getExecutiveAssessment(risky: number, lossMaking: number) {
 
   return "Order Profitability Stable";
 }
-
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
 export default function AIOrderProfitabilityIntelligencePage() {
   const [loading, setLoading] = useState(true);
   const [records, setRecords] = useState<OrderProfitRecord[]>([]);
@@ -230,57 +235,83 @@ export default function AIOrderProfitabilityIntelligencePage() {
           ) : (
             <>
               <section className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                <div className="rounded-2xl border border-cyan-700/40 bg-cyan-950/10 p-5">
-                  <p className="text-cyan-300 text-sm">Order Value</p>
-                  <h2 className="text-4xl font-bold mt-4">
-                    ${(intelligence.totalOrderValue / 1000).toFixed(0)}k
-                  </h2>
-                </div>
 
-                <div className="rounded-2xl border border-fuchsia-700/40 bg-fuchsia-950/10 p-5">
-                  <p className="text-fuchsia-300 text-sm">Actual Cost</p>
-                  <h2 className="text-4xl font-bold mt-4">
-                    ${(intelligence.totalActualCost / 1000).toFixed(0)}k
-                  </h2>
-                </div>
+  <a
+    href="#total-order-value"
+    className="block rounded-2xl border border-cyan-700/40 bg-cyan-950/10 p-5 transition hover:-translate-y-1 hover:border-cyan-400/40"
+  >
 
-                <div className="rounded-2xl border border-red-700/40 bg-red-950/10 p-5">
-                  <p className="text-red-300 text-sm">Profit Leakage</p>
-                  <h2 className="text-4xl font-bold mt-4">
-                    ${intelligence.totalLeakage.toLocaleString()}
-                  </h2>
-                </div>
+    <p className="text-cyan-300 text-sm">
+      Order Value
+    </p>
 
-                <div className="rounded-2xl border border-green-700/40 bg-green-950/10 p-5">
-                  <p className="text-green-300 text-sm">Avg Margin</p>
-                  <h2 className="text-5xl font-bold mt-3">
-                    {intelligence.averageMargin}%
-                  </h2>
-                </div>
+    <h2 className="text-4xl font-bold mt-4">
+      ${(intelligence.totalOrderValue / 1000).toFixed(0)}k
+    </h2>
 
-                <div className="rounded-2xl border border-orange-700/40 bg-orange-950/10 p-5">
-                  <p className="text-orange-300 text-sm">Risky/Loss Orders</p>
-                  <h2 className="text-5xl font-bold mt-3">
-                    {intelligence.riskyOrders + intelligence.lossMakingOrders}
-                  </h2>
-                </div>
-              </section>
+  </a>
 
-              <section className="rounded-2xl border border-cyan-700/40 bg-cyan-950/10 p-6">
-                <p className="text-cyan-300 uppercase tracking-widest text-sm">
-                  Executive Order Profitability Assessment
-                </p>
+  <a
+    href="#actual-order-cost"
+    className="block rounded-2xl border border-fuchsia-700/40 bg-fuchsia-950/10 p-5 transition hover:-translate-y-1 hover:border-fuchsia-400/40"
+  >
 
-                <h2 className="text-3xl font-bold mt-2">
-                  {intelligence.assessment}
-                </h2>
+    <p className="text-fuchsia-300 text-sm">
+      Actual Cost
+    </p>
 
-                <p className="text-slate-300 mt-4">
-                  AI compares planned costing with actual order performance and
-                  highlights orders where rework, delay, air shipment, wastage,
-                  or claim exposure is damaging profitability.
-                </p>
-              </section>
+    <h2 className="text-4xl font-bold mt-4">
+      ${(intelligence.totalActualCost / 1000).toFixed(0)}k
+    </h2>
+
+  </a>
+
+  <a
+    href="#profit-leakage"
+    className="block rounded-2xl border border-red-700/40 bg-red-950/10 p-5 transition hover:-translate-y-1 hover:border-red-400/40"
+  >
+
+    <p className="text-red-300 text-sm">
+      Profit Leakage
+    </p>
+
+    <h2 className="text-4xl font-bold mt-4">
+      ${intelligence.totalLeakage.toLocaleString()}
+    </h2>
+
+  </a>
+
+  <a
+    href="#average-margin"
+    className="block rounded-2xl border border-green-700/40 bg-green-950/10 p-5 transition hover:-translate-y-1 hover:border-green-400/40"
+  >
+
+    <p className="text-green-300 text-sm">
+      Avg Margin
+    </p>
+
+    <h2 className="text-5xl font-bold mt-3">
+      {intelligence.averageMargin}%
+    </h2>
+
+  </a>
+
+  <a
+    href="#risky-orders"
+    className="block rounded-2xl border border-orange-700/40 bg-orange-950/10 p-5 transition hover:-translate-y-1 hover:border-orange-400/40"
+  >
+
+    <p className="text-orange-300 text-sm">
+      Risky/Loss Orders
+    </p>
+
+    <h2 className="text-5xl font-bold mt-3">
+      {intelligence.riskyOrders + intelligence.lossMakingOrders}
+    </h2>
+
+  </a>
+
+</section>
 
               <section className="rounded-2xl border border-slate-800 bg-slate-900 overflow-hidden">
                 <div className="border-b border-slate-800 p-5">
@@ -304,101 +335,161 @@ export default function AIOrderProfitabilityIntelligencePage() {
                     </thead>
 
                     <tbody>
-                      {records.map((record) => {
-                        const leakage =
-                          record.reworkCost +
-                          record.delayCost +
-                          record.airShipmentCost;
 
-                        return (
-                          <tr
-                            key={record.id}
-                            className="border-b border-slate-800"
-                          >
-                            <td className="p-4">{record.orderNo}</td>
-                            <td className="p-4">{record.buyer}</td>
-                            <td className="p-4 text-cyan-300">
-                              ${record.orderValue.toLocaleString()}
-                            </td>
-                            <td className="p-4 text-fuchsia-300">
-                              ${record.actualCost.toLocaleString()}
-                            </td>
-                            <td className="p-4 text-red-300">
-                              ${leakage.toLocaleString()}
-                            </td>
-                            <td className="p-4 text-green-300">
-                              {record.profitMargin}%
-                            </td>
-                            <td className="p-4">{record.status}</td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
+  {records.map((record) => {
+    const leakage =
+      record.reworkCost +
+      record.delayCost +
+      record.airShipmentCost;
+
+    return (
+      <tr
+        key={record.id}
+        id={slugify(record.orderNo)}
+        className="border-b border-slate-800 transition hover:bg-cyan-900/20"
+      >
+
+        <td className="p-4">
+          <a
+            href={`#${slugify(record.orderNo)}`}
+            className="text-cyan-300 underline hover:text-cyan-200"
+          >
+            {record.orderNo}
+          </a>
+        </td>
+
+        <td className="p-4">
+          {record.buyer}
+        </td>
+
+        <td className="p-4 text-cyan-300">
+          ${record.orderValue.toLocaleString()}
+        </td>
+
+        <td className="p-4 text-fuchsia-300">
+          ${record.actualCost.toLocaleString()}
+        </td>
+
+        <td className="p-4 text-red-300">
+          ${leakage.toLocaleString()}
+        </td>
+
+        <td className="p-4 text-green-300">
+          {record.profitMargin}%
+        </td>
+
+        <td className="p-4">
+          {record.status}
+        </td>
+
+      </tr>
+    );
+  })}
+
+</tbody>
                   </table>
                 </div>
               </section>
 
               <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {records.map((record) => (
-                  <article
-                    key={record.id}
-                    className={`rounded-2xl border p-5 ${getStatusStyle(
-                      record.status
-                    )}`}
-                  >
-                    <div className="flex justify-between gap-4">
-                      <div>
-                        <p className="text-sm opacity-80">{record.orderNo}</p>
-                        <h3 className="text-2xl font-bold mt-1">
-                          {record.product}
-                        </h3>
-                        <p className="text-sm opacity-80 mt-1">
-                          {record.buyer}
-                        </p>
-                      </div>
 
-                      <div className="text-right">
-                        <p className="text-sm opacity-80">Margin</p>
-                        <p className="text-3xl font-bold">
-                          {record.profitMargin}%
-                        </p>
-                      </div>
-                    </div>
+  {records.map((record) => (
+    <a
+      key={record.id}
+      href={`#${slugify(record.orderNo)}`}
+      className={`block rounded-2xl border p-5 transition hover:-translate-y-1 hover:border-cyan-400/40 ${getStatusStyle(
+        record.status
+      )}`}
+    >
 
-                    <div className="mt-5 rounded-xl border border-slate-700/60 bg-slate-950/60 p-4">
-                      <p className="text-xs uppercase tracking-widest opacity-70">
-                        AI Order Observation
-                      </p>
-                      <p className="text-sm text-slate-200 mt-2">
-                        {record.aiObservation}
-                      </p>
-                    </div>
+      <div className="flex justify-between gap-4">
 
-                    <div className="mt-5 grid grid-cols-3 gap-3 text-sm">
-                      <div>
-                        <p className="opacity-70">Rework</p>
-                        <p className="font-semibold">
-                          ${record.reworkCost.toLocaleString()}
-                        </p>
-                      </div>
+        <div>
 
-                      <div>
-                        <p className="opacity-70">Delay</p>
-                        <p className="font-semibold">
-                          ${record.delayCost.toLocaleString()}
-                        </p>
-                      </div>
+          <p className="text-sm opacity-80">
+            {record.orderNo}
+          </p>
 
-                      <div>
-                        <p className="opacity-70">Air</p>
-                        <p className="font-semibold">
-                          ${record.airShipmentCost.toLocaleString()}
-                        </p>
-                      </div>
-                    </div>
-                  </article>
-                ))}
-              </section>
+          <h3 className="text-2xl font-bold mt-1">
+            {record.product}
+          </h3>
+
+          <p className="text-sm opacity-80 mt-1">
+            {record.buyer}
+          </p>
+
+        </div>
+
+        <div className="text-right">
+
+          <p className="text-sm opacity-80">
+            Margin
+          </p>
+
+          <p className="text-3xl font-bold">
+            {record.profitMargin}%
+          </p>
+
+        </div>
+
+      </div>
+
+      <div className="mt-5 rounded-xl border border-slate-700/60 bg-slate-950/60 p-4">
+
+        <p className="text-xs uppercase tracking-widest opacity-70">
+          AI Order Observation
+        </p>
+
+        <p className="text-sm text-slate-200 mt-2">
+          {record.aiObservation}
+        </p>
+
+      </div>
+
+      <div className="mt-5 grid grid-cols-3 gap-3 text-sm">
+
+        <div>
+
+          <p className="opacity-70">
+            Rework
+          </p>
+
+          <p className="font-semibold">
+            ${record.reworkCost.toLocaleString()}
+          </p>
+
+        </div>
+
+        <div>
+
+          <p className="opacity-70">
+            Delay
+          </p>
+
+          <p className="font-semibold">
+            ${record.delayCost.toLocaleString()}
+          </p>
+
+        </div>
+
+        <div>
+
+          <p className="opacity-70">
+            Air
+          </p>
+
+          <p className="font-semibold">
+            ${record.airShipmentCost.toLocaleString()}
+          </p>
+
+        </div>
+
+      </div>
+
+    </a>
+  ))}
+
+</section>
             </>
           )}
         </div>

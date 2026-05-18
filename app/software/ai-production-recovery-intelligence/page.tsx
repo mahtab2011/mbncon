@@ -79,7 +79,12 @@ function getRecommendation(record: RecoveryRecord) {
 
   return "Production recovery currently manageable with operational monitoring.";
 }
-
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
 export default function AIProductionRecoveryIntelligencePage() {
   const [loading, setLoading] = useState(true);
 
@@ -192,55 +197,67 @@ export default function AIProductionRecoveryIntelligencePage() {
             <>
               <section className="grid grid-cols-1 md:grid-cols-4 gap-4">
 
-                <div className="rounded-2xl bg-slate-900 border border-slate-800 p-5">
+  <a
+    href="#active-recovery-orders"
+    className="block rounded-2xl bg-slate-900 border border-slate-800 p-5 transition hover:-translate-y-1 hover:border-cyan-400/40"
+  >
 
-                  <p className="text-slate-400 text-sm">
-                    Active Recovery Orders
-                  </p>
+    <p className="text-slate-400 text-sm">
+      Active Recovery Orders
+    </p>
 
-                  <h2 className="text-5xl font-bold mt-3">
-                    {intelligence.totalOrders}
-                  </h2>
+    <h2 className="text-5xl font-bold mt-3">
+      {intelligence.totalOrders}
+    </h2>
 
-                </div>
+  </a>
 
-                <div className="rounded-2xl bg-orange-950/20 border border-orange-700/40 p-5">
+  <a
+    href="#delayed-production-hours"
+    className="block rounded-2xl bg-orange-950/20 border border-orange-700/40 p-5 transition hover:-translate-y-1 hover:border-orange-400/40"
+  >
 
-                  <p className="text-orange-300 text-sm">
-                    Delayed Hours
-                  </p>
+    <p className="text-orange-300 text-sm">
+      Delayed Hours
+    </p>
 
-                  <h2 className="text-5xl font-bold mt-3">
-                    {intelligence.totalDelayedHours}
-                  </h2>
+    <h2 className="text-5xl font-bold mt-3">
+      {intelligence.totalDelayedHours}
+    </h2>
 
-                </div>
+  </a>
 
-                <div className="rounded-2xl bg-red-950/20 border border-red-700/40 p-5">
+  <a
+    href="#critical-recovery-orders"
+    className="block rounded-2xl bg-red-950/20 border border-red-700/40 p-5 transition hover:-translate-y-1 hover:border-red-400/40"
+  >
 
-                  <p className="text-red-300 text-sm">
-                    Critical Recovery Orders
-                  </p>
+    <p className="text-red-300 text-sm">
+      Critical Recovery Orders
+    </p>
 
-                  <h2 className="text-5xl font-bold mt-3">
-                    {intelligence.criticalOrders}
-                  </h2>
+    <h2 className="text-5xl font-bold mt-3">
+      {intelligence.criticalOrders}
+    </h2>
 
-                </div>
+  </a>
 
-                <div className="rounded-2xl bg-green-950/20 border border-green-700/40 p-5">
+  <a
+    href="#average-recovery-probability"
+    className="block rounded-2xl bg-green-950/20 border border-green-700/40 p-5 transition hover:-translate-y-1 hover:border-green-400/40"
+  >
 
-                  <p className="text-green-300 text-sm">
-                    Average Recovery Probability
-                  </p>
+    <p className="text-green-300 text-sm">
+      Average Recovery Probability
+    </p>
 
-                  <h2 className="text-5xl font-bold mt-3">
-                    {intelligence.averageRecoveryProbability}%
-                  </h2>
+    <h2 className="text-5xl font-bold mt-3">
+      {intelligence.averageRecoveryProbability}%
+    </h2>
 
-                </div>
+  </a>
 
-              </section>
+</section>
 
               <section className="rounded-2xl border border-orange-700/40 bg-orange-950/10 p-6">
 
@@ -307,46 +324,54 @@ export default function AIProductionRecoveryIntelligencePage() {
 
                     <tbody>
 
-                      {records.map((record) => (
-                        <tr
-                          key={record.id}
-                          className="border-b border-slate-800"
-                        >
-                          <td className="p-4">
-                            {record.orderNo}
-                          </td>
+  {records.map((record) => (
+    <tr
+      key={record.id}
+      id={slugify(record.orderNo)}
+      className="border-b border-slate-800 transition hover:bg-orange-900/20"
+    >
 
-                          <td className="p-4">
-                            {record.buyer}
-                          </td>
+      <td className="p-4">
+        <a
+          href={`#${slugify(record.orderNo)}`}
+          className="text-cyan-300 underline hover:text-cyan-200"
+        >
+          {record.orderNo}
+        </a>
+      </td>
 
-                          <td className="p-4">
-                            {record.productionLine}
-                          </td>
+      <td className="p-4">
+        {record.buyer}
+      </td>
 
-                          <td className="p-4">
-                            {calculateCompletion(
-                              record.plannedQty,
-                              record.completedQty
-                            )}
-                            %
-                          </td>
+      <td className="p-4">
+        {record.productionLine}
+      </td>
 
-                          <td className="p-4 text-orange-300">
-                            {record.delayedHours} hrs
-                          </td>
+      <td className="p-4">
+        {calculateCompletion(
+          record.plannedQty,
+          record.completedQty
+        )}
+        %
+      </td>
 
-                          <td className="p-4">
-                            {record.shipmentDaysLeft} days
-                          </td>
+      <td className="p-4 text-orange-300">
+        {record.delayedHours} hrs
+      </td>
 
-                          <td className="p-4">
-                            {record.recoveryProbability}%
-                          </td>
-                        </tr>
-                      ))}
+      <td className="p-4">
+        {record.shipmentDaysLeft} days
+      </td>
 
-                    </tbody>
+      <td className="p-4 text-green-300">
+        {record.recoveryProbability}%
+      </td>
+
+    </tr>
+  ))}
+
+</tbody>
 
                   </table>
 
@@ -356,42 +381,47 @@ export default function AIProductionRecoveryIntelligencePage() {
 
               <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                {records.map((record) => (
-                  <div
-                    key={record.id}
-                    className="rounded-2xl bg-slate-900 border border-slate-800 p-5"
-                  >
-                    <p className="text-sm text-slate-400">
-                      {record.orderNo} · {record.buyer}
-                    </p>
+  {records.map((record) => (
+    <a
+      key={record.id}
+      href={`#${slugify(record.orderNo)}`}
+      className="block rounded-2xl bg-slate-900 border border-slate-800 p-5 transition hover:-translate-y-1 hover:border-orange-400/40"
+    >
 
-                    <h3 className="text-xl font-bold mt-2">
-                      {getRiskLevel(
-                        record.recoveryProbability
-                      )}
-                    </h3>
+      <p className="text-sm text-slate-400">
+        {record.orderNo} · {record.buyer}
+      </p>
 
-                    <p className="text-slate-300 mt-4">
-                      {getRecommendation(record)}
-                    </p>
+      <h3 className="text-xl font-bold mt-2">
+        {getRiskLevel(
+          record.recoveryProbability
+        )}
+      </h3>
 
-                    <div className="mt-5 flex justify-between">
-                      <span className="text-orange-300">
-                        Delay:
-                        {" "}
-                        {record.delayedHours} hrs
-                      </span>
+      <p className="text-slate-300 mt-4">
+        {getRecommendation(record)}
+      </p>
 
-                      <span className="text-green-300">
-                        Recovery:
-                        {" "}
-                        {record.recoveryProbability}%
-                      </span>
-                    </div>
-                  </div>
-                ))}
+      <div className="mt-5 flex justify-between">
 
-              </section>
+        <span className="text-orange-300">
+          Delay:
+          {" "}
+          {record.delayedHours} hrs
+        </span>
+
+        <span className="text-green-300">
+          Recovery:
+          {" "}
+          {record.recoveryProbability}%
+        </span>
+
+      </div>
+
+    </a>
+  ))}
+
+</section>
 
             </>
           )}

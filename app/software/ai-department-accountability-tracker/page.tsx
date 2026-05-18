@@ -123,6 +123,12 @@ function getExecutiveAssessment(overdue: number, critical: number) {
   return "Department Accountability Under Control";
 }
 
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
 export default function AIDepartmentAccountabilityTrackerPage() {
   const [loading, setLoading] = useState(true);
   const [records, setRecords] = useState<AccountabilityRecord[]>([]);
@@ -218,41 +224,63 @@ export default function AIDepartmentAccountabilityTrackerPage() {
           ) : (
             <>
               <section className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                <div className="rounded-2xl border border-cyan-700/40 bg-cyan-950/10 p-5">
-                  <p className="text-cyan-300 text-sm">Total Actions</p>
-                  <h2 className="text-5xl font-bold mt-3">
-                    {intelligence.totalActions}
-                  </h2>
-                </div>
 
-                <div className="rounded-2xl border border-orange-700/40 bg-orange-950/10 p-5">
-                  <p className="text-orange-300 text-sm">Open Actions</p>
-                  <h2 className="text-5xl font-bold mt-3">
-                    {intelligence.openActions}
-                  </h2>
-                </div>
+  <a
+    href="#total-actions"
+    className="block rounded-2xl border border-cyan-700/40 bg-cyan-950/10 p-5 transition hover:-translate-y-1 hover:border-cyan-400/40"
+  >
+    <p className="text-cyan-300 text-sm">Total Actions</p>
 
-                <div className="rounded-2xl border border-red-700/40 bg-red-950/10 p-5">
-                  <p className="text-red-300 text-sm">Overdue</p>
-                  <h2 className="text-5xl font-bold mt-3">
-                    {intelligence.overdueActions}
-                  </h2>
-                </div>
+    <h2 className="text-5xl font-bold mt-3">
+      {intelligence.totalActions}
+    </h2>
+  </a>
 
-                <div className="rounded-2xl border border-fuchsia-700/40 bg-fuchsia-950/10 p-5">
-                  <p className="text-fuchsia-300 text-sm">Critical</p>
-                  <h2 className="text-5xl font-bold mt-3">
-                    {intelligence.criticalActions}
-                  </h2>
-                </div>
+  <a
+    href="#open-actions"
+    className="block rounded-2xl border border-orange-700/40 bg-orange-950/10 p-5 transition hover:-translate-y-1 hover:border-orange-400/40"
+  >
+    <p className="text-orange-300 text-sm">Open Actions</p>
 
-                <div className="rounded-2xl border border-green-700/40 bg-green-950/10 p-5">
-                  <p className="text-green-300 text-sm">Departments</p>
-                  <h2 className="text-5xl font-bold mt-3">
-                    {intelligence.departments}
-                  </h2>
-                </div>
-              </section>
+    <h2 className="text-5xl font-bold mt-3">
+      {intelligence.openActions}
+    </h2>
+  </a>
+
+  <a
+    href="#overdue-actions"
+    className="block rounded-2xl border border-red-700/40 bg-red-950/10 p-5 transition hover:-translate-y-1 hover:border-red-400/40"
+  >
+    <p className="text-red-300 text-sm">Overdue</p>
+
+    <h2 className="text-5xl font-bold mt-3">
+      {intelligence.overdueActions}
+    </h2>
+  </a>
+
+  <a
+    href="#critical-actions"
+    className="block rounded-2xl border border-fuchsia-700/40 bg-fuchsia-950/10 p-5 transition hover:-translate-y-1 hover:border-fuchsia-400/40"
+  >
+    <p className="text-fuchsia-300 text-sm">Critical</p>
+
+    <h2 className="text-5xl font-bold mt-3">
+      {intelligence.criticalActions}
+    </h2>
+  </a>
+
+  <a
+    href="#departments"
+    className="block rounded-2xl border border-green-700/40 bg-green-950/10 p-5 transition hover:-translate-y-1 hover:border-green-400/40"
+  >
+    <p className="text-green-300 text-sm">Departments</p>
+
+    <h2 className="text-5xl font-bold mt-3">
+      {intelligence.departments}
+    </h2>
+  </a>
+
+</section>
 
               <section className="rounded-2xl border border-cyan-700/40 bg-cyan-950/10 p-6">
                 <p className="text-cyan-300 uppercase tracking-widest text-sm">
@@ -291,77 +319,217 @@ export default function AIDepartmentAccountabilityTrackerPage() {
                     </thead>
 
                     <tbody>
-                      {records.map((record) => (
-                        <tr
-                          key={record.id}
-                          className="border-b border-slate-800"
-                        >
-                          <td className="p-4">{record.department}</td>
-                          <td className="p-4">{record.owner}</td>
-                          <td className="p-4">{record.issue}</td>
-                          <td className="p-4">{record.priority}</td>
-                          <td className={`p-4 ${getStatusStyle(record.status)}`}>
-                            {record.status}
-                          </td>
-                          <td className="p-4">{record.dueDate}</td>
-                        </tr>
-                      ))}
-                    </tbody>
+  {records.map((record) => (
+    <tr
+      key={record.id}
+      id={slugify(record.issue)}
+      className="border-b border-slate-800 transition hover:bg-cyan-900/20"
+    >
+      <td className="p-4">{record.department}</td>
+
+      <td className="p-4">{record.owner}</td>
+
+      <td className="p-4">
+        <a
+          href={`#${slugify(record.issue)}`}
+          className="text-cyan-300 underline hover:text-cyan-200"
+        >
+          {record.issue}
+        </a>
+      </td>
+
+      <td className="p-4">{record.priority}</td>
+
+      <td className={`p-4 ${getStatusStyle(record.status)}`}>
+        {record.status}
+      </td>
+
+      <td className="p-4">{record.dueDate}</td>
+    </tr>
+  ))}
+</tbody>
                   </table>
                 </div>
               </section>
 
               <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {records.map((record) => (
-                  <article
-                    key={record.id}
-                    className={`rounded-2xl border p-5 ${getPriorityStyle(
-                      record.priority
-                    )}`}
-                  >
-                    <div className="flex justify-between gap-4">
-                      <div>
-                        <p className="text-sm opacity-80">{record.id}</p>
-                        <h3 className="text-2xl font-bold mt-1">
-                          {record.department}
-                        </h3>
-                      </div>
 
-                      <div className="text-right">
-                        <p className="text-sm opacity-80">Status</p>
-                        <p className={`font-bold ${getStatusStyle(record.status)}`}>
-                          {record.status}
-                        </p>
-                      </div>
-                    </div>
+  {records.map((record) => (
+    <a
+      key={record.id}
+      href={`#${slugify(record.issue)}`}
+      className={`block rounded-2xl border p-5 transition hover:-translate-y-1 hover:border-cyan-400/40 ${getPriorityStyle(
+        record.priority
+      )}`}
+    >
+      <div className="flex justify-between gap-4">
 
-                    <p className="mt-4 text-slate-200">{record.issue}</p>
+        <div>
+          <p className="text-sm opacity-80">
+            {record.id}
+          </p>
 
-                    <div className="mt-4 rounded-xl border border-slate-700/60 bg-slate-950/60 p-4">
-                      <p className="text-xs uppercase tracking-widest opacity-70">
-                        AI Action Required
-                      </p>
-                      <p className="text-sm text-slate-200 mt-2">
-                        {record.aiAction}
-                      </p>
-                    </div>
+          <h3 className="text-2xl font-bold mt-1">
+            {record.department}
+          </h3>
+        </div>
 
-                    <div className="mt-4 rounded-xl border border-slate-700/60 bg-slate-950/60 p-4">
-                      <p className="text-xs uppercase tracking-widest opacity-70">
-                        Evidence Required
-                      </p>
-                      <p className="text-sm text-slate-200 mt-2">
-                        {record.evidenceRequired}
-                      </p>
-                    </div>
+        <div className="text-right">
+          <p className="text-sm opacity-80">
+            Status
+          </p>
 
-                    <div className="mt-4 text-sm text-slate-300">
-                      <p>Owner: {record.owner}</p>
-                      <p>Source: {record.sourceModule}</p>
-                    </div>
-                  </article>
-                ))}
-              </section>
+          <p className={`font-bold ${getStatusStyle(record.status)}`}>
+            {record.status}
+          </p>
+        </div>
+
+      </div>
+
+      <p className="mt-4 text-slate-200">
+        {record.issue}
+      </p>
+
+      <div className="mt-4 rounded-xl border border-slate-700/60 bg-slate-950/60 p-4">
+
+        <p className="text-xs uppercase tracking-widest opacity-70">
+          AI Action Required
+        </p>
+
+        <p className="text-sm text-slate-200 mt-2">
+          {record.aiAction}
+        </p>
+
+      </div>
+
+      <div className="mt-4 rounded-xl border border-slate-700/60 bg-slate-950/60 p-4">
+
+        <p className="text-xs uppercase tracking-widest opacity-70">
+          Evidence Required
+        </p>
+
+        <p className="text-sm text-slate-200 mt-2">
+          {record.evidenceRequired}
+        </p>
+
+      </div>
+
+      <div className="mt-4 text-sm text-slate-300">
+        <p>Owner: {record.owner}</p>
+        <p>Source: {record.sourceModule}</p>
+      </div>
+
+    </a>
+  ))}
+
+</section>
+<section className="space-y-6">
+
+  {records.map((record) => (
+    <section
+      key={record.id}
+      id={slugify(record.issue)}
+      className="scroll-mt-28 rounded-2xl border border-slate-800 bg-slate-900/70 p-6"
+    >
+
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+
+        <div>
+          <p className="text-sm uppercase tracking-widest text-cyan-300">
+            {record.department}
+          </p>
+
+          <h2 className="text-3xl font-bold mt-2">
+            {record.issue}
+          </h2>
+        </div>
+
+        <div
+          className={`rounded-full border px-4 py-2 text-sm font-semibold ${getPriorityStyle(
+            record.priority
+          )}`}
+        >
+          {record.priority} Priority
+        </div>
+
+      </div>
+
+      <div className="mt-6 grid gap-5 md:grid-cols-2">
+
+        <div className="rounded-xl border border-slate-700/60 bg-slate-950/60 p-5">
+
+          <p className="text-xs uppercase tracking-widest text-cyan-300">
+            AI Action Required
+          </p>
+
+          <p className="mt-3 text-slate-200 leading-relaxed">
+            {record.aiAction}
+          </p>
+
+        </div>
+
+        <div className="rounded-xl border border-slate-700/60 bg-slate-950/60 p-5">
+
+          <p className="text-xs uppercase tracking-widest text-orange-300">
+            Evidence Required
+          </p>
+
+          <p className="mt-3 text-slate-200 leading-relaxed">
+            {record.evidenceRequired}
+          </p>
+
+        </div>
+
+      </div>
+
+      <div className="mt-6 grid gap-4 md:grid-cols-4">
+
+        <div className="rounded-xl bg-slate-950/60 p-4">
+          <p className="text-sm text-slate-400">
+            Owner
+          </p>
+
+          <p className="mt-2 font-semibold">
+            {record.owner}
+          </p>
+        </div>
+
+        <div className="rounded-xl bg-slate-950/60 p-4">
+          <p className="text-sm text-slate-400">
+            Status
+          </p>
+
+          <p className={`mt-2 font-semibold ${getStatusStyle(record.status)}`}>
+            {record.status}
+          </p>
+        </div>
+
+        <div className="rounded-xl bg-slate-950/60 p-4">
+          <p className="text-sm text-slate-400">
+            Due Date
+          </p>
+
+          <p className="mt-2 font-semibold">
+            {record.dueDate}
+          </p>
+        </div>
+
+        <div className="rounded-xl bg-slate-950/60 p-4">
+          <p className="text-sm text-slate-400">
+            Source Module
+          </p>
+
+          <p className="mt-2 font-semibold">
+            {record.sourceModule}
+          </p>
+        </div>
+
+      </div>
+
+    </section>
+  ))}
+
+</section>
             </>
           )}
         </div>

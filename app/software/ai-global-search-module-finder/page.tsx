@@ -141,6 +141,13 @@ function normalise(value: string) {
   return value.toLowerCase().trim();
 }
 
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
 export default function AIGlobalSearchModuleFinderPage() {
   const [query, setQuery] = useState("");
 
@@ -206,7 +213,7 @@ export default function AIGlobalSearchModuleFinderPage() {
                     key={item}
                     type="button"
                     onClick={() => setQuery(item)}
-                    className="rounded-full border border-slate-700 bg-slate-950 px-4 py-2 text-slate-300 hover:border-cyan-400 hover:text-cyan-300"
+                    className="rounded-full border border-slate-700 bg-slate-950 px-4 py-2 text-slate-300 transition hover:border-cyan-400 hover:text-cyan-300"
                   >
                     {item}
                   </button>
@@ -216,24 +223,33 @@ export default function AIGlobalSearchModuleFinderPage() {
           </section>
 
           <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="rounded-2xl border border-cyan-700/40 bg-cyan-950/10 p-5">
+            <a
+              href="#modules-found"
+              className="block rounded-2xl border border-cyan-700/40 bg-cyan-950/10 p-5 transition hover:-translate-y-1 hover:border-cyan-400/40"
+            >
               <p className="text-sm text-cyan-300">Modules Found</p>
               <h2 className="text-5xl font-bold mt-3">
                 {filteredModules.length}
               </h2>
-            </div>
+            </a>
 
-            <div className="rounded-2xl border border-fuchsia-700/40 bg-fuchsia-950/10 p-5">
+            <a
+              href="#search-mode"
+              className="block rounded-2xl border border-fuchsia-700/40 bg-fuchsia-950/10 p-5 transition hover:-translate-y-1 hover:border-fuchsia-400/40"
+            >
               <p className="text-sm text-fuchsia-300">Search Mode</p>
               <h2 className="text-3xl font-bold mt-4">
                 {query ? "Filtered" : "All"}
               </h2>
-            </div>
+            </a>
 
-            <div className="rounded-2xl border border-green-700/40 bg-green-950/10 p-5">
+            <a
+              href="#navigation-status"
+              className="block rounded-2xl border border-green-700/40 bg-green-950/10 p-5 transition hover:-translate-y-1 hover:border-green-400/40"
+            >
               <p className="text-sm text-green-300">Navigation Status</p>
               <h2 className="text-3xl font-bold mt-4">Ready</h2>
-            </div>
+            </a>
           </section>
 
           <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -241,7 +257,7 @@ export default function AIGlobalSearchModuleFinderPage() {
               <Link
                 key={module.id}
                 href={module.href}
-                className="rounded-2xl border border-slate-800 bg-slate-900 p-5 hover:border-cyan-500 hover:bg-slate-900/80 transition-all duration-300"
+                className="block rounded-2xl border border-slate-800 bg-slate-900 p-5 transition hover:-translate-y-1 hover:border-cyan-400/40 hover:bg-slate-900/80"
               >
                 <p className="text-xs uppercase tracking-widest text-cyan-300">
                   {module.id} · {module.category}
@@ -259,6 +275,48 @@ export default function AIGlobalSearchModuleFinderPage() {
                 </div>
               </Link>
             ))}
+          </section>
+
+          <section className="space-y-5">
+            <section
+              id="modules-found"
+              className="scroll-mt-28 rounded-2xl border border-cyan-700/40 bg-cyan-950/10 p-6"
+            >
+              <h2 className="text-2xl font-bold text-cyan-300">
+                Modules Found
+              </h2>
+              <p className="mt-3 text-slate-300">
+                The finder is currently showing {filteredModules.length} module
+                result(s) based on the search term entered by the user.
+              </p>
+            </section>
+
+            <section
+              id="search-mode"
+              className="scroll-mt-28 rounded-2xl border border-fuchsia-700/40 bg-fuchsia-950/10 p-6"
+            >
+              <h2 className="text-2xl font-bold text-fuchsia-300">
+                Search Mode
+              </h2>
+              <p className="mt-3 text-slate-300">
+                Current mode: {query ? "Filtered search result view" : "All modules view"}.
+                This helps users quickly move between complete navigation and
+                focused module discovery.
+              </p>
+            </section>
+
+            <section
+              id="navigation-status"
+              className="scroll-mt-28 rounded-2xl border border-green-700/40 bg-green-950/10 p-6"
+            >
+              <h2 className="text-2xl font-bold text-green-300">
+                Navigation Status
+              </h2>
+              <p className="mt-3 text-slate-300">
+                Module navigation is ready. Each result card links directly to
+                the relevant intelligence module page.
+              </p>
+            </section>
           </section>
 
           {filteredModules.length === 0 && (

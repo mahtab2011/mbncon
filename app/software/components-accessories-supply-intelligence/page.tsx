@@ -40,13 +40,45 @@ const packagingMaterials = [
   "Barcode labels",
 ];
 
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 export default function ComponentsAccessoriesSupplyIntelligencePage() {
+  const kpiCards = [
+    {
+      label: "Industry Coverage",
+      value: "Garments & Shoes",
+      href: "#garment-components",
+    },
+    {
+      label: "Supply Risk",
+      value: "Monitored",
+      href: "#executive-supply-assessment",
+    },
+    {
+      label: "Import Dependency",
+      value: "Tracked",
+      href: "#shoe-components",
+    },
+    {
+      label: "Packaging Visibility",
+      value: "Active",
+      href: "#packaging-materials",
+    },
+  ];
+
   return (
     <main className="min-h-screen bg-slate-950 text-white">
       <section className="mx-auto max-w-7xl px-6 py-12">
         <Link
           href="/"
-          className="rounded-full border border-white/20 px-4 py-2 text-sm text-slate-200 hover:bg-white/10"
+          className="rounded-full border border-white/20 px-4 py-2 text-sm text-slate-200 transition hover:bg-white/10"
         >
           ← Back to Dashboard
         </Link>
@@ -67,91 +99,145 @@ export default function ComponentsAccessoriesSupplyIntelligencePage() {
           </p>
         </div>
 
-        <section className="mt-10 grid gap-6 md:grid-cols-4">
-          {[
-            ["Industry Coverage", "Garments & Shoes"],
-            ["Supply Risk", "Monitored"],
-            ["Import Dependency", "Tracked"],
-            ["Packaging Visibility", "Active"],
-          ].map(([label, value]) => (
-            <div
-              key={label}
-              className="rounded-2xl border border-white/10 bg-white/5 p-6"
+        <section
+          id="enterprise-kpis"
+          className="mt-10 grid scroll-mt-28 gap-6 md:grid-cols-4"
+        >
+          {kpiCards.map((card) => (
+            <a
+              key={card.label}
+              href={card.href}
+              className="rounded-2xl border border-white/10 bg-white/5 p-6 transition hover:-translate-y-1 hover:border-orange-400/70 hover:shadow-xl"
             >
-              <p className="text-sm text-slate-400">{label}</p>
+              <p className="text-sm text-slate-400">{card.label}</p>
+
               <p className="mt-3 text-xl font-bold text-orange-300">
-                {value}
+                {card.value}
               </p>
-            </div>
+
+              <p className="mt-3 text-xs text-slate-500">
+                Click to review supply intelligence
+              </p>
+            </a>
           ))}
         </section>
 
+        <section
+          id="executive-supply-assessment"
+          className="mt-10 scroll-mt-28 rounded-3xl border border-orange-400/30 bg-orange-400/10 p-8"
+        >
+          <p className="text-sm uppercase tracking-widest text-orange-300">
+            Executive Supply Assessment
+          </p>
+
+          <h2 className="mt-2 text-3xl font-bold text-orange-100">
+            Supply Chain Visibility & Dependency Monitoring Active
+          </h2>
+
+          <p className="mt-4 text-slate-200">
+            AI assessment tracks component dependency, imported material
+            exposure, packaging shortages, supplier performance, lead-time
+            instability, and material quality risk across garments and footwear
+            manufacturing operations.
+          </p>
+        </section>
+
         <section className="mt-10 grid gap-6 md:grid-cols-3">
-          <div className="rounded-3xl border border-white/10 bg-slate-900 p-8">
+          <div
+            id="garment-components"
+            className="scroll-mt-28 rounded-3xl border border-white/10 bg-slate-900 p-8"
+          >
             <h2 className="text-2xl font-bold text-orange-200">
               Garment Components
             </h2>
 
             <div className="mt-6 space-y-3">
-              {garmentComponents.map((item, index) => (
-                <div
-                  key={item}
-                  className="flex gap-3 rounded-xl border border-white/10 bg-white/5 p-3"
-                >
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-orange-400 text-sm font-bold text-slate-950">
-                    {index + 1}
-                  </span>
+              {garmentComponents.map((item, index) => {
+                const sectionId = slugify(item);
 
-                  <span className="text-sm text-slate-200">{item}</span>
-                </div>
-              ))}
+                return (
+                  <a
+                    key={item}
+                    id={sectionId}
+                    href="#consultancy-application"
+                    className="scroll-mt-28 flex gap-3 rounded-xl border border-white/10 bg-white/5 p-3 transition hover:-translate-y-1 hover:border-orange-400/70 hover:shadow-xl"
+                  >
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-orange-400 text-sm font-bold text-slate-950">
+                      {index + 1}
+                    </span>
+
+                    <span className="text-sm text-slate-200">{item}</span>
+                  </a>
+                );
+              })}
             </div>
           </div>
 
-          <div className="rounded-3xl border border-white/10 bg-slate-900 p-8">
+          <div
+            id="shoe-components"
+            className="scroll-mt-28 rounded-3xl border border-white/10 bg-slate-900 p-8"
+          >
             <h2 className="text-2xl font-bold text-orange-200">
               Shoe Components
             </h2>
 
             <div className="mt-6 space-y-3">
-              {shoeComponents.map((item, index) => (
-                <div
-                  key={item}
-                  className="flex gap-3 rounded-xl border border-white/10 bg-white/5 p-3"
-                >
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-orange-400 text-sm font-bold text-slate-950">
-                    {index + 1}
-                  </span>
+              {shoeComponents.map((item, index) => {
+                const sectionId = slugify(item);
 
-                  <span className="text-sm text-slate-200">{item}</span>
-                </div>
-              ))}
+                return (
+                  <a
+                    key={item}
+                    id={sectionId}
+                    href="#consultancy-application"
+                    className="scroll-mt-28 flex gap-3 rounded-xl border border-white/10 bg-white/5 p-3 transition hover:-translate-y-1 hover:border-orange-400/70 hover:shadow-xl"
+                  >
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-orange-400 text-sm font-bold text-slate-950">
+                      {index + 1}
+                    </span>
+
+                    <span className="text-sm text-slate-200">{item}</span>
+                  </a>
+                );
+              })}
             </div>
           </div>
 
-          <div className="rounded-3xl border border-white/10 bg-slate-900 p-8">
+          <div
+            id="packaging-materials"
+            className="scroll-mt-28 rounded-3xl border border-white/10 bg-slate-900 p-8"
+          >
             <h2 className="text-2xl font-bold text-orange-200">
               Packaging Materials
             </h2>
 
             <div className="mt-6 space-y-3">
-              {packagingMaterials.map((item, index) => (
-                <div
-                  key={item}
-                  className="flex gap-3 rounded-xl border border-white/10 bg-white/5 p-3"
-                >
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-orange-400 text-sm font-bold text-slate-950">
-                    {index + 1}
-                  </span>
+              {packagingMaterials.map((item, index) => {
+                const sectionId = slugify(item);
 
-                  <span className="text-sm text-slate-200">{item}</span>
-                </div>
-              ))}
+                return (
+                  <a
+                    key={item}
+                    id={sectionId}
+                    href="#consultancy-application"
+                    className="scroll-mt-28 flex gap-3 rounded-xl border border-white/10 bg-white/5 p-3 transition hover:-translate-y-1 hover:border-orange-400/70 hover:shadow-xl"
+                  >
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-orange-400 text-sm font-bold text-slate-950">
+                      {index + 1}
+                    </span>
+
+                    <span className="text-sm text-slate-200">{item}</span>
+                  </a>
+                );
+              })}
             </div>
           </div>
         </section>
 
-        <section className="mt-10 rounded-3xl border border-orange-400/30 bg-orange-400/10 p-8">
+        <section
+          id="consultancy-application"
+          className="mt-10 scroll-mt-28 rounded-3xl border border-orange-400/30 bg-orange-400/10 p-8"
+        >
           <h2 className="text-2xl font-bold text-orange-200">
             Consultancy Application
           </h2>
@@ -162,6 +248,19 @@ export default function ComponentsAccessoriesSupplyIntelligencePage() {
             material quality problems, and lead-time instability across garment
             and footwear manufacturing supply chains.
           </p>
+
+          <div className="mt-6 rounded-2xl border border-white/10 bg-slate-950/60 p-5">
+            <p className="text-sm uppercase tracking-widest text-orange-300">
+              AI Recommendation
+            </p>
+
+            <p className="mt-3 text-slate-200">
+              Management should monitor supplier dependency, imported material
+              lead times, packaging availability, quality consistency,
+              alternative sourcing readiness, and high-risk material shortages
+              before production planning and shipment commitment.
+            </p>
+          </div>
         </section>
       </section>
     </main>

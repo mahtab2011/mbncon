@@ -189,37 +189,63 @@ export default function AIComplianceRiskIntelligencePage() {
           ) : (
             <>
               <section className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                <div className="rounded-2xl bg-slate-900 border border-slate-800 p-5">
-                  <p className="text-slate-400 text-sm">Total Issues</p>
-                  <h2 className="text-3xl font-bold">{intelligence.totalIssues}</h2>
-                </div>
+  <a
+    href="#total-issues"
+    className="rounded-2xl bg-slate-900 border border-slate-800 p-5 transition hover:-translate-y-1 hover:border-cyan-400/40 hover:bg-cyan-400/10 block"
+  >
+    <p className="text-slate-400 text-sm">Total Issues</p>
 
-                <div className="rounded-2xl bg-slate-900 border border-slate-800 p-5">
-                  <p className="text-slate-400 text-sm">Open Issues</p>
-                  <h2 className="text-3xl font-bold text-yellow-300">
-                    {intelligence.openIssues}
-                  </h2>
-                </div>
+    <h2 className="text-3xl font-bold">
+      {intelligence.totalIssues}
+    </h2>
+  </a>
 
-                <div className="rounded-2xl bg-slate-900 border border-slate-800 p-5">
-                  <p className="text-slate-400 text-sm">Critical Issues</p>
-                  <h2 className="text-3xl font-bold text-red-400">
-                    {intelligence.criticalIssues}
-                  </h2>
-                </div>
+  <a
+    href="#open-issues"
+    className="rounded-2xl bg-slate-900 border border-slate-800 p-5 transition hover:-translate-y-1 hover:border-yellow-400/40 hover:bg-yellow-400/10 block"
+  >
+    <p className="text-slate-400 text-sm">Open Issues</p>
 
-                <div className="rounded-2xl bg-slate-900 border border-slate-800 p-5">
-                  <p className="text-slate-400 text-sm">AI Risk Score</p>
-                  <h2 className="text-3xl font-bold">{intelligence.averageRiskScore}</h2>
-                </div>
+    <h2 className="text-3xl font-bold text-yellow-300">
+      {intelligence.openIssues}
+    </h2>
+  </a>
 
-                <div className="rounded-2xl bg-slate-900 border border-slate-800 p-5">
-                  <p className="text-slate-400 text-sm">Financial Exposure</p>
-                  <h2 className="text-3xl font-bold text-red-300">
-                    £{intelligence.totalFinancialRisk.toLocaleString()}
-                  </h2>
-                </div>
-              </section>
+  <a
+    href="#critical-issues"
+    className="rounded-2xl bg-slate-900 border border-slate-800 p-5 transition hover:-translate-y-1 hover:border-red-400/40 hover:bg-red-400/10 block"
+  >
+    <p className="text-slate-400 text-sm">Critical Issues</p>
+
+    <h2 className="text-3xl font-bold text-red-400">
+      {intelligence.criticalIssues}
+    </h2>
+  </a>
+
+  <a
+    href="#ai-risk-score"
+    className="rounded-2xl bg-slate-900 border border-slate-800 p-5 transition hover:-translate-y-1 hover:border-orange-400/40 hover:bg-orange-400/10 block"
+  >
+    <p className="text-slate-400 text-sm">AI Risk Score</p>
+
+    <h2 className="text-3xl font-bold">
+      {intelligence.averageRiskScore}
+    </h2>
+  </a>
+
+  <a
+    href="#financial-exposure"
+    className="rounded-2xl bg-slate-900 border border-slate-800 p-5 transition hover:-translate-y-1 hover:border-pink-400/40 hover:bg-pink-400/10 block"
+  >
+    <p className="text-slate-400 text-sm">
+      Financial Exposure
+    </p>
+
+    <h2 className="text-3xl font-bold text-red-300">
+      £{intelligence.totalFinancialRisk.toLocaleString()}
+    </h2>
+  </a>
+</section>
 
               <section className="rounded-2xl bg-red-950/40 border border-red-700/40 p-5">
                 <p className="text-red-300 text-sm">Executive AI Assessment</p>
@@ -253,50 +279,144 @@ export default function AIComplianceRiskIntelligencePage() {
                     </thead>
 
                     <tbody>
-                      {records.map((record) => (
-                        <tr key={record.id} className="border-b border-slate-800">
-                          <td className="p-4">{record.id}</td>
-                          <td className="p-4">{record.department}</td>
-                          <td className="p-4">{record.auditArea}</td>
-                          <td className="p-4 text-slate-300">{record.issue}</td>
-                          <td className="p-4">
-                            <span className="rounded-full px-3 py-1 bg-red-900/50 text-red-200">
-                              {record.severity}
-                            </span>
-                          </td>
-                          <td className="p-4">{record.status}</td>
-                          <td className="p-4">{record.owner}</td>
-                          <td className="p-4">{record.daysOpen}</td>
-                          <td className="p-4">
-                            £{record.financialRisk.toLocaleString()}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </section>
+  {records.map((record) => (
+    <tr
+      key={record.id}
+      id={record.id.toLowerCase()}
+      className="border-b border-slate-800 transition hover:bg-red-900/20"
+    >
+      <td className="p-4">
+        <a
+          href={`#${record.id.toLowerCase()}`}
+          className="text-cyan-300 underline hover:text-cyan-200"
+        >
+          {record.id}
+        </a>
+      </td>
 
+      <td className="p-4">{record.department}</td>
+      <td className="p-4">{record.auditArea}</td>
+      <td className="p-4 text-slate-300">{record.issue}</td>
+
+      <td className="p-4">
+        <span className="rounded-full px-3 py-1 bg-red-900/50 text-red-200">
+          {record.severity}
+        </span>
+      </td>
+
+      <td className="p-4">{record.status}</td>
+      <td className="p-4">{record.owner}</td>
+      <td className="p-4">{record.daysOpen}</td>
+
+      <td className="p-4">
+        £{record.financialRisk.toLocaleString()}
+      </td>
+    </tr>
+  ))}
+</tbody>
+</table>
+</div>
+</section>
               <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {records.map((record) => (
-                  <div
-                    key={record.id}
-                    className="rounded-2xl bg-slate-900 border border-slate-800 p-5"
-                  >
-                    <p className="text-sm text-slate-400">
-                      {record.department} · {record.auditArea}
-                    </p>
-                    <h3 className="text-lg font-bold mt-1">{record.issue}</h3>
-                    <p className="text-slate-300 mt-3">
-                      {getRecommendation(record)}
-                    </p>
-                  </div>
-                ))}
-              </section>
-            </>
-          )}
+  {records.map((record) => (
+    <a
+      key={record.id}
+      href={`#${record.id.toLowerCase()}`}
+      className="block rounded-2xl bg-slate-900 border border-slate-800 p-5 transition hover:-translate-y-1 hover:border-red-400/40 hover:bg-red-900/20"
+    >
+      <p className="text-sm text-slate-400">
+        {record.department} · {record.auditArea}
+      </p>
+
+      <h3 className="text-lg font-bold mt-1">{record.issue}</h3>
+
+      <p className="text-slate-300 mt-3">
+        {getRecommendation(record)}
+      </p>
+    </a>
+  ))}
+</section>
+<section className="space-y-6">
+  {records.map((record) => (
+    <section
+      key={record.id}
+      id={record.id.toLowerCase()}
+      className="scroll-mt-28 rounded-2xl border border-slate-800 bg-slate-900/70 p-6"
+    >
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <p className="text-sm uppercase tracking-wide text-red-300">
+            {record.department} · {record.auditArea}
+          </p>
+
+          <h2 className="mt-2 text-2xl font-bold">
+            {record.issue}
+          </h2>
         </div>
-      </main>
-    </DashboardShell>
-  );
+
+        <div className="rounded-full bg-red-900/40 border border-red-500/40 px-4 py-2 text-sm text-red-200">
+          {record.severity} Severity
+        </div>
+      </div>
+
+      <div className="mt-6 grid gap-5 md:grid-cols-2">
+        <div className="rounded-xl bg-slate-950/70 p-5">
+          <p className="text-sm uppercase tracking-wide text-cyan-300">
+            Executive Intelligence
+          </p>
+
+          <p className="mt-3 text-slate-300 leading-relaxed">
+            This compliance intelligence area helps leadership identify
+            operational exposure, audit weakness, buyer escalation risk,
+            corrective action ageing, and potential financial or reputational
+            damage before the issue becomes critical.
+          </p>
+        </div>
+
+        <div className="rounded-xl border border-red-500/30 bg-red-950/30 p-5">
+          <p className="text-sm uppercase tracking-wide text-red-300">
+            Recommended Action
+          </p>
+
+          <p className="mt-3 text-slate-200 leading-relaxed">
+            {getRecommendation(record)}
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-6 grid gap-4 md:grid-cols-4">
+        <div className="rounded-xl bg-slate-950/70 p-4">
+          <p className="text-sm text-slate-400">Owner</p>
+          <p className="mt-2 font-semibold">{record.owner}</p>
+        </div>
+
+        <div className="rounded-xl bg-slate-950/70 p-4">
+          <p className="text-sm text-slate-400">Status</p>
+          <p className="mt-2 font-semibold">{record.status}</p>
+        </div>
+
+        <div className="rounded-xl bg-slate-950/70 p-4">
+          <p className="text-sm text-slate-400">Days Open</p>
+          <p className="mt-2 font-semibold">{record.daysOpen}</p>
+        </div>
+
+        <div className="rounded-xl bg-slate-950/70 p-4">
+          <p className="text-sm text-slate-400">
+            Financial Exposure
+          </p>
+
+          <p className="mt-2 font-semibold text-red-300">
+            £{record.financialRisk.toLocaleString()}
+          </p>
+        </div>
+      </div>
+    </section>
+  ))}
+</section>
+</>
+)}
+</div>
+</main>
+</DashboardShell>
+);
 }

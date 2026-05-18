@@ -419,21 +419,62 @@ export default function AdaptiveLeadershipAssessmentPage() {
 
           <div className="mt-8 grid gap-6 md:grid-cols-2">
             {[
-              "Stakeholder interests",
-              "Sources of resistance",
-              "Political pressures",
-              "Potential losses",
-              "Competing priorities",
-              "Communication barriers",
-              "Trust relationships",
-              "Shared and conflicting values",
-            ].map((item) => (
-              <div
+              ["01", "Stakeholder interests", "#stakeholder-interests"],
+              ["02", "Sources of resistance", "#sources-of-resistance"],
+              ["03", "Political pressures", "#political-pressures"],
+              ["04", "Potential losses", "#potential-losses"],
+              ["05", "Competing priorities", "#competing-priorities"],
+              ["06", "Communication barriers", "#communication-barriers"],
+              ["07", "Trust relationships", "#trust-relationships"],
+              [
+                "08",
+                "Shared and conflicting values",
+                "#shared-conflicting-values",
+              ],
+            ].map(([number, item, href]) => (
+              <a
                 key={item}
-                className="rounded-2xl bg-blue-50 p-5 text-lg font-medium text-gray-700"
+                href={href}
+                className="rounded-2xl bg-blue-50 p-5 text-lg font-medium text-gray-700 transition hover:-translate-y-1 hover:bg-blue-100"
               >
-                • {item}
-              </div>
+                <span className="mr-3 font-extrabold text-blue-700">
+                  {number}
+                </span>
+                {item}
+              </a>
+            ))}
+          </div>
+
+          <div className="mt-10 space-y-6">
+            {[
+              ["stakeholder-interests", "Stakeholder Interests"],
+              ["sources-of-resistance", "Sources of Resistance"],
+              ["political-pressures", "Political Pressures"],
+              ["potential-losses", "Potential Losses"],
+              ["competing-priorities", "Competing Priorities"],
+              ["communication-barriers", "Communication Barriers"],
+              ["trust-relationships", "Trust Relationships"],
+              [
+                "shared-conflicting-values",
+                "Shared and Conflicting Values",
+              ],
+            ].map(([id, title]) => (
+              <section
+                key={id}
+                id={id}
+                className="scroll-mt-28 rounded-2xl border border-blue-100 bg-blue-50 p-6"
+              >
+                <h3 className="text-2xl font-bold text-blue-700">
+                  {title}
+                </h3>
+
+                <p className="mt-4 text-lg leading-8 text-gray-700">
+                  This area helps leadership understand hidden pressure,
+                  resistance, trust gaps, communication barriers,
+                  organizational politics, and alignment risks before major
+                  decisions are made.
+                </p>
+              </section>
             ))}
           </div>
         </div>

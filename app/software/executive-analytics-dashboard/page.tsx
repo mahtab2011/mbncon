@@ -16,6 +16,14 @@ import { generateExecutiveAnomalySummary } from "@/lib/software/anomalyDetection
 import { generateExecutiveRootCauseSummary } from "@/lib/software/rootCauseIntelligence";
 
 type RecordType = Record<string, any>;
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
 
 export default function ExecutiveAnalyticsDashboardPage() {
   const [loading, setLoading] = useState(true);
@@ -309,14 +317,35 @@ export default function ExecutiveAnalyticsDashboardPage() {
   );
 }
 
-function AnalyticsCard({ title, value }: { title: string; value: string }) {
+function AnalyticsCard({
+  title,
+  value,
+}: {
+  title: string;
+  value: string;
+}) {
   return (
-    <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-      <p className="text-sm font-medium text-slate-500">{title}</p>
-      <h2 className="mt-4 text-3xl font-bold text-slate-900">{value}</h2>
+    <div
+      onClick={() => {
+        window.location.href = `#${slugify(title)}`;
+      }}
+      className="cursor-pointer rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:border-indigo-300 hover:shadow-lg"
+    >
+      <p className="text-sm font-medium text-slate-500">
+        {title}
+      </p>
+
+      <h2 className="mt-4 text-3xl font-bold text-slate-900">
+        {value}
+      </h2>
+
+      <p className="mt-4 text-xs text-slate-400">
+        Click to explore intelligence
+      </p>
     </div>
   );
 }
+  
 
 function ChartBox({
   title,
@@ -332,7 +361,10 @@ function ChartBox({
   const percentage = Math.min(100, (value / maxValue) * 100);
 
   return (
-    <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+    <div
+  id={slugify(title)}
+  className="scroll-mt-28 rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:border-cyan-300 hover:shadow-lg"
+>
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold text-slate-900">{title}</h2>
         <span className="text-sm font-semibold text-slate-500">
@@ -356,7 +388,10 @@ function ChartBox({
 
 function InsightPanel({ title, items }: { title: string; items: string[] }) {
   return (
-    <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+    <div
+  id={slugify(title)}
+  className="scroll-mt-28 rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:border-purple-300 hover:shadow-lg"
+>
       <h2 className="text-2xl font-bold text-slate-900">{title}</h2>
 
       <div className="mt-6 space-y-4">

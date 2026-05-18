@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import DashboardShell from "@/components/software/DashboardShell";
 import { useLanguage } from "@/components/software/LanguageProvider";
 
@@ -66,6 +66,18 @@ const content = {
   },
 };
 
+function toNumber(value: string) {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function getComplianceAssessment(score: number, critical: number) {
+  if (critical > 0) return "Critical Compliance Exposure";
+  if (score >= 85) return "Compliance Position Stable";
+  if (score >= 70) return "Moderate Compliance Monitoring Required";
+  return "High Compliance Improvement Required";
+}
+
 export default function ComplianceAuditEntryPage() {
   const { language } = useLanguage();
   const t = content[language];
@@ -93,6 +105,39 @@ export default function ComplianceAuditEntryPage() {
     currentStatus: "",
     remarks: "",
   });
+
+  const complianceScore = toNumber(form.complianceScore);
+  const criticalCount = toNumber(form.criticalFindings);
+  const majorCount = toNumber(form.majorFindings);
+  const minorCount = toNumber(form.minorFindings);
+
+  const executiveAssessment = useMemo(
+    () => getComplianceAssessment(complianceScore, criticalCount),
+    [complianceScore, criticalCount]
+  );
+
+  const kpiCards = [
+    {
+      title: "Compliance Score",
+      value: `${complianceScore}%`,
+      href: "#executive-compliance-assessment",
+    },
+    {
+      title: "Critical Findings",
+      value: criticalCount,
+      href: "#audit-findings",
+    },
+    {
+      title: "Major Findings",
+      value: majorCount,
+      href: "#audit-findings",
+    },
+    {
+      title: "Minor Findings",
+      value: minorCount,
+      href: "#audit-findings",
+    },
+  ];
 
   const updateField = (field: string, value: string) => {
     setForm((prev) => ({
@@ -149,13 +194,58 @@ export default function ComplianceAuditEntryPage() {
           </h1>
 
           <p className="mt-4 max-w-4xl text-slate-600">{t.subtitle}</p>
+
+          <section
+            id="enterprise-kpis"
+            className="mt-8 grid scroll-mt-28 grid-cols-1 gap-4 md:grid-cols-4"
+          >
+            {kpiCards.map((card) => (
+              <a
+                key={card.title}
+                href={card.href}
+                className="rounded-2xl border border-cyan-100 bg-cyan-50 p-5 transition hover:-translate-y-1 hover:border-cyan-400 hover:shadow-xl"
+              >
+                <p className="text-sm text-slate-500">{card.title}</p>
+
+                <h2 className="mt-3 text-3xl font-bold text-cyan-700">
+                  {card.value}
+                </h2>
+
+                <p className="mt-3 text-xs text-slate-500">
+                  Click to review compliance intelligence
+                </p>
+              </a>
+            ))}
+          </section>
+
+          <section
+            id="executive-compliance-assessment"
+            className="mt-8 scroll-mt-28 rounded-3xl border border-cyan-200 bg-cyan-50 p-6"
+          >
+            <p className="text-sm uppercase tracking-widest text-cyan-700">
+              Executive Compliance Assessment
+            </p>
+
+            <h2 className="mt-2 text-3xl font-bold text-slate-900">
+              {executiveAssessment}
+            </h2>
+
+            <p className="mt-4 text-slate-700">
+              AI evaluates audit score, critical findings, corrective action
+              closure, certification status, safety exposure, environmental
+              risk, and department ownership before management sign-off.
+            </p>
+          </section>
         </div>
 
         <form
           onSubmit={handleSubmit}
           className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm"
         >
-          <div className="grid gap-6 md:grid-cols-2">
+          <div
+            id="audit-findings"
+            className="grid scroll-mt-28 gap-6 md:grid-cols-2"
+          >
             {Object.entries(t.fields).map(([key, label]) => (
               <div key={key} className="space-y-2">
                 <label className="text-sm font-semibold text-slate-700">
@@ -175,7 +265,13 @@ export default function ComplianceAuditEntryPage() {
                   />
                 ) : (
                   <input
-                    type="text"
+                    type={
+                      key === "auditDate" || key === "targetClosureDate"
+                        ? "date"
+                        : key === "complianceScore"
+                        ? "number"
+                        : "text"
+                    }
                     value={form[key as keyof typeof form]}
                     onChange={(e) => updateField(key, e.target.value)}
                     className="w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-cyan-500"
@@ -184,6 +280,22 @@ export default function ComplianceAuditEntryPage() {
               </div>
             ))}
           </div>
+
+          <section
+            id="ai-recommendation"
+            className="mt-10 scroll-mt-28 rounded-3xl border border-cyan-200 bg-cyan-50 p-6"
+          >
+            <p className="text-sm uppercase tracking-widest text-cyan-700">
+              AI Recommendation
+            </p>
+
+            <p className="mt-3 text-slate-700">
+              Management should review critical findings first, assign clear
+              departmental ownership, close corrective actions before the target
+              date, and monitor certification, safety, and environmental risk
+              until compliance exposure is fully controlled.
+            </p>
+          </section>
 
           <div className="mt-8 flex items-center gap-4">
             <button
