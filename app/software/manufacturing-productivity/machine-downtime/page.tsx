@@ -12,6 +12,15 @@ type MachineRow = {
   endShiftCheck: "Completed" | "Pending";
 };
 
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 export default function MachineDowntimePage() {
   const [rows, setRows] = useState<MachineRow[]>([
     {
@@ -115,9 +124,17 @@ export default function MachineDowntimePage() {
     setEndShiftCheck("Pending");
   };
 
+  const governanceItems = [
+    "Morning readiness check two hours before production starts",
+    "Immediate maintenance review after production finishes",
+    "Preventive maintenance schedule for every critical machine",
+    "Public dashboard for maintenance visibility and accountability",
+  ];
+
   return (
     <main className="min-h-screen bg-slate-100 text-slate-900">
-      <section className="bg-linear-to-r from-slate-950 via-blue-900 to-orange-800 px-6 py-16 text-white">
+      {/* HERO */}
+      <section className="bg-slate-950 px-6 py-16 text-white">
         <div className="mx-auto max-w-7xl">
           <p className="mb-4 text-sm font-bold uppercase tracking-[0.3em] text-yellow-300">
             Machine Downtime Intelligence
@@ -137,43 +154,58 @@ export default function MachineDowntimePage() {
 
       <section className="px-6 py-16">
         <div className="mx-auto max-w-7xl">
+          {/* TOP CARDS */}
           <div className="grid gap-6 md:grid-cols-3">
-            <div className="rounded-3xl bg-orange-100 p-8 shadow-md">
-              <h2 className="text-2xl font-extrabold text-orange-950">
-                Morning Maintenance Check
-              </h2>
-              <p className="mt-5 text-lg leading-relaxed text-orange-950">
-                Critical machines should be checked at least two hours before
-                staff start production so breakdown risk can be reduced before
-                the line begins work.
-              </p>
-            </div>
+            {[
+              {
+                title: "Morning Maintenance Check",
+                color: "bg-orange-100 text-orange-950",
+                text:
+                  "Critical machines should be checked at least two hours before staff start production so breakdown risk can be reduced before the line begins work.",
+              },
+              {
+                title: "End-of-Production Check",
+                color: "bg-blue-100 text-blue-950",
+                text:
+                  "Maintenance review should be carried out immediately after production finishes to identify faults, wear, leakage, noise, overheating, or adjustment requirements.",
+              },
+              {
+                title: "Preventive Maintenance Routine",
+                color: "bg-emerald-100 text-emerald-950",
+                text:
+                  "Planned preventive maintenance should be scheduled, recorded, reviewed, and displayed so production teams know whether each critical machine is ready, due, or overdue.",
+              },
+            ].map((item) => {
+              const id = slugify(item.title);
 
-            <div className="rounded-3xl bg-blue-100 p-8 shadow-md">
-              <h2 className="text-2xl font-extrabold text-blue-950">
-                End-of-Production Check
-              </h2>
-              <p className="mt-5 text-lg leading-relaxed text-blue-950">
-                Maintenance review should be carried out immediately after
-                production finishes to identify faults, wear, leakage, noise,
-                overheating, or adjustment requirements.
-              </p>
-            </div>
+              return (
+                <a
+                  key={item.title}
+                  href={`#${id}`}
+                  className={`scroll-mt-28 rounded-3xl p-8 shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-xl ${item.color}`}
+                >
+                  <h2
+                    id={id}
+                    className="text-2xl font-extrabold"
+                  >
+                    {item.title}
+                  </h2>
 
-            <div className="rounded-3xl bg-emerald-100 p-8 shadow-md">
-              <h2 className="text-2xl font-extrabold text-emerald-950">
-                Preventive Maintenance Routine
-              </h2>
-              <p className="mt-5 text-lg leading-relaxed text-emerald-950">
-                Planned preventive maintenance should be scheduled, recorded,
-                reviewed, and displayed so production teams know whether each
-                critical machine is ready, due, or overdue.
-              </p>
-            </div>
+                  <p className="mt-5 text-lg leading-relaxed">
+                    {item.text}
+                  </p>
+                </a>
+              );
+            })}
           </div>
 
+          {/* MAIN GRID */}
           <div className="mt-12 grid gap-6 xl:grid-cols-3">
-            <div className="rounded-3xl bg-white p-8 shadow-md">
+            {/* ENTRY FORM */}
+            <section
+              id={slugify("Machine Status Entry")}
+              className="scroll-mt-28 rounded-3xl bg-white p-8 shadow-md"
+            >
               <h2 className="text-3xl font-extrabold text-blue-950">
                 Machine Status Entry
               </h2>
@@ -183,32 +215,41 @@ export default function MachineDowntimePage() {
                   <span className="font-bold text-slate-700">
                     Machine Name
                   </span>
+
                   <input
                     value={machine}
                     onChange={(e) => setMachine(e.target.value)}
-                    className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 outline-none focus:border-blue-600"
+                    className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 outline-none transition focus:border-blue-600 focus:bg-white"
                     placeholder="Example: Cutting Machine 1"
                   />
                 </label>
 
                 <label className="block">
-                  <span className="font-bold text-slate-700">Department</span>
+                  <span className="font-bold text-slate-700">
+                    Department
+                  </span>
+
                   <input
                     value={department}
                     onChange={(e) => setDepartment(e.target.value)}
-                    className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 outline-none focus:border-blue-600"
+                    className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 outline-none transition focus:border-blue-600 focus:bg-white"
                     placeholder="Example: Sewing"
                   />
                 </label>
 
                 <label className="block">
-                  <span className="font-bold text-slate-700">Criticality</span>
+                  <span className="font-bold text-slate-700">
+                    Criticality
+                  </span>
+
                   <select
                     value={criticality}
                     onChange={(e) =>
-                      setCriticality(e.target.value as MachineRow["criticality"])
+                      setCriticality(
+                        e.target.value as MachineRow["criticality"]
+                      )
                     }
-                    className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 outline-none focus:border-blue-600"
+                    className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 outline-none transition focus:border-blue-600 focus:bg-white"
                   >
                     <option>High</option>
                     <option>Medium</option>
@@ -220,11 +261,12 @@ export default function MachineDowntimePage() {
                   <span className="font-bold text-slate-700">
                     Downtime Minutes
                   </span>
+
                   <input
                     value={downtimeMinutes}
                     onChange={(e) => setDowntimeMinutes(e.target.value)}
                     type="number"
-                    className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 outline-none focus:border-blue-600"
+                    className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 outline-none transition focus:border-blue-600 focus:bg-white"
                     placeholder="Example: 30"
                   />
                 </label>
@@ -233,6 +275,7 @@ export default function MachineDowntimePage() {
                   <span className="font-bold text-slate-700">
                     Preventive Maintenance Status
                   </span>
+
                   <select
                     value={preventiveStatus}
                     onChange={(e) =>
@@ -240,7 +283,7 @@ export default function MachineDowntimePage() {
                         e.target.value as MachineRow["preventiveStatus"]
                       )
                     }
-                    className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 outline-none focus:border-blue-600"
+                    className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 outline-none transition focus:border-blue-600 focus:bg-white"
                   >
                     <option>Completed</option>
                     <option>Due</option>
@@ -252,6 +295,7 @@ export default function MachineDowntimePage() {
                   <span className="font-bold text-slate-700">
                     Morning Check
                   </span>
+
                   <select
                     value={morningCheck}
                     onChange={(e) =>
@@ -259,7 +303,7 @@ export default function MachineDowntimePage() {
                         e.target.value as MachineRow["morningCheck"]
                       )
                     }
-                    className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 outline-none focus:border-blue-600"
+                    className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 outline-none transition focus:border-blue-600 focus:bg-white"
                   >
                     <option>Completed</option>
                     <option>Pending</option>
@@ -270,6 +314,7 @@ export default function MachineDowntimePage() {
                   <span className="font-bold text-slate-700">
                     End-of-Production Check
                   </span>
+
                   <select
                     value={endShiftCheck}
                     onChange={(e) =>
@@ -277,7 +322,7 @@ export default function MachineDowntimePage() {
                         e.target.value as MachineRow["endShiftCheck"]
                       )
                     }
-                    className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 outline-none focus:border-blue-600"
+                    className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 outline-none transition focus:border-blue-600 focus:bg-white"
                   >
                     <option>Completed</option>
                     <option>Pending</option>
@@ -286,14 +331,18 @@ export default function MachineDowntimePage() {
 
                 <button
                   onClick={addMachine}
-                  className="w-full rounded-2xl bg-blue-900 px-8 py-4 text-lg font-extrabold text-white shadow-md transition hover:bg-blue-800"
+                  className="w-full rounded-2xl bg-blue-900 px-8 py-4 text-lg font-extrabold text-white shadow-md transition duration-300 hover:bg-blue-800 hover:shadow-xl"
                 >
                   Add Machine Status
                 </button>
               </div>
-            </div>
+            </section>
 
-            <div className="rounded-3xl bg-white p-8 shadow-md xl:col-span-2">
+            {/* DASHBOARD */}
+            <section
+              id={slugify("Public Critical Machine Dashboard")}
+              className="scroll-mt-28 rounded-3xl bg-white p-8 shadow-md xl:col-span-2"
+            >
               <h2 className="text-3xl font-extrabold text-slate-900">
                 Public Critical Machine Dashboard
               </h2>
@@ -305,97 +354,118 @@ export default function MachineDowntimePage() {
               </p>
 
               <div className="mt-8 space-y-6">
-                {analysedRows.map((row) => (
-                  <div
-                    key={row.machine}
-                    className="rounded-3xl border border-slate-200 bg-slate-50 p-6"
-                  >
-                    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                      <div>
-                        <h3 className="text-2xl font-extrabold text-slate-900">
-                          {row.machine}
-                        </h3>
-                        <p className="mt-1 text-lg text-slate-700">
-                          {row.department} | Criticality: {row.criticality}
-                        </p>
+                {analysedRows.map((row) => {
+                  const id = slugify(row.machine);
+
+                  return (
+                    <div
+                      key={row.machine}
+                      id={id}
+                      className="scroll-mt-28 rounded-3xl border border-slate-200 bg-slate-50 p-6 transition duration-300 hover:shadow-xl"
+                    >
+                      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                        <div>
+                          <h3 className="text-2xl font-extrabold text-slate-900">
+                            {row.machine}
+                          </h3>
+
+                          <p className="mt-1 text-lg text-slate-700">
+                            {row.department} | Criticality:{" "}
+                            {row.criticality}
+                          </p>
+                        </div>
+
+                        <div className="rounded-2xl bg-slate-900 px-5 py-3 text-white">
+                          <p className="font-bold">
+                            Priority: {row.priority}
+                          </p>
+                        </div>
                       </div>
 
-                      <div className="rounded-2xl bg-slate-900 px-5 py-3 text-white">
-                        <p className="font-bold">Priority: {row.priority}</p>
+                      <div className="mt-6 grid gap-4 md:grid-cols-4">
+                        <div className="rounded-2xl bg-orange-100 p-4 transition hover:shadow-md">
+                          <p className="text-sm font-bold uppercase text-orange-700">
+                            Downtime
+                          </p>
+
+                          <p className="mt-2 text-2xl font-extrabold text-orange-950">
+                            {row.downtimeMinutes} min
+                          </p>
+                        </div>
+
+                        <div className="rounded-2xl bg-blue-100 p-4 transition hover:shadow-md">
+                          <p className="text-sm font-bold uppercase text-blue-700">
+                            PM Status
+                          </p>
+
+                          <p className="mt-2 text-2xl font-extrabold text-blue-950">
+                            {row.preventiveStatus}
+                          </p>
+                        </div>
+
+                        <div className="rounded-2xl bg-emerald-100 p-4 transition hover:shadow-md">
+                          <p className="text-sm font-bold uppercase text-emerald-700">
+                            Morning
+                          </p>
+
+                          <p className="mt-2 text-2xl font-extrabold text-emerald-950">
+                            {row.morningCheck}
+                          </p>
+                        </div>
+
+                        <div className="rounded-2xl bg-violet-100 p-4 transition hover:shadow-md">
+                          <p className="text-sm font-bold uppercase text-violet-700">
+                            End Check
+                          </p>
+
+                          <p className="mt-2 text-2xl font-extrabold text-violet-950">
+                            {row.endShiftCheck}
+                          </p>
+                        </div>
                       </div>
+
+                      <p className="mt-6 rounded-2xl bg-yellow-50 p-5 text-lg font-semibold text-yellow-950">
+                        Recommendation: {row.recommendation}
+                      </p>
                     </div>
-
-                    <div className="mt-6 grid gap-4 md:grid-cols-4">
-                      <div className="rounded-2xl bg-orange-100 p-4">
-                        <p className="text-sm font-bold uppercase text-orange-700">
-                          Downtime
-                        </p>
-                        <p className="mt-2 text-2xl font-extrabold text-orange-950">
-                          {row.downtimeMinutes} min
-                        </p>
-                      </div>
-
-                      <div className="rounded-2xl bg-blue-100 p-4">
-                        <p className="text-sm font-bold uppercase text-blue-700">
-                          PM Status
-                        </p>
-                        <p className="mt-2 text-2xl font-extrabold text-blue-950">
-                          {row.preventiveStatus}
-                        </p>
-                      </div>
-
-                      <div className="rounded-2xl bg-emerald-100 p-4">
-                        <p className="text-sm font-bold uppercase text-emerald-700">
-                          Morning
-                        </p>
-                        <p className="mt-2 text-2xl font-extrabold text-emerald-950">
-                          {row.morningCheck}
-                        </p>
-                      </div>
-
-                      <div className="rounded-2xl bg-violet-100 p-4">
-                        <p className="text-sm font-bold uppercase text-violet-700">
-                          End Check
-                        </p>
-                        <p className="mt-2 text-2xl font-extrabold text-violet-950">
-                          {row.endShiftCheck}
-                        </p>
-                      </div>
-                    </div>
-
-                    <p className="mt-6 rounded-2xl bg-yellow-50 p-5 text-lg font-semibold text-yellow-950">
-                      Recommendation: {row.recommendation}
-                    </p>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
-            </div>
+            </section>
           </div>
 
-          <div className="mt-12 rounded-3xl bg-slate-900 p-8 text-white shadow-md">
+          {/* GOVERNANCE */}
+          <section className="mt-12 rounded-3xl bg-slate-900 p-8 text-white shadow-md">
             <h2 className="text-3xl font-extrabold text-cyan-300">
               Maintenance Governance
             </h2>
 
             <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-              {[
-                "Morning readiness check two hours before production starts",
-                "Immediate maintenance review after production finishes",
-                "Preventive maintenance schedule for every critical machine",
-                "Public dashboard for maintenance visibility and accountability",
-              ].map((item) => (
-                <div key={item} className="rounded-2xl bg-white/10 p-6">
-                  <h3 className="text-xl font-extrabold text-yellow-300">
-                    {item}
-                  </h3>
-                  <p className="mt-4 text-slate-300">
-                    Designed to reduce avoidable downtime, protect production
-                    flow, and support continuous improvement discipline.
-                  </p>
-                </div>
-              ))}
+              {governanceItems.map((item) => {
+                const id = slugify(item);
+
+                return (
+                  <a
+                    key={item}
+                    href={`#${id}`}
+                    className="scroll-mt-28 rounded-2xl bg-white/10 p-6 transition duration-300 hover:bg-white/20 hover:shadow-xl"
+                  >
+                    <h3
+                      id={id}
+                      className="text-xl font-extrabold text-yellow-300"
+                    >
+                      {item}
+                    </h3>
+
+                    <p className="mt-4 text-slate-300">
+                      Designed to reduce avoidable downtime, protect production
+                      flow, and support continuous improvement discipline.
+                    </p>
+                  </a>
+                );
+              })}
             </div>
-          </div>
+          </section>
         </div>
       </section>
     </main>

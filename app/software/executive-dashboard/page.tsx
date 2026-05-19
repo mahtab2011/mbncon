@@ -1,6 +1,5 @@
 "use client";
 
-
 import { useEffect, useMemo, useState } from "react";
 
 import DashboardShell from "@/components/software/DashboardShell";
@@ -76,18 +75,31 @@ const emptyDashboardData: DashboardData = {
   riskReports: [],
 };
 
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 const navigationCards = [
-  { number: "01", title: "Executive Intelligence", href: "#executive-intelligence" },
-  { number: "02", title: "Operational Risks", href: "#operational-risks" },
-  { number: "03", title: "Trend Monitoring", href: "#trend-monitoring" },
-  { number: "04", title: "Forecast Intelligence", href: "#forecast-intelligence" },
-  { number: "05", title: "Lean, Kaizen & TQM", href: "#lean-kaizen-tqm" },
-  { number: "06", title: "Corrective Actions", href: "#corrective-actions" },
-  { number: "07", title: "Root Cause Analysis", href: "#root-cause-analysis" },
-  { number: "08", title: "Buyer Intelligence", href: "#buyer-intelligence" },
-  { number: "09", title: "Bangladesh Apparel", href: "#bangladesh-apparel" },
-  { number: "10", title: "Executive AI Summary", href: "#executive-ai-summary" },
-];
+  "Executive Intelligence",
+  "Operational Risks",
+  "Trend Monitoring",
+  "Forecast Intelligence",
+  "Lean, Kaizen & TQM",
+  "Corrective Actions",
+  "Root Cause Analysis",
+  "Buyer Intelligence",
+  "Bangladesh Apparel",
+  "Executive AI Summary",
+].map((title, index) => ({
+  number: String(index + 1).padStart(2, "0"),
+  title,
+  href: `#${slugify(title)}`,
+}));
 
 function numberValue(value: unknown, fallback = 0) {
   const n = Number(value);
@@ -103,14 +115,7 @@ function severityFromRisk(level: string) {
   if (level === "Medium") return "warning";
   return "info";
 }
-function slugify(value: string) {
-  return value
-    .toLowerCase()
-    .trim()
-    .replace(/&/g, "and")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
+
 export default function ExecutiveDashboardPage() {
   const factoryId = "demo-factory";
 
@@ -165,9 +170,7 @@ export default function ExecutiveDashboardPage() {
         );
         setData(emptyDashboardData);
       } finally {
-        if (active) {
-          setLoading(false);
-        }
+        if (active) setLoading(false);
       }
     }
 
@@ -345,126 +348,125 @@ export default function ExecutiveDashboardPage() {
         </div>
       ) : null}
 
-      <section id="executive-intelligence" className="scroll-mt-28">
-  <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-    <div
-      onClick={() => {
-        window.location.href = "#executive-ai-summary";
-      }}
-      className="cursor-pointer transition hover:-translate-y-1 hover:scale-[1.01]"
-    >
-      <KpiCard
-        title="Live Records"
-        value={String(dashboard.liveRecordCount)}
-        change="Firestore connected"
-        risk={dashboard.liveRecordCount > 0 ? "Low" : "Medium"}
-      />
-    </div>
+      <section id={slugify("Executive Intelligence")} className="scroll-mt-28">
+        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+          <div
+            onClick={() => {
+              window.location.href = `#${slugify("Executive AI Summary")}`;
+            }}
+            className="cursor-pointer transition hover:-translate-y-1 hover:scale-[1.01]"
+          >
+            <KpiCard
+              title="Live Records"
+              value={String(dashboard.liveRecordCount)}
+              change="Firestore connected"
+              risk={dashboard.liveRecordCount > 0 ? "Low" : "Medium"}
+            />
+          </div>
 
-    <div
-      onClick={() => {
-        window.location.href = "#executive-ai-summary";
-      }}
-      className="cursor-pointer transition hover:-translate-y-1 hover:scale-[1.01]"
-    >
-      <KpiCard
-        title="Overall Score"
-        value={`${dashboard.executiveScore.score}%`}
-        change={dashboard.executiveScore.status}
-        risk={dashboard.executiveRisk.level}
-      />
-    </div>
+          <div
+            onClick={() => {
+              window.location.href = `#${slugify("Executive AI Summary")}`;
+            }}
+            className="cursor-pointer transition hover:-translate-y-1 hover:scale-[1.01]"
+          >
+            <KpiCard
+              title="Overall Score"
+              value={`${dashboard.executiveScore.score}%`}
+              change={dashboard.executiveScore.status}
+              risk={dashboard.executiveRisk.level}
+            />
+          </div>
 
-    <div
-      onClick={() => {
-        window.location.href = "#forecast-intelligence";
-      }}
-      className="cursor-pointer transition hover:-translate-y-1 hover:scale-[1.01]"
-    >
-      <KpiCard
-        title="Production Forecast"
-        value={`${dashboard.productionForecast.nextForecast}%`}
-        change={dashboard.productionForecast.trend}
-        risk={dashboard.productionForecast.riskLevel}
-      />
-    </div>
+          <div
+            onClick={() => {
+              window.location.href = `#${slugify("Forecast Intelligence")}`;
+            }}
+            className="cursor-pointer transition hover:-translate-y-1 hover:scale-[1.01]"
+          >
+            <KpiCard
+              title="Production Forecast"
+              value={`${dashboard.productionForecast.nextForecast}%`}
+              change={dashboard.productionForecast.trend}
+              risk={dashboard.productionForecast.riskLevel}
+            />
+          </div>
 
-    <div
-      onClick={() => {
-        window.location.href = "#forecast-intelligence";
-      }}
-      className="cursor-pointer transition hover:-translate-y-1 hover:scale-[1.01]"
-    >
-      <KpiCard
-        title="Forecast Accuracy"
-        value={`${dashboard.productionForecast.averageAccuracy}%`}
-        change="Exponential smoothing"
-        risk={dashboard.productionForecast.riskLevel}
-      />
-    </div>
-  </div>
+          <div
+            onClick={() => {
+              window.location.href = `#${slugify("Forecast Intelligence")}`;
+            }}
+            className="cursor-pointer transition hover:-translate-y-1 hover:scale-[1.01]"
+          >
+            <KpiCard
+              title="Forecast Accuracy"
+              value={`${dashboard.productionForecast.averageAccuracy}%`}
+              change="Exponential smoothing"
+              risk={dashboard.productionForecast.riskLevel}
+            />
+          </div>
+        </div>
 
-  <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-    {navigationCards.map((item) => (
-      <a
-        key={item.href}
-        href={item.href}
-        className="rounded-3xl border border-neutral-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:border-cyan-300 hover:shadow-lg"
-      >
-        <p className="text-sm font-black text-cyan-700">
-          {item.number}
-        </p>
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+          {navigationCards.map((item) => (
+            <a
+              key={item.href}
+              href={item.href}
+              className="rounded-3xl border border-neutral-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:border-cyan-300 hover:shadow-lg"
+            >
+              <p className="text-sm font-black text-cyan-700">{item.number}</p>
 
-        <h3 className="mt-2 text-base font-bold text-neutral-950">
-          {item.title}
-        </h3>
+              <h3 className="mt-2 text-base font-bold text-neutral-950">
+                {item.title}
+              </h3>
 
-        <p className="mt-2 text-xs text-neutral-500">
-          Open detail section
-        </p>
-      </a>
-    ))}
-  </div>
+              <p className="mt-2 text-xs text-neutral-500">
+                Open detail section
+              </p>
+            </a>
+          ))}
+        </div>
 
-  <div className="mt-10 grid gap-6 lg:grid-cols-3">
-    <div
-      onClick={() => {
-        window.location.href = "#executive-ai-summary";
-      }}
-      className="cursor-pointer transition hover:-translate-y-1 hover:scale-[1.01]"
-    >
-      <ScoreRing
-        label="Executive Score"
-        score={Math.round(dashboard.executiveScore.score)}
-      />
-    </div>
+        <div className="mt-10 grid gap-6 lg:grid-cols-3">
+          <div
+            onClick={() => {
+              window.location.href = `#${slugify("Executive AI Summary")}`;
+            }}
+            className="cursor-pointer transition hover:-translate-y-1 hover:scale-[1.01]"
+          >
+            <ScoreRing
+              label="Executive Score"
+              score={Math.round(dashboard.executiveScore.score)}
+            />
+          </div>
 
-    <div
-      onClick={() => {
-        window.location.href = "#forecast-intelligence";
-      }}
-      className="cursor-pointer transition hover:-translate-y-1 hover:scale-[1.01]"
-    >
-      <ScoreRing
-        label="Forecast Accuracy"
-        score={Math.round(dashboard.productionForecast.averageAccuracy)}
-      />
-    </div>
+          <div
+            onClick={() => {
+              window.location.href = `#${slugify("Forecast Intelligence")}`;
+            }}
+            className="cursor-pointer transition hover:-translate-y-1 hover:scale-[1.01]"
+          >
+            <ScoreRing
+              label="Forecast Accuracy"
+              score={Math.round(dashboard.productionForecast.averageAccuracy)}
+            />
+          </div>
 
-    <div
-      onClick={() => {
-        window.location.href = "#operational-risks";
-      }}
-      className="cursor-pointer transition hover:-translate-y-1 hover:scale-[1.01]"
-    >
-      <ScoreRing
-        label="Risk Score"
-        score={dashboard.executiveRisk.score}
-      />
-    </div>
-  </div>
-</section>
-      <section id="operational-risks" className="scroll-mt-28">
+          <div
+            onClick={() => {
+              window.location.href = `#${slugify("Operational Risks")}`;
+            }}
+            className="cursor-pointer transition hover:-translate-y-1 hover:scale-[1.01]"
+          >
+            <ScoreRing
+              label="Risk Score"
+              score={dashboard.executiveRisk.score}
+            />
+          </div>
+        </div>
+      </section>
+
+      <section id={slugify("Operational Risks")} className="scroll-mt-28">
         <SectionHeader
           label="02 Operational Risks"
           title="Factory Risk Intelligence"
@@ -472,16 +474,16 @@ export default function ExecutiveDashboardPage() {
         />
 
         <div className="mt-6 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          <RiskCard title="Production Risk" risk={dashboard.productionRisk} />
-          <RiskCard title="Manpower Risk" risk={dashboard.manpowerRisk} />
-          <RiskCard title="Wastage Risk" risk={dashboard.wastageRisk} />
-          <RiskCard title="Export Risk" risk={dashboard.exportRisk} />
-          <RiskCard title="Utilities Risk" risk={dashboard.utilitiesRisk} />
-          <RiskCard title="Maintenance Risk" risk={dashboard.maintenanceRisk} />
+          <RiskClickCard title="Production Risk" risk={dashboard.productionRisk} />
+          <RiskClickCard title="Manpower Risk" risk={dashboard.manpowerRisk} />
+          <RiskClickCard title="Wastage Risk" risk={dashboard.wastageRisk} />
+          <RiskClickCard title="Export Risk" risk={dashboard.exportRisk} />
+          <RiskClickCard title="Utilities Risk" risk={dashboard.utilitiesRisk} />
+          <RiskClickCard title="Maintenance Risk" risk={dashboard.maintenanceRisk} />
         </div>
       </section>
 
-      <section id="trend-monitoring" className="scroll-mt-28">
+      <section id={slugify("Trend Monitoring")} className="scroll-mt-28">
         <SectionHeader
           label="03 Trend Monitoring"
           title="Operational Trend Monitoring"
@@ -489,128 +491,145 @@ export default function ExecutiveDashboardPage() {
         />
 
         <div className="mt-6 grid gap-6 lg:grid-cols-2">
-          <LiveTrendChart
-            title="Production Efficiency Trend"
-            data={dashboard.productionData.map((item) => ({
-              period: item.period,
-              value: item.actual,
-            }))}
-          />
+          <ChartClickCard target="Forecast Intelligence">
+            <LiveTrendChart
+              title="Production Efficiency Trend"
+              data={dashboard.productionData.map((item) => ({
+                period: item.period,
+                value: item.actual,
+              }))}
+            />
+          </ChartClickCard>
 
-          <LiveTrendChart
-            title="Workforce Absenteeism Trend"
-            data={
-              dashboard.manpowerLogs.length > 0
-                ? [...dashboard.manpowerLogs]
-                    .reverse()
-                    .map((log: AnyLog, index: number) => ({
-                      period: String(log.period || `P${index + 1}`),
-                      value: numberValue(log.absenteeismPercent, 0),
-                    }))
-                : [
-                    { period: "Jan", value: 6 },
-                    { period: "Feb", value: 7 },
-                    { period: "Mar", value: 5 },
-                    { period: "Apr", value: 8 },
-                    { period: "May", value: 6 },
-                  ]
-            }
-          />
+          <ChartClickCard target="Operational Risks">
+            <LiveTrendChart
+              title="Workforce Absenteeism Trend"
+              data={
+                dashboard.manpowerLogs.length > 0
+                  ? [...dashboard.manpowerLogs]
+                      .reverse()
+                      .map((log: AnyLog, index: number) => ({
+                        period: String(log.period || `P${index + 1}`),
+                        value: numberValue(log.absenteeismPercent, 0),
+                      }))
+                  : [
+                      { period: "Jan", value: 6 },
+                      { period: "Feb", value: 7 },
+                      { period: "Mar", value: 5 },
+                      { period: "Apr", value: 8 },
+                      { period: "May", value: 6 },
+                    ]
+              }
+            />
+          </ChartClickCard>
 
-          <LiveTrendChart
-            title="Wastage % Trend"
-            data={
-              dashboard.wastageLogs.length > 0
-                ? [...dashboard.wastageLogs]
-                    .reverse()
-                    .map((log: AnyLog, index: number) => ({
-                      period: String(log.period || `P${index + 1}`),
-                      value: numberValue(log.wastagePercent, 0),
-                    }))
-                : [
-                    { period: "Jan", value: 4 },
-                    { period: "Feb", value: 5 },
-                    { period: "Mar", value: 6 },
-                    { period: "Apr", value: 5 },
-                    { period: "May", value: 4 },
-                  ]
-            }
-          />
+          <ChartClickCard target="Operational Risks">
+            <LiveTrendChart
+              title="Wastage % Trend"
+              data={
+                dashboard.wastageLogs.length > 0
+                  ? [...dashboard.wastageLogs]
+                      .reverse()
+                      .map((log: AnyLog, index: number) => ({
+                        period: String(log.period || `P${index + 1}`),
+                        value: numberValue(log.wastagePercent, 0),
+                      }))
+                  : [
+                      { period: "Jan", value: 4 },
+                      { period: "Feb", value: 5 },
+                      { period: "Mar", value: 6 },
+                      { period: "Apr", value: 5 },
+                      { period: "May", value: 4 },
+                    ]
+              }
+            />
+          </ChartClickCard>
 
-          <LiveTrendChart
-            title="Export Delay Days Trend"
-            data={
-              dashboard.exportLogs.length > 0
-                ? [...dashboard.exportLogs]
-                    .reverse()
-                    .map((log: AnyLog, index: number) => ({
-                      period: String(log.period || `P${index + 1}`),
-                      value: numberValue(log.delayDays, 0),
-                    }))
-                : [
-                    { period: "Jan", value: 1 },
-                    { period: "Feb", value: 3 },
-                    { period: "Mar", value: 2 },
-                    { period: "Apr", value: 5 },
-                    { period: "May", value: 2 },
-                  ]
-            }
-          />
+          <ChartClickCard target="Operational Risks">
+            <LiveTrendChart
+              title="Export Delay Days Trend"
+              data={
+                dashboard.exportLogs.length > 0
+                  ? [...dashboard.exportLogs]
+                      .reverse()
+                      .map((log: AnyLog, index: number) => ({
+                        period: String(log.period || `P${index + 1}`),
+                        value: numberValue(log.delayDays, 0),
+                      }))
+                  : [
+                      { period: "Jan", value: 1 },
+                      { period: "Feb", value: 3 },
+                      { period: "Mar", value: 2 },
+                      { period: "Apr", value: 5 },
+                      { period: "May", value: 2 },
+                    ]
+              }
+            />
+          </ChartClickCard>
 
-          <LiveTrendChart
-            title="Utilities Cost Trend"
-            data={
-              dashboard.utilitiesLogs.length > 0
-                ? [...dashboard.utilitiesLogs]
-                    .reverse()
-                    .map((log: AnyLog, index: number) => ({
-                      period: String(log.period || `P${index + 1}`),
-                      value:
-                        numberValue(log.electricityCost, 0) +
-                        numberValue(log.generatorFuelCost, 0) +
-                        numberValue(log.gasCost, 0) +
-                        numberValue(log.waterCost, 0),
-                    }))
-                : [
-                    { period: "Jan", value: 21000 },
-                    { period: "Feb", value: 23000 },
-                    { period: "Mar", value: 24000 },
-                    { period: "Apr", value: 22000 },
-                    { period: "May", value: 25000 },
-                  ]
-            }
-          />
+          <ChartClickCard target="Operational Risks">
+            <LiveTrendChart
+              title="Utilities Cost Trend"
+              data={
+                dashboard.utilitiesLogs.length > 0
+                  ? [...dashboard.utilitiesLogs]
+                      .reverse()
+                      .map((log: AnyLog, index: number) => ({
+                        period: String(log.period || `P${index + 1}`),
+                        value:
+                          numberValue(log.electricityCost, 0) +
+                          numberValue(log.generatorFuelCost, 0) +
+                          numberValue(log.gasCost, 0) +
+                          numberValue(log.waterCost, 0),
+                      }))
+                  : [
+                      { period: "Jan", value: 21000 },
+                      { period: "Feb", value: 23000 },
+                      { period: "Mar", value: 24000 },
+                      { period: "Apr", value: 22000 },
+                      { period: "May", value: 25000 },
+                    ]
+              }
+            />
+          </ChartClickCard>
 
-          <LiveTrendChart
-            title="Maintenance Downtime Trend"
-            data={
-              dashboard.maintenanceLogs.length > 0
-                ? [...dashboard.maintenanceLogs]
-                    .reverse()
-                    .map((log: AnyLog, index: number) => ({
-                      period: String(log.period || `P${index + 1}`),
-                      value: numberValue(log.downtimeHours, 0),
-                    }))
-                : [
-                    { period: "Jan", value: 8 },
-                    { period: "Feb", value: 12 },
-                    { period: "Mar", value: 10 },
-                    { period: "Apr", value: 14 },
-                    { period: "May", value: 9 },
-                  ]
-            }
-          />
+          <ChartClickCard target="Operational Risks">
+            <LiveTrendChart
+              title="Maintenance Downtime Trend"
+              data={
+                dashboard.maintenanceLogs.length > 0
+                  ? [...dashboard.maintenanceLogs]
+                      .reverse()
+                      .map((log: AnyLog, index: number) => ({
+                        period: String(log.period || `P${index + 1}`),
+                        value: numberValue(log.downtimeHours, 0),
+                      }))
+                  : [
+                      { period: "Jan", value: 8 },
+                      { period: "Feb", value: 12 },
+                      { period: "Mar", value: 10 },
+                      { period: "Apr", value: 14 },
+                      { period: "May", value: 9 },
+                    ]
+              }
+            />
+          </ChartClickCard>
         </div>
       </section>
 
-      <section id="forecast-intelligence" className="scroll-mt-28">
+      <section id={slugify("Forecast Intelligence")} className="scroll-mt-28">
         <SectionHeader
           label="04 Forecast Intelligence"
           title="Production Forecasting Engine"
           description="Exponential smoothing forecast intelligence for executive planning and early warning."
         />
 
-        <div className="mt-6">
+        <div
+          onClick={() => {
+            window.location.href = `#${slugify("Executive AI Summary")}`;
+          }}
+          className="mt-6 cursor-pointer transition hover:-translate-y-1 hover:scale-[1.01]"
+        >
           <ForecastCard
             title="Live Production Forecasting Engine"
             current={`${
@@ -624,41 +643,87 @@ export default function ExecutiveDashboardPage() {
         </div>
 
         <div className="mt-6 grid gap-6 lg:grid-cols-2">
-          <AlertPanel
-            title={dashboard.operationalObservation.title}
-            message={dashboard.operationalObservation.summary}
-            severity={severityFromRisk(
-              dashboard.operationalObservation.priority
-            )}
-          />
+          <div
+            onClick={() => {
+              window.location.href = `#${slugify("Executive AI Summary")}`;
+            }}
+            className="cursor-pointer transition hover:-translate-y-1 hover:scale-[1.01]"
+          >
+            <AlertPanel
+              title={dashboard.operationalObservation.title}
+              message={dashboard.operationalObservation.summary}
+              severity={severityFromRisk(
+                dashboard.operationalObservation.priority
+              )}
+            />
+          </div>
 
-          <AlertPanel
-            title={dashboard.forecastObservation.title}
-            message={dashboard.forecastObservation.summary}
-            severity={severityFromRisk(dashboard.forecastObservation.priority)}
-          />
+          <div
+            onClick={() => {
+              window.location.href = `#${slugify("Executive AI Summary")}`;
+            }}
+            className="cursor-pointer transition hover:-translate-y-1 hover:scale-[1.01]"
+          >
+            <AlertPanel
+              title={dashboard.forecastObservation.title}
+              message={dashboard.forecastObservation.summary}
+              severity={severityFromRisk(dashboard.forecastObservation.priority)}
+            />
+          </div>
         </div>
       </section>
 
-      <section id="lean-kaizen-tqm" className="scroll-mt-28">
+            <section id={slugify("Lean, Kaizen & TQM")} className="scroll-mt-28">
         <SectionHeader
           label="05 Lean, Kaizen & TQM"
           title="Operational Excellence Execution"
-          description="Kaizen, Gemba, Muda, TQM, and factory benchmarking execution tools."
+          description="Executive overview only. Detailed forms remain in their own operational entry modules."
         />
 
-        <div className="mt-6 space-y-8">
-          <KaizenActionForm />
+        <div className="mt-6 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+          <ModuleSummaryCard
+            title="Kaizen Actions"
+            description="Review continuous improvement actions, owners, deadlines, and execution status."
+            href="/software/lean-kaizen-entry"
+          />
+
+          <ModuleSummaryCard
+            title="Gemba Observations"
+            description="Monitor shop-floor observations, recurring issues, and escalation requirements."
+            href="/software/gemba-observation-entry"
+          />
+
+          <ModuleSummaryCard
+            title="Muda / Waste Scoring"
+            description="Summarise waste, waiting, motion, rework, overproduction, and cost leakage signals."
+            href="/software/muda-scoring-entry"
+          />
+
+          <ModuleSummaryCard
+            title="TQM Implementation"
+            description="Track quality discipline, department ownership, corrective progress, and audit readiness."
+            href="/software/tqm-entry"
+          />
+
+          <ModuleSummaryCard
+            title="Factory Benchmarking"
+            description="Compare productivity, quality, delivery, cost, compliance, and improvement performance."
+            href="/software/factory-benchmark-entry"
+          />
+
+          <ModuleSummaryCard
+            title="Improvement Governance"
+            description="Use the executive dashboard to review progress, risks, overdue actions, and leadership decisions."
+            href={`#${slugify("Executive AI Summary")}`}
+          />
+        </div>
+
+        <div className="mt-8 space-y-8">
           <KaizenActionList />
-          <GembaObservationForm />
           <GembaObservationList />
-          <MudaScoringForm />
-          <TQMImplementationForm />
-          <FactoryBenchmarkForm />
         </div>
       </section>
-
-      <section id="corrective-actions" className="scroll-mt-28">
+      <section id={slugify("Corrective Actions")} className="scroll-mt-28">
         <SectionHeader
           label="06 Corrective Actions"
           title="Corrective Action Tracking"
@@ -671,7 +736,7 @@ export default function ExecutiveDashboardPage() {
         </div>
       </section>
 
-      <section id="root-cause-analysis" className="scroll-mt-28">
+      <section id={slugify("Root Cause Analysis")} className="scroll-mt-28">
         <SectionHeader
           label="07 Root Cause Analysis"
           title="Root Cause Intelligence"
@@ -683,7 +748,7 @@ export default function ExecutiveDashboardPage() {
         </div>
       </section>
 
-      <section id="buyer-intelligence" className="scroll-mt-28">
+      <section id={slugify("Buyer Intelligence")} className="scroll-mt-28">
         <SectionHeader
           label="08 Buyer Intelligence"
           title="Buyer Executive Summary"
@@ -695,7 +760,7 @@ export default function ExecutiveDashboardPage() {
         </div>
       </section>
 
-      <section id="bangladesh-apparel" className="scroll-mt-28">
+      <section id={slugify("Bangladesh Apparel")} className="scroll-mt-28">
         <SectionHeader
           label="09 Bangladesh Apparel"
           title="Bangladesh Apparel Showcase"
@@ -707,7 +772,7 @@ export default function ExecutiveDashboardPage() {
         </div>
       </section>
 
-      <section id="executive-ai-summary" className="scroll-mt-28">
+      <section id={slugify("Executive AI Summary")} className="scroll-mt-28">
         <div className="mt-10 rounded-3xl border border-neutral-200 bg-white p-8 shadow-sm">
           <p className="text-sm font-semibold uppercase tracking-widest text-cyan-700">
             10 Live Executive AI Summary
@@ -761,6 +826,74 @@ function SectionHeader({
     </div>
   );
 }
+function ModuleSummaryCard({
+  title,
+  description,
+  href,
+}: {
+  title: string;
+  description: string;
+  href: string;
+}) {
+  return (
+    <a
+      href={href}
+      className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:border-cyan-300 hover:shadow-lg"
+    >
+      <h3 className="text-lg font-bold text-neutral-950">{title}</h3>
+
+      <p className="mt-4 text-sm leading-7 text-neutral-600">
+        {description}
+      </p>
+
+      <p className="mt-4 text-xs font-semibold text-cyan-700">
+        Open detailed module
+      </p>
+    </a>
+  );
+}
+function ChartClickCard({
+  target,
+  children,
+}: {
+  target: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      onClick={() => {
+        window.location.href = `#${slugify(target)}`;
+      }}
+      className="cursor-pointer transition hover:-translate-y-1 hover:scale-[1.01]"
+    >
+      {children}
+    </div>
+  );
+}
+
+function RiskClickCard({
+  title,
+  risk,
+}: {
+  title: string;
+  risk: {
+    level: "Low" | "Medium" | "High" | "Critical";
+    score: number;
+    message: string;
+    action: string;
+  };
+}) {
+  return (
+    <div
+      onClick={() => {
+        window.location.href = `#${slugify("Executive AI Summary")}`;
+      }}
+      className="cursor-pointer transition hover:-translate-y-1 hover:scale-[1.01]"
+    >
+      <RiskCard title={title} risk={risk} />
+    </div>
+  );
+}
 
 function RiskCard({
   title,
@@ -775,37 +908,28 @@ function RiskCard({
   };
 }) {
   return (
-    <div
-  onClick={() => {
-    window.location.href = "#executive-ai-summary";
-  }}
-  className="cursor-pointer rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:border-cyan-300 hover:shadow-lg"
->
-  <div className="flex items-center justify-between gap-4">
-    <h3 className="text-lg font-bold text-neutral-950">
-      {title}
-    </h3>
+    <div className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm transition hover:border-cyan-300 hover:shadow-lg">
+      <div className="flex items-center justify-between gap-4">
+        <h3 className="text-lg font-bold text-neutral-950">{title}</h3>
 
-    <span className="rounded-full bg-neutral-100 px-3 py-1 text-xs font-bold text-neutral-700">
-      {risk.level}
-    </span>
-  </div>
+        <span className="rounded-full bg-neutral-100 px-3 py-1 text-xs font-bold text-neutral-700">
+          {risk.level}
+        </span>
+      </div>
 
-  <p className="mt-4 text-3xl font-bold text-neutral-950">
-    {risk.score}
-  </p>
+      <p className="mt-4 text-3xl font-bold text-neutral-950">{risk.score}</p>
 
-  <p className="mt-4 text-sm leading-7 text-neutral-600">
-    {risk.message}
-  </p>
+      <p className="mt-4 text-sm leading-7 text-neutral-600">
+        {risk.message}
+      </p>
 
-  <p className="mt-4 text-sm font-semibold leading-7 text-cyan-700">
-    {risk.action}
-  </p>
+      <p className="mt-4 text-sm font-semibold leading-7 text-cyan-700">
+        {risk.action}
+      </p>
 
-  <p className="mt-4 text-xs text-neutral-500">
-    Click to review executive AI summary
-  </p>
-</div>
+      <p className="mt-4 text-xs text-neutral-500">
+        Click to review executive AI summary
+      </p>
+    </div>
   );
 }

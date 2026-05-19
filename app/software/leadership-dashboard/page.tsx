@@ -15,6 +15,15 @@ import {
   CartesianGrid,
 } from "recharts";
 
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 const performanceData = [
   { name: "Leadership", score: 82 },
   { name: "Production", score: 74 },
@@ -40,78 +49,84 @@ const trendData = [
   { month: "Jun", score: 81 },
 ];
 
-const COLORS = [
-  "#22c55e",
-  "#eab308",
-  "#f97316",
-  "#dc2626",
+const COLORS = ["#22c55e", "#eab308", "#f97316", "#dc2626"];
+
+const kpis = [
+  ["Overall Performance", "81%", "text-green-400"],
+  ["Leadership Stability", "84%", "text-blue-400"],
+  ["Operational Risk", "27%", "text-orange-400"],
+  ["Customer Confidence", "88%", "text-purple-400"],
+];
+
+const intelligenceCards = [
+  {
+    title: "Adaptive Leadership",
+    tone: "text-blue-300",
+    body:
+      "Strong adaptive leadership capacity identified. Leadership team demonstrates emotional stability, stakeholder engagement and conflict orchestration.",
+  },
+  {
+    title: "Operational Bottlenecks",
+    tone: "text-orange-300",
+    body:
+      "Moderate bottlenecks detected in quality control and logistics synchronization. Kaizen intervention and workflow balancing recommended.",
+  },
+  {
+    title: "Strategic Recommendation",
+    tone: "text-green-300",
+    body:
+      "Continue lean optimization, leadership coaching, trust rebuilding, supplier diversification and continuous improvement implementation.",
+  },
 ];
 
 export default function LeadershipDashboardPage() {
   return (
-    <main className="min-h-screen bg-neutral-950 text-white px-6 py-12">
-      <div className="max-w-7xl mx-auto">
-        <div className="rounded-3xl bg-linear-to-r from-indigo-700 to-blue-700 p-10 shadow-2xl">
-          <h1 className="text-5xl font-bold">
+    <main className="min-h-screen bg-neutral-950 px-6 py-12 text-white">
+      <div className="mx-auto max-w-7xl space-y-10">
+        <section
+          id={slugify("MBNCON Leadership Intelligence Dashboard")}
+          className="scroll-mt-28 rounded-3xl bg-linear-to-r from-indigo-700 to-blue-700 p-10 shadow-2xl"
+        >
+          <p className="text-sm font-semibold uppercase tracking-widest text-blue-100">
+            MBNCON Executive Leadership Intelligence
+          </p>
+
+          <h1 className="mt-3 text-5xl font-bold">
             MBNCON Leadership Intelligence Dashboard
           </h1>
 
           <p className="mt-5 max-w-4xl text-lg leading-8 text-blue-100">
-            Executive operational intelligence system integrating
-            adaptive leadership, manufacturing diagnostics,
-            organizational trust, conflict orchestration,
-            lean systems and performance analytics.
+            Executive operational intelligence system integrating adaptive
+            leadership, manufacturing diagnostics, organizational trust,
+            conflict orchestration, lean systems and performance analytics.
           </p>
-        </div>
+        </section>
 
-        <div className="grid gap-6 mt-10 md:grid-cols-4">
-          <div className="rounded-2xl bg-neutral-900 p-6 border border-neutral-800">
-            <p className="text-neutral-400">
-              Overall Performance
-            </p>
+        <section
+          id={slugify("Leadership KPI Cards")}
+          className="scroll-mt-28 grid gap-6 md:grid-cols-4"
+        >
+          {kpis.map(([label, value, tone]) => (
+            <a
+              key={label}
+              id={slugify(label)}
+              href={`#${slugify(label)}`}
+              className="scroll-mt-28 rounded-2xl border border-neutral-800 bg-neutral-900 p-6 transition hover:-translate-y-1 hover:border-blue-400/50 hover:bg-blue-950/30 hover:shadow-xl"
+            >
+              <p className="text-neutral-400">{label}</p>
 
-            <h2 className="text-5xl font-bold text-green-400 mt-3">
-              81%
-            </h2>
-          </div>
+              <h2 className={`mt-3 text-5xl font-bold ${tone}`}>
+                {value}
+              </h2>
+            </a>
+          ))}
+        </section>
 
-          <div className="rounded-2xl bg-neutral-900 p-6 border border-neutral-800">
-            <p className="text-neutral-400">
-              Leadership Stability
-            </p>
-
-            <h2 className="text-5xl font-bold text-blue-400 mt-3">
-              84%
-            </h2>
-          </div>
-
-          <div className="rounded-2xl bg-neutral-900 p-6 border border-neutral-800">
-            <p className="text-neutral-400">
-              Operational Risk
-            </p>
-
-            <h2 className="text-5xl font-bold text-orange-400 mt-3">
-              27%
-            </h2>
-          </div>
-
-          <div className="rounded-2xl bg-neutral-900 p-6 border border-neutral-800">
-            <p className="text-neutral-400">
-              Customer Confidence
-            </p>
-
-            <h2 className="text-5xl font-bold text-purple-400 mt-3">
-              88%
-            </h2>
-          </div>
-        </div>
-
-        <div className="grid gap-8 mt-12 lg:grid-cols-2">
-          <div className="rounded-2xl bg-neutral-900 border border-neutral-800 p-6">
-            <h2 className="text-2xl font-bold mb-6">
-              Department Performance Scores
-            </h2>
-
+        <section
+          id={slugify("Leadership Analytics Charts")}
+          className="scroll-mt-28 grid gap-8 lg:grid-cols-2"
+        >
+          <ChartCard title="Department Performance Scores">
             <div className="h-88 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={performanceData}>
@@ -127,25 +142,16 @@ export default function LeadershipDashboardPage() {
                 </BarChart>
               </ResponsiveContainer>
             </div>
-          </div>
+          </ChartCard>
 
-          <div className="rounded-2xl bg-neutral-900 border border-neutral-800 p-6">
-            <h2 className="text-2xl font-bold mb-6">
-              Organizational Risk Distribution
-            </h2>
-
+          <ChartCard title="Organizational Risk Distribution">
             <div className="h-88">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Pie
-                    data={riskData}
-                    dataKey="value"
-                    outerRadius={120}
-                    label
-                  >
+                  <Pie data={riskData} dataKey="value" outerRadius={120} label>
                     {riskData.map((entry, index) => (
                       <Cell
-                        key={index}
+                        key={entry.name}
                         fill={COLORS[index % COLORS.length]}
                       />
                     ))}
@@ -155,14 +161,10 @@ export default function LeadershipDashboardPage() {
                 </PieChart>
               </ResponsiveContainer>
             </div>
-          </div>
-        </div>
+          </ChartCard>
+        </section>
 
-        <div className="rounded-2xl bg-neutral-900 border border-neutral-800 p-6 mt-12">
-          <h2 className="text-2xl font-bold mb-6">
-            Leadership & Operational Growth Trend
-          </h2>
-
+        <ChartCard title="Leadership and Operational Growth Trend">
           <div className="h-100 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={trendData}>
@@ -183,46 +185,49 @@ export default function LeadershipDashboardPage() {
               </LineChart>
             </ResponsiveContainer>
           </div>
-        </div>
+        </ChartCard>
 
-        <div className="grid gap-6 mt-12 md:grid-cols-3">
-          <div className="rounded-2xl bg-neutral-900 border border-neutral-800 p-6">
-            <h2 className="text-xl font-bold text-blue-300">
-              Adaptive Leadership
-            </h2>
+        <section
+          id={slugify("Leadership Intelligence Recommendations")}
+          className="scroll-mt-28 grid gap-6 md:grid-cols-3"
+        >
+          {intelligenceCards.map((card) => (
+            <a
+              key={card.title}
+              id={slugify(card.title)}
+              href={`#${slugify(card.title)}`}
+              className="scroll-mt-28 rounded-2xl border border-neutral-800 bg-neutral-900 p-6 transition hover:-translate-y-1 hover:border-blue-400/50 hover:bg-blue-950/30 hover:shadow-xl"
+            >
+              <h2 className={`text-xl font-bold ${card.tone}`}>
+                {card.title}
+              </h2>
 
-            <p className="mt-4 text-neutral-300 leading-8">
-              Strong adaptive leadership capacity identified.
-              Leadership team demonstrates emotional stability,
-              stakeholder engagement and conflict orchestration.
-            </p>
-          </div>
-
-          <div className="rounded-2xl bg-neutral-900 border border-neutral-800 p-6">
-            <h2 className="text-xl font-bold text-orange-300">
-              Operational Bottlenecks
-            </h2>
-
-            <p className="mt-4 text-neutral-300 leading-8">
-              Moderate bottlenecks detected in quality control
-              and logistics synchronization. Kaizen intervention
-              and workflow balancing recommended.
-            </p>
-          </div>
-
-          <div className="rounded-2xl bg-neutral-900 border border-neutral-800 p-6">
-            <h2 className="text-xl font-bold text-green-300">
-              Strategic Recommendation
-            </h2>
-
-            <p className="mt-4 text-neutral-300 leading-8">
-              Continue lean optimization, leadership coaching,
-              trust rebuilding, supplier diversification and
-              continuous improvement implementation.
-            </p>
-          </div>
-        </div>
+              <p className="mt-4 leading-8 text-neutral-300">
+                {card.body}
+              </p>
+            </a>
+          ))}
+        </section>
       </div>
     </main>
+  );
+}
+
+function ChartCard({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section
+      id={slugify(title)}
+      className="scroll-mt-28 rounded-2xl border border-neutral-800 bg-neutral-900 p-6 transition hover:-translate-y-1 hover:border-blue-400/50 hover:shadow-xl"
+    >
+      <h2 className="mb-6 text-2xl font-bold">{title}</h2>
+
+      {children}
+    </section>
   );
 }

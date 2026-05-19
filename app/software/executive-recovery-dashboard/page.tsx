@@ -13,9 +13,15 @@ import {
 
 type RecordType = Record<string, any>;
 
-export default function ExecutiveRecoveryDashboardPage() {
-  const [loading, setLoading] = useState(true);
+function numberValue(value: unknown): number {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : 0;
+}
 
+export default function ExecutiveRecoveryDashboardPage() {
+  const factoryId = "demo-factory";
+
+  const [loading, setLoading] = useState(true);
   const [factoryLossData, setFactoryLossData] = useState<RecordType[]>([]);
   const [postOrderData, setPostOrderData] = useState<RecordType[]>([]);
   const [productionData, setProductionData] = useState<RecordType[]>([]);
@@ -23,18 +29,35 @@ export default function ExecutiveRecoveryDashboardPage() {
   const [maintenanceData, setMaintenanceData] = useState<RecordType[]>([]);
 
   useEffect(() => {
+    let active = true;
+
+    async function safeFetch(fn: () => Promise<RecordType[]>) {
+      try {
+        const result = await Promise.race([
+          fn(),
+          new Promise<RecordType[]>((resolve) =>
+            setTimeout(() => resolve([]), 3000)
+          ),
+        ]);
+
+        return Array.isArray(result) ? result : [];
+      } catch {
+        return [];
+      }
+    }
+
     async function loadData() {
       try {
-        const factoryId = "demo-factory";
-
         const [loss, postOrder, production, wastage, maintenance] =
           await Promise.all([
-            getFactoryLossIntelligenceEntries(factoryId),
-            getPostOrderIntelligenceEntries(factoryId),
-            getProductionLogs(factoryId),
-            getWastageLogs(factoryId),
-            getMaintenanceLogs(factoryId),
+            safeFetch(() => getFactoryLossIntelligenceEntries(factoryId)),
+            safeFetch(() => getPostOrderIntelligenceEntries(factoryId)),
+            safeFetch(() => getProductionLogs(factoryId)),
+            safeFetch(() => getWastageLogs(factoryId)),
+            safeFetch(() => getMaintenanceLogs(factoryId)),
           ]);
+
+        if (!active) return;
 
         setFactoryLossData(loss);
         setPostOrderData(postOrder);
@@ -44,81 +67,109 @@ export default function ExecutiveRecoveryDashboardPage() {
       } catch (error) {
         console.error("Executive recovery dashboard load error:", error);
       } finally {
-        setLoading(false);
+        if (active) setLoading(false);
       }
     }
 
     loadData();
+
+    return () => {
+      active = false;
+    };
   }, []);
 
-  const totalEstimatedLoss = useMemo(() => {
-    return factoryLossData.reduce(
-      (sum, item) => sum + Number(item.estimatedLossValue || 0),
-      0
-    );
-  }, [factoryLossData]);
-
-  const totalRecoveryOpportunity = useMemo(() => {
-    return (
+  const totalEstimatedLoss = useMemo(
+    () =>
       factoryLossData.reduce(
-        (sum, item) => sum + Number(item.recoveryOpportunityValue || 0),
+        (sum, item) => sum + numberValue(item.estimatedLossValue),
+        0
+      ),
+    [factoryLossData]
+  );
+
+  const totalRecoveryOpportunity = useMemo(
+    () =>
+      factoryLossData.reduce(
+        (sum, item) => sum + numberValue(item.recoveryOpportunityValue),
         0
       ) +
       postOrderData.reduce(
-        (sum, item) => sum + Number(item.recoveryValue || 0),
+        (sum, item) => sum + numberValue(item.recoveryValue),
         0
-      )
-    );
-  }, [factoryLossData, postOrderData]);
+      ),
+    [factoryLossData, postOrderData]
+  );
 
-  const totalReworkExposure = useMemo(() => {
-    return postOrderData.reduce(
-      (sum, item) => sum + Number(item.reworkCost || 0),
-      0
-    );
-  }, [postOrderData]);
+  const totalReworkExposure = useMemo(
+    () =>
+      postOrderData.reduce(
+        (sum, item) => sum + numberValue(item.reworkCost),
+        0
+      ),
+    [postOrderData]
+  );
 
-  const totalRejectionExposure = useMemo(() => {
-    return postOrderData.reduce(
-      (sum, item) => sum + Number(item.rejectedQty || 0),
-      0
-    );
-  }, [postOrderData]);
+  const totalRejectionExposure = useMemo(
+    () =>
+      postOrderData.reduce(
+        (sum, item) => sum + numberValue(item.rejectedQty),
+        0
+      ),
+    [postOrderData]
+  );
 
-  const criticalLossAreas = useMemo(() => {
-    return factoryLossData.filter((item) => item.priorityLevel === "Critical")
-      .length;
-  }, [factoryLossData]);
+  const criticalLossAreas = useMemo(
+    () =>
+      factoryLossData.filter((item) => item.priorityLevel === "Critical")
+        .length,
+    [factoryLossData]
+  );
 
-  const inventoryAgeingAlerts = useMemo(() => {
-    return postOrderData.filter(
-      (item) => Number(item.inventoryAgeingDays || 0) > 90
-    ).length;
-  }, [postOrderData]);
+  const inventoryAgeingAlerts = useMemo(
+    () =>
+      postOrderData.filter((item) => numberValue(item.inventoryAgeingDays) > 90)
+        .length,
+    [postOrderData]
+  );
 
-  const machineBreakdownRisk = useMemo(() => {
-    return maintenanceData.reduce(
-      (sum, item) => sum + Number(item.breakdownCount || 0),
-      0
-    );
-  }, [maintenanceData]);
+  const machineBreakdownRisk = useMemo(
+    () =>
+      maintenanceData.reduce(
+        (sum, item) => sum + numberValue(item.breakdownCount),
+        0
+      ),
+    [maintenanceData]
+  );
 
-  const productionDelayRisk = useMemo(() => {
-    return productionData.reduce(
-      (sum, item) => sum + Number(item.delayPercent || 0),
-      0
-    );
-  }, [productionData]);
+  const productionDelayRisk = useMemo(
+    () =>
+      productionData.reduce(
+        (sum, item) => sum + numberValue(item.delayPercent),
+        0
+      ),
+    [productionData]
+  );
 
-  const totalWastage = useMemo(() => {
-    return wastageData.reduce(
-      (sum, item) => sum + Number(item.wastageQty || 0),
-      0
-    );
-  }, [wastageData]);
+  const totalWastage = useMemo(
+    () =>
+      wastageData.reduce((sum, item) => sum + numberValue(item.wastageQty), 0),
+    [wastageData]
+  );
 
-  const executiveScore = useMemo(() => {
-    return calculateExecutiveHealthScore({
+  const executiveScore = useMemo(
+    () =>
+      calculateExecutiveHealthScore({
+        totalEstimatedLoss,
+        totalRecoveryOpportunity,
+        productionDelayRisk,
+        inventoryAgeingAlerts,
+        machineBreakdownRisk,
+        totalWastage,
+        totalReworkExposure,
+        totalRejectionExposure,
+        criticalLossAreas,
+      }),
+    [
       totalEstimatedLoss,
       totalRecoveryOpportunity,
       productionDelayRisk,
@@ -128,18 +179,8 @@ export default function ExecutiveRecoveryDashboardPage() {
       totalReworkExposure,
       totalRejectionExposure,
       criticalLossAreas,
-    });
-  }, [
-    totalEstimatedLoss,
-    totalRecoveryOpportunity,
-    productionDelayRisk,
-    inventoryAgeingAlerts,
-    machineBreakdownRisk,
-    totalWastage,
-    totalReworkExposure,
-    totalRejectionExposure,
-    criticalLossAreas,
-  ]);
+    ]
+  );
 
   const executiveAiRecommendation = useMemo(() => {
     if (totalEstimatedLoss > 500000 || criticalLossAreas > 5) {
@@ -164,127 +205,79 @@ export default function ExecutiveRecoveryDashboardPage() {
 
   if (loading) {
     return (
-      <DashboardShell title="Executive Recovery Dashboard">
-        <div className="rounded-3xl border border-slate-200 bg-white p-10 text-center text-lg font-semibold">
-          Loading executive intelligence...
+      <DashboardShell
+        title="Executive Recovery Dashboard"
+        subtitle="Loading recovery, loss, inventory, production, wastage, and maintenance intelligence."
+      >
+        <div className="rounded-3xl border border-cyan-200 bg-cyan-50 p-8 text-cyan-800">
+          Loading executive recovery intelligence...
         </div>
       </DashboardShell>
     );
   }
 
   return (
-    <DashboardShell title="Executive Recovery Dashboard">
+    <DashboardShell
+      title="Executive Recovery Dashboard"
+      subtitle="Executive visibility into loss recovery, production instability, inventory ageing, rework exposure, and hidden profit leakage."
+    >
       <div className="space-y-8">
-        <div className="rounded-3xl border border-cyan-100 bg-white p-8 shadow-sm">
+        <section className="rounded-3xl border border-cyan-200 bg-cyan-50 p-8">
           <p className="text-sm font-semibold uppercase tracking-widest text-cyan-700">
-            MBNCON EXECUTIVE RECOVERY INTELLIGENCE
+            MBNCON Executive Recovery Intelligence
           </p>
 
-          <h1 className="mt-3 text-4xl font-bold text-slate-900">
+          <h1 className="mt-3 text-4xl font-bold text-neutral-950">
             Executive Recovery Dashboard
           </h1>
 
-          <p className="mt-4 max-w-5xl text-slate-600">
+          <p className="mt-4 max-w-5xl text-lg leading-8 text-neutral-700">
             Executive visibility into operational losses, recovery
             opportunities, production instability, inventory ageing, shipment
             exposure, rework cost, and hidden profit leakage across factory
             operations.
           </p>
-        </div>
-
-        <section className="grid gap-6 md:grid-cols-4">
-          <KpiCard
-            title="Factory Health Score"
-            value={`${executiveScore.finalScore}/100`}
-          />
-
-          <KpiCard title="Executive Grade" value={executiveScore.grade} />
-
-          <KpiCard
-            title="Operational Status"
-            value={executiveScore.status}
-          />
-
-          <KpiCard
-            title="Recovery Efficiency"
-            value={`${executiveScore.recoveryScore}%`}
-          />
         </section>
 
-        <section className="grid gap-6 md:grid-cols-4">
-          <KpiCard
-            title="Production Stability"
-            value={`${executiveScore.productionScore}%`}
-          />
-
-          <KpiCard
-            title="Inventory Risk Score"
-            value={`${executiveScore.inventoryScore}%`}
-          />
-
-          <KpiCard
-            title="Operational Risk Score"
-            value={`${executiveScore.operationalScore}%`}
-          />
-
-          <KpiCard
-            title="Recovery Score"
-            value={`${executiveScore.recoveryScore}%`}
-          />
+        <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+          <KpiCard title="Factory Health Score" value={`${executiveScore.finalScore}/100`} note="Overall factory recovery health" />
+          <KpiCard title="Executive Grade" value={executiveScore.grade} note="Management performance signal" />
+          <KpiCard title="Operational Status" value={executiveScore.status} note="Factory recovery condition" />
+          <KpiCard title="Recovery Efficiency" value={`${executiveScore.recoveryScore}%`} note="Loss recovery effectiveness" />
         </section>
 
-        <section className="grid gap-6 md:grid-cols-4">
-          <KpiCard
-            title="Estimated Total Loss"
-            value={`$${totalEstimatedLoss.toLocaleString()}`}
-          />
-
-          <KpiCard
-            title="Recovery Opportunity"
-            value={`$${totalRecoveryOpportunity.toLocaleString()}`}
-          />
-
-          <KpiCard
-            title="Critical Loss Areas"
-            value={String(criticalLossAreas)}
-          />
-
-          <KpiCard
-            title="Inventory Ageing Alerts"
-            value={String(inventoryAgeingAlerts)}
-          />
+        <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+          <KpiCard title="Production Stability" value={`${executiveScore.productionScore}%`} note="Production delay pressure" />
+          <KpiCard title="Inventory Risk Score" value={`${executiveScore.inventoryScore}%`} note="Ageing inventory exposure" />
+          <KpiCard title="Operational Risk Score" value={`${executiveScore.operationalScore}%`} note="Combined operating risk" />
+          <KpiCard title="Recovery Score" value={`${executiveScore.recoveryScore}%`} note="Recovery opportunity status" />
         </section>
 
-        <section className="grid gap-6 md:grid-cols-4">
-          <KpiCard
-            title="Rework Exposure"
-            value={`$${totalReworkExposure.toLocaleString()}`}
-          />
-
-          <KpiCard
-            title="Rejected Quantity"
-            value={String(totalRejectionExposure)}
-          />
-
-          <KpiCard
-            title="Machine Breakdown Risk"
-            value={String(machineBreakdownRisk)}
-          />
-
-          <KpiCard title="Material Wastage" value={String(totalWastage)} />
+        <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+          <KpiCard title="Estimated Total Loss" value={`$${totalEstimatedLoss.toLocaleString()}`} note="Current estimated factory loss" />
+          <KpiCard title="Recovery Opportunity" value={`$${totalRecoveryOpportunity.toLocaleString()}`} note="Recoverable value potential" />
+          <KpiCard title="Critical Loss Areas" value={String(criticalLossAreas)} note="Loss areas needing leadership focus" />
+          <KpiCard title="Inventory Ageing Alerts" value={String(inventoryAgeingAlerts)} note="Inventory above 90 days" />
         </section>
 
-        <div className="rounded-3xl border border-red-200 bg-red-50 p-8">
+        <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+          <KpiCard title="Rework Exposure" value={`$${totalReworkExposure.toLocaleString()}`} note="Estimated rework cost" />
+          <KpiCard title="Rejected Quantity" value={String(totalRejectionExposure)} note="Total rejection exposure" />
+          <KpiCard title="Machine Breakdown Risk" value={String(machineBreakdownRisk)} note="Breakdown frequency signal" />
+          <KpiCard title="Material Wastage" value={String(totalWastage)} note="Total material wastage quantity" />
+        </section>
+
+        <section className="rounded-3xl border border-red-200 bg-red-50 p-8">
           <h2 className="text-2xl font-bold text-red-900">
             Executive AI Recommendation
           </h2>
 
-          <p className="mt-4 text-lg leading-8 text-slate-700">
+          <p className="mt-4 text-lg leading-8 text-neutral-700">
             {executiveAiRecommendation}
           </p>
-        </div>
+        </section>
 
-        <section className="grid gap-6 md:grid-cols-2">
+        <section className="grid gap-6 lg:grid-cols-2">
           <InsightCard
             title="Operational Risk Summary"
             items={[
@@ -306,8 +299,8 @@ export default function ExecutiveRecoveryDashboardPage() {
           />
         </section>
 
-        <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-          <h2 className="text-2xl font-bold text-slate-900">
+        <section className="rounded-3xl border border-neutral-200 bg-white p-8 shadow-sm">
+          <h2 className="text-2xl font-bold text-neutral-950">
             Executive Leadership Action Priorities
           </h2>
 
@@ -324,40 +317,48 @@ export default function ExecutiveRecoveryDashboardPage() {
             ].map((item) => (
               <div
                 key={item}
-                className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+                className="rounded-2xl border border-neutral-200 bg-neutral-50 p-4 transition hover:-translate-y-1 hover:border-cyan-300 hover:shadow-sm"
               >
-                <p className="font-medium text-slate-700">{item}</p>
+                <p className="font-medium text-neutral-700">{item}</p>
               </div>
             ))}
           </div>
-        </div>
+        </section>
       </div>
     </DashboardShell>
   );
 }
 
-function KpiCard({ title, value }: { title: string; value: string }) {
+function KpiCard({
+  title,
+  value,
+  note,
+}: {
+  title: string;
+  value: string;
+  note: string;
+}) {
   return (
-    <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-      <p className="text-sm font-medium text-slate-500">{title}</p>
-
-      <h2 className="mt-4 text-3xl font-bold text-slate-900">{value}</h2>
+    <div className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:border-cyan-300 hover:shadow-lg">
+      <p className="text-sm font-semibold text-neutral-500">{title}</p>
+      <h2 className="mt-4 text-3xl font-bold text-neutral-950">{value}</h2>
+      <p className="mt-3 text-xs font-semibold text-cyan-700">{note}</p>
     </div>
   );
 }
 
 function InsightCard({ title, items }: { title: string; items: string[] }) {
   return (
-    <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-      <h2 className="text-2xl font-bold text-slate-900">{title}</h2>
+    <div className="rounded-3xl border border-neutral-200 bg-white p-8 shadow-sm">
+      <h2 className="text-2xl font-bold text-neutral-950">{title}</h2>
 
       <div className="mt-6 space-y-4">
         {items.map((item) => (
           <div
             key={item}
-            className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+            className="rounded-2xl border border-neutral-200 bg-neutral-50 p-4"
           >
-            <p className="text-slate-700">{item}</p>
+            <p className="text-neutral-700">{item}</p>
           </div>
         ))}
       </div>

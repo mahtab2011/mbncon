@@ -2,6 +2,15 @@
 
 import { useMemo, useState } from "react";
 
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 type ProcessRow = {
   process: string;
   ratedCapacity: number;
@@ -46,13 +55,16 @@ export default function BottleneckAnalysisPage() {
     return rows
       .map((row) => {
         const gap = row.ratedCapacity - row.actualOutput;
+
         const utilisation =
           row.ratedCapacity > 0
             ? (row.actualOutput / row.ratedCapacity) * 100
             : 0;
 
         const severity =
-          row.ratedCapacity > 0 ? (gap / row.ratedCapacity) * 100 : 0;
+          row.ratedCapacity > 0
+            ? (gap / row.ratedCapacity) * 100
+            : 0;
 
         let recommendation = "Monitor";
         let priority = "Low";
@@ -84,7 +96,9 @@ export default function BottleneckAnalysisPage() {
     const actual = Number(actualOutput);
 
     if (!process || rated <= 0 || actual < 0) {
-      alert("Please enter process name, rated capacity, and actual output.");
+      alert(
+        "Please enter process name, rated capacity, and actual output."
+      );
       return;
     }
 
@@ -106,14 +120,18 @@ export default function BottleneckAnalysisPage() {
 
   return (
     <main className="min-h-screen bg-slate-100 text-slate-900">
-      <section className="bg-linear-to-r from-blue-950 via-violet-900 to-red-900 px-6 py-16 text-white">
+      <section
+        id="bottleneck-analysis-overview"
+        className="scroll-mt-28 bg-slate-950 px-6 py-16 text-white"
+      >
         <div className="mx-auto max-w-7xl">
           <p className="mb-4 text-sm font-bold uppercase tracking-[0.3em] text-yellow-300">
             Bottleneck Analysis & Capacity Utilisation
           </p>
 
           <h1 className="max-w-5xl text-5xl font-extrabold leading-tight">
-            Identify, Prioritise, Elevate, and Subordinate Operational Bottlenecks
+            Identify, Prioritise, Elevate, and Subordinate Operational
+            Bottlenecks
           </h1>
 
           <p className="mt-6 max-w-4xl text-xl leading-relaxed text-white/85">
@@ -128,36 +146,57 @@ export default function BottleneckAnalysisPage() {
       <section className="px-6 py-16">
         <div className="mx-auto max-w-7xl">
           <div className="grid gap-6 md:grid-cols-3">
-            <div className="rounded-3xl bg-red-100 p-8 shadow-md">
+            <a
+              href={`#${slugify(
+                topBottleneck?.process || "bottleneck"
+              )}`}
+              className="rounded-3xl bg-red-100 p-8 shadow-md transition hover:-translate-y-1 hover:shadow-xl"
+            >
               <p className="text-sm font-bold uppercase tracking-wide text-red-700">
                 Top Bottleneck
               </p>
+
               <h2 className="mt-4 text-4xl font-extrabold text-red-950">
                 {topBottleneck?.process || "No Data"}
               </h2>
-            </div>
+            </a>
 
-            <div className="rounded-3xl bg-yellow-100 p-8 shadow-md">
+            <a
+              href={`#${slugify(
+                topBottleneck?.process || "bottleneck"
+              )}`}
+              className="rounded-3xl bg-yellow-100 p-8 shadow-md transition hover:-translate-y-1 hover:shadow-xl"
+            >
               <p className="text-sm font-bold uppercase tracking-wide text-yellow-700">
                 Biggest Capacity Gap
               </p>
+
               <h2 className="mt-4 text-5xl font-extrabold text-yellow-950">
                 {topBottleneck?.gap || 0}
               </h2>
-            </div>
+            </a>
 
-            <div className="rounded-3xl bg-blue-100 p-8 shadow-md">
+            <a
+              href={`#${slugify(
+                topBottleneck?.process || "bottleneck"
+              )}`}
+              className="rounded-3xl bg-blue-100 p-8 shadow-md transition hover:-translate-y-1 hover:shadow-xl"
+            >
               <p className="text-sm font-bold uppercase tracking-wide text-blue-700">
                 Recommendation
               </p>
+
               <h2 className="mt-4 text-3xl font-extrabold text-blue-950">
                 {topBottleneck?.recommendation || "Monitor"}
               </h2>
-            </div>
+            </a>
           </div>
 
           <div className="mt-10 grid gap-6 xl:grid-cols-3">
-            <div className="rounded-3xl bg-white p-8 shadow-md">
+            <section
+              id="add-process-capacity-data"
+              className="scroll-mt-28 rounded-3xl bg-white p-8 shadow-md"
+            >
               <h2 className="text-3xl font-extrabold text-blue-950">
                 Add Process Capacity Data
               </h2>
@@ -167,10 +206,11 @@ export default function BottleneckAnalysisPage() {
                   <span className="font-bold text-slate-700">
                     Process / Workstation
                   </span>
+
                   <input
                     value={process}
                     onChange={(e) => setProcess(e.target.value)}
-                    className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 outline-none focus:border-blue-600"
+                    className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 outline-none transition focus:border-blue-600"
                     placeholder="Example: Stitching"
                   />
                 </label>
@@ -179,11 +219,12 @@ export default function BottleneckAnalysisPage() {
                   <span className="font-bold text-slate-700">
                     Rated / Assumed Capacity
                   </span>
+
                   <input
                     value={ratedCapacity}
                     onChange={(e) => setRatedCapacity(e.target.value)}
                     type="number"
-                    className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 outline-none focus:border-blue-600"
+                    className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 outline-none transition focus:border-blue-600"
                     placeholder="Example: 1000"
                   />
                 </label>
@@ -192,11 +233,12 @@ export default function BottleneckAnalysisPage() {
                   <span className="font-bold text-slate-700">
                     Actual Output
                   </span>
+
                   <input
                     value={actualOutput}
                     onChange={(e) => setActualOutput(e.target.value)}
                     type="number"
-                    className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 outline-none focus:border-blue-600"
+                    className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 outline-none transition focus:border-blue-600"
                     placeholder="Example: 720"
                   />
                 </label>
@@ -205,12 +247,15 @@ export default function BottleneckAnalysisPage() {
                   <span className="font-bold text-slate-700">
                     Urgency
                   </span>
+
                   <select
                     value={urgency}
                     onChange={(e) =>
-                      setUrgency(e.target.value as "Low" | "Medium" | "High")
+                      setUrgency(
+                        e.target.value as "Low" | "Medium" | "High"
+                      )
                     }
-                    className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 outline-none focus:border-blue-600"
+                    className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 outline-none transition focus:border-blue-600"
                   >
                     <option>Low</option>
                     <option>Medium</option>
@@ -225,18 +270,27 @@ export default function BottleneckAnalysisPage() {
                   Add to Bottleneck Analysis
                 </button>
               </div>
-            </div>
+            </section>
 
-            <div className="rounded-3xl bg-white p-8 shadow-md xl:col-span-2">
+            <section
+              id="live-bottleneck-ranking"
+              className="scroll-mt-28 rounded-3xl bg-white p-8 shadow-md xl:col-span-2"
+            >
               <h2 className="text-3xl font-extrabold text-slate-900">
                 Live Bottleneck Ranking
               </h2>
 
               <div className="mt-8 space-y-6">
                 {analysisRows.map((row) => (
-                  <div key={row.process}>
+                  <a
+                    key={row.process}
+                    id={slugify(row.process)}
+                    href={`#${slugify(row.process)}`}
+                    className="block rounded-2xl p-2 transition hover:bg-slate-50"
+                  >
                     <div className="mb-2 flex flex-wrap justify-between gap-3 text-lg font-bold">
                       <span>{row.process}</span>
+
                       <span>
                         Utilisation {row.utilisation.toFixed(1)}% | Gap{" "}
                         {row.gap} | Priority {row.priority}
@@ -245,21 +299,27 @@ export default function BottleneckAnalysisPage() {
 
                     <div className="h-6 rounded-full bg-slate-200">
                       <div
-                        className="h-6 rounded-full bg-linear-to-r from-red-700 to-yellow-400"
-                        style={{ width: `${Math.min(row.severity, 100)}%` }}
+                        className="h-6 rounded-full bg-red-700"
+                        style={{
+                          width: `${Math.min(row.severity, 100)}%`,
+                        }}
                       />
                     </div>
 
                     <p className="mt-3 rounded-2xl bg-slate-100 p-4 text-slate-800">
-                      <strong>Recommendation:</strong> {row.recommendation}
+                      <strong>Recommendation:</strong>{" "}
+                      {row.recommendation}
                     </p>
-                  </div>
+                  </a>
                 ))}
               </div>
-            </div>
+            </section>
           </div>
 
-          <div className="mt-10 rounded-3xl bg-slate-900 p-8 text-white shadow-md">
+          <section
+            id="theory-of-constraints-guidance"
+            className="mt-10 scroll-mt-28 rounded-3xl bg-slate-900 p-8 text-white shadow-md"
+          >
             <h2 className="text-3xl font-extrabold text-cyan-300">
               Theory of Constraints Guidance
             </h2>
@@ -269,9 +329,11 @@ export default function BottleneckAnalysisPage() {
                 <h3 className="text-xl font-extrabold text-yellow-300">
                   Identify
                 </h3>
+
                 <p className="mt-4 text-slate-300">
-                  Find the process with the biggest capacity gap, lowest
-                  utilisation against required output, or highest urgency.
+                  Find the process with the biggest capacity gap,
+                  lowest utilisation against required output, or
+                  highest urgency.
                 </p>
               </div>
 
@@ -279,9 +341,11 @@ export default function BottleneckAnalysisPage() {
                 <h3 className="text-xl font-extrabold text-yellow-300">
                   Exploit
                 </h3>
+
                 <p className="mt-4 text-slate-300">
-                  Make the bottleneck work without avoidable waiting, missing
-                  materials, unclear instructions, or unnecessary interruptions.
+                  Make the bottleneck work without avoidable waiting,
+                  missing materials, unclear instructions, or
+                  unnecessary interruptions.
                 </p>
               </div>
 
@@ -289,10 +353,11 @@ export default function BottleneckAnalysisPage() {
                 <h3 className="text-xl font-extrabold text-yellow-300">
                   Subordinate
                 </h3>
+
                 <p className="mt-4 text-slate-300">
-                  Align upstream and downstream processes to the bottleneck so
-                  the whole system supports the constraint instead of creating
-                  excess WIP or waiting.
+                  Align upstream and downstream processes to the
+                  bottleneck so the whole system supports the
+                  constraint instead of creating excess WIP or waiting.
                 </p>
               </div>
 
@@ -300,14 +365,15 @@ export default function BottleneckAnalysisPage() {
                 <h3 className="text-xl font-extrabold text-yellow-300">
                   Elevate
                 </h3>
+
                 <p className="mt-4 text-slate-300">
-                  Add capacity through training, machine improvement, better
-                  staffing, maintenance, method change, layout change, or
-                  investment.
+                  Add capacity through training, machine improvement,
+                  better staffing, maintenance, method change, layout
+                  change, or investment.
                 </p>
               </div>
             </div>
-          </div>
+          </section>
 
           <div className="mt-10 overflow-x-auto rounded-3xl bg-white p-8 shadow-md">
             <h2 className="text-3xl font-extrabold text-slate-900">
@@ -325,19 +391,26 @@ export default function BottleneckAnalysisPage() {
                   <th className="p-4">Utilisation</th>
                   <th className="p-4">Urgency</th>
                   <th className="p-4">Priority</th>
-                  <th className="rounded-r-xl p-4">Recommendation</th>
+                  <th className="rounded-r-xl p-4">
+                    Recommendation
+                  </th>
                 </tr>
               </thead>
 
               <tbody>
                 {analysisRows.map((row, index) => (
-                  <tr key={row.process} className="border-b border-slate-200">
+                  <tr
+                    key={row.process}
+                    className="border-b border-slate-200"
+                  >
                     <td className="p-4">{index + 1}</td>
                     <td className="p-4 font-bold">{row.process}</td>
                     <td className="p-4">{row.ratedCapacity}</td>
                     <td className="p-4">{row.actualOutput}</td>
                     <td className="p-4">{row.gap}</td>
-                    <td className="p-4">{row.utilisation.toFixed(1)}%</td>
+                    <td className="p-4">
+                      {row.utilisation.toFixed(1)}%
+                    </td>
                     <td className="p-4">{row.urgency}</td>
                     <td className="p-4">{row.priority}</td>
                     <td className="p-4">{row.recommendation}</td>
@@ -348,7 +421,7 @@ export default function BottleneckAnalysisPage() {
           </div>
         </div>
       </section>
-            {/* BOTTLENECK IDENTIFICATION PROCEDURE */}
+
       <section className="bg-white px-6 py-20">
         <div className="mx-auto max-w-7xl">
           <div className="max-w-5xl">
@@ -361,10 +434,10 @@ export default function BottleneckAnalysisPage() {
             </h2>
 
             <p className="mt-6 text-xl leading-relaxed text-slate-700">
-              Bottlenecks should be identified through structured observation,
-              activity sampling, capacity comparison, workflow analysis, and
-              actual shop-floor evidence. The system should not depend only on
-              assumptions or opinions.
+              Bottlenecks should be identified through structured
+              observation, activity sampling, capacity comparison,
+              workflow analysis, and actual shop-floor evidence. The
+              system should not depend only on assumptions or opinions.
             </p>
           </div>
 
@@ -373,7 +446,8 @@ export default function BottleneckAnalysisPage() {
               {
                 title: "1. Select Observation Area",
                 text: "Choose the line, department, process, workstation, or machine where output is below required capacity.",
-                color: "border-blue-300 bg-blue-100 text-blue-950",
+                color:
+                  "border-blue-300 bg-blue-100 text-blue-950",
               },
               {
                 title: "2. Observe for 7 Working Days",
@@ -383,17 +457,20 @@ export default function BottleneckAnalysisPage() {
               {
                 title: "3. Use Last 5 Days for Analysis",
                 text: "Use days 3 to 7 as more reliable data for standard work, non-standard work, idle time, waiting time, and interruption analysis.",
-                color: "border-emerald-300 bg-emerald-100 text-emerald-950",
+                color:
+                  "border-emerald-300 bg-emerald-100 text-emerald-950",
               },
               {
                 title: "4. Classify Activities",
                 text: "Mark every observed activity as standard work, non-standard work, idle time, waiting for material, waiting for machine, rework, movement, or supervision delay.",
-                color: "border-violet-300 bg-violet-100 text-violet-950",
+                color:
+                  "border-violet-300 bg-violet-100 text-violet-950",
               },
               {
                 title: "5. Tally Each Action",
                 text: "Use tally marks for each observation. Four right slashes followed by one back slash equals five observations. This makes manual counting simple and reliable.",
-                color: "border-yellow-300 bg-yellow-100 text-yellow-950",
+                color:
+                  "border-yellow-300 bg-yellow-100 text-yellow-950",
               },
               {
                 title: "6. Compare With Capacity",
@@ -401,9 +478,11 @@ export default function BottleneckAnalysisPage() {
                 color: "border-pink-300 bg-pink-100 text-pink-950",
               },
             ].map((item) => (
-              <div
+              <a
                 key={item.title}
-                className={`rounded-3xl border p-8 shadow-md ${item.color}`}
+                id={slugify(item.title)}
+                href={`#${slugify(item.title)}`}
+                className={`rounded-3xl border p-8 shadow-md transition hover:-translate-y-1 hover:shadow-xl ${item.color}`}
               >
                 <h3 className="text-2xl font-extrabold">
                   {item.title}
@@ -412,11 +491,14 @@ export default function BottleneckAnalysisPage() {
                 <p className="mt-5 text-lg leading-relaxed">
                   {item.text}
                 </p>
-              </div>
+              </a>
             ))}
           </div>
 
-          <div className="mt-14 rounded-3xl bg-slate-900 p-8 text-white shadow-lg">
+          <section
+            id="activity-sampling-categories"
+            className="mt-14 scroll-mt-28 rounded-3xl bg-slate-900 p-8 text-white shadow-lg"
+          >
             <h3 className="text-3xl font-extrabold text-cyan-300">
               Activity Sampling Categories
             </h3>
@@ -426,6 +508,7 @@ export default function BottleneckAnalysisPage() {
                 <h4 className="text-2xl font-extrabold text-emerald-300">
                   Standard Work
                 </h4>
+
                 <p className="mt-4 text-slate-300">
                   Productive work done according to the defined method,
                   sequence, quality requirement, and expected cycle.
@@ -436,9 +519,11 @@ export default function BottleneckAnalysisPage() {
                 <h4 className="text-2xl font-extrabold text-yellow-300">
                   Non-Standard Work
                 </h4>
+
                 <p className="mt-4 text-slate-300">
-                  Rework, unnecessary movement, searching, correction,
-                  repeated handling, unclear method, or avoidable extra work.
+                  Rework, unnecessary movement, searching,
+                  correction, repeated handling, unclear method, or
+                  avoidable extra work.
                 </p>
               </div>
 
@@ -446,27 +531,33 @@ export default function BottleneckAnalysisPage() {
                 <h4 className="text-2xl font-extrabold text-red-300">
                   Idle / Waiting Time
                 </h4>
+
                 <p className="mt-4 text-slate-300">
                   Waiting for material, machine, supervisor decision,
-                  instruction, maintenance, previous process, or next process.
+                  instruction, maintenance, previous process, or next
+                  process.
                 </p>
               </div>
             </div>
-          </div>
+          </section>
 
-          <div className="mt-14 rounded-3xl bg-yellow-50 p-8 shadow-md">
+          <section
+            id="manual-tally-method"
+            className="mt-14 scroll-mt-28 rounded-3xl bg-yellow-50 p-8 shadow-md"
+          >
             <h3 className="text-3xl font-extrabold text-yellow-950">
               Manual Tally Method
             </h3>
 
             <p className="mt-5 text-xl leading-relaxed text-yellow-950">
-              During observation, each activity is recorded using tally marks:
-              four right slashes followed by one crossing back slash equals
-              five observations. Example: <strong>////</strong> then cross it
-              to complete one group of <strong>5</strong>. This allows quick
-              manual counting before transferring data into the software.
+              During observation, each activity is recorded using tally
+              marks: four right slashes followed by one crossing back
+              slash equals five observations. Example:{" "}
+              <strong>////</strong> then cross it to complete one group
+              of <strong>5</strong>. This allows quick manual counting
+              before transferring data into the software.
             </p>
-          </div>
+          </section>
         </div>
       </section>
     </main>

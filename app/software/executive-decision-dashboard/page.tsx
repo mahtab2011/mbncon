@@ -1,18 +1,32 @@
 "use client";
 
+import Link from "next/link";
 import DashboardShell from "@/components/software/DashboardShell";
 import RiskBadge from "@/components/software/RiskBadge";
 
-const decisions = [
+type RiskLevel = "Low" | "Medium" | "High" | "Critical";
+
+type Decision = {
+  title: string;
+  department: string;
+  risk: RiskLevel;
+  owner: string;
+  deadline: string;
+  action: string;
+  status: string;
+  href: string;
+};
+
+const decisions: Decision[] = [
   {
     title: "Reduce Production Rejection",
     department: "Production",
     risk: "High",
     owner: "Production Manager",
     deadline: "7 Days",
-    action:
-      "Launch root cause analysis and operator retraining programme.",
+    action: "Launch root cause analysis and operator retraining programme.",
     status: "Urgent",
+    href: "/software/root-cause-intelligence",
   },
   {
     title: "Control Excess Utilities Consumption",
@@ -23,6 +37,7 @@ const decisions = [
     action:
       "Investigate generator overuse and optimize electricity consumption.",
     status: "Monitoring",
+    href: "/software/utility-cost-intelligence",
   },
   {
     title: "Export Shipment Delay Recovery",
@@ -33,6 +48,7 @@ const decisions = [
     action:
       "Coordinate with logistics partner and prioritize delayed shipment.",
     status: "Escalated",
+    href: "/software/shipment-delay-prediction",
   },
   {
     title: "Machine Breakdown Prevention",
@@ -43,6 +59,7 @@ const decisions = [
     action:
       "Perform preventive maintenance audit for all critical machines.",
     status: "Action Required",
+    href: "/software/preventive-maintenance-intelligence",
   },
   {
     title: "Absenteeism Reduction Plan",
@@ -53,6 +70,26 @@ const decisions = [
     action:
       "Review attendance trend and improve workforce engagement programme.",
     status: "In Progress",
+    href: "/software/idle-manpower-intelligence",
+  },
+];
+
+const decisionSummary = [
+  {
+    label: "Critical Decisions",
+    value: decisions.filter((item) => item.risk === "Critical").length,
+  },
+  {
+    label: "High Risk Actions",
+    value: decisions.filter((item) => item.risk === "High").length,
+  },
+  {
+    label: "Active Departments",
+    value: new Set(decisions.map((item) => item.department)).size,
+  },
+  {
+    label: "Total Actions",
+    value: decisions.length,
   },
 ];
 
@@ -60,26 +97,53 @@ export default function ExecutiveDecisionDashboardPage() {
   return (
     <DashboardShell title="Executive Decision Dashboard">
       <div className="space-y-8">
-        <div>
-          <h1 className="text-4xl font-bold text-neutral-900">
+        <section className="rounded-3xl border border-cyan-200 bg-cyan-50 p-8">
+          <p className="text-sm font-semibold uppercase tracking-widest text-cyan-700">
+            Executive Control Board
+          </p>
+
+          <h1 className="mt-3 text-4xl font-bold text-neutral-950">
             Executive Decision Dashboard
           </h1>
 
-          <p className="mt-4 max-w-4xl text-lg leading-8 text-neutral-600">
+          <p className="mt-4 max-w-4xl text-lg leading-8 text-neutral-700">
             Centralized management decision board for operational risk,
-            corrective actions, escalation tracking, and strategic execution.
+            corrective actions, escalation tracking, department ownership, and
+            strategic execution.
           </p>
-        </div>
+        </section>
 
-        <div className="grid gap-6">
-          {decisions.map((decision) => (
+        <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+          {decisionSummary.map((item) => (
             <div
+              key={item.label}
+              className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:border-cyan-300 hover:shadow-lg"
+            >
+              <p className="text-sm font-semibold text-neutral-500">
+                {item.label}
+              </p>
+
+              <p className="mt-3 text-4xl font-bold text-neutral-950">
+                {item.value}
+              </p>
+
+              <p className="mt-3 text-xs font-semibold text-cyan-700">
+                Executive decision signal
+              </p>
+            </div>
+          ))}
+        </section>
+
+        <section className="grid gap-6">
+          {decisions.map((decision) => (
+            <Link
               key={decision.title}
-              className="rounded-3xl border border-neutral-200 bg-white p-8 shadow-sm"
+              href={decision.href}
+              className="rounded-3xl border border-neutral-200 bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:border-cyan-300 hover:shadow-lg"
             >
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
-                  <h2 className="text-2xl font-bold text-neutral-900">
+                  <h2 className="text-2xl font-bold text-neutral-950">
                     {decision.title}
                   </h2>
 
@@ -88,29 +152,14 @@ export default function ExecutiveDecisionDashboardPage() {
                   </p>
                 </div>
 
-                <RiskBadge level={decision.risk as any} />
+                <RiskBadge level={decision.risk} />
               </div>
 
               <div className="mt-6 grid gap-5 md:grid-cols-2">
-                <InfoBox
-                  label="Decision Owner"
-                  value={decision.owner}
-                />
-
-                <InfoBox
-                  label="Completion Deadline"
-                  value={decision.deadline}
-                />
-
-                <InfoBox
-                  label="Current Status"
-                  value={decision.status}
-                />
-
-                <InfoBox
-                  label="Priority Level"
-                  value={decision.risk}
-                />
+                <InfoBox label="Decision Owner" value={decision.owner} />
+                <InfoBox label="Completion Deadline" value={decision.deadline} />
+                <InfoBox label="Current Status" value={decision.status} />
+                <InfoBox label="Priority Level" value={decision.risk} />
               </div>
 
               <div className="mt-6 rounded-2xl bg-neutral-50 p-5">
@@ -122,30 +171,26 @@ export default function ExecutiveDecisionDashboardPage() {
                   {decision.action}
                 </p>
               </div>
-            </div>
+
+              <p className="mt-5 text-xs font-semibold text-cyan-700">
+                Open related intelligence module
+              </p>
+            </Link>
           ))}
-        </div>
+        </section>
       </div>
     </DashboardShell>
   );
 }
 
-function InfoBox({
-  label,
-  value,
-}: {
-  label: string;
-  value: string;
-}) {
+function InfoBox({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-2xl border border-neutral-200 p-5">
       <p className="text-xs font-bold uppercase tracking-wide text-neutral-500">
         {label}
       </p>
 
-      <p className="mt-2 text-base font-semibold text-neutral-900">
-        {value}
-      </p>
+      <p className="mt-2 text-base font-semibold text-neutral-900">{value}</p>
     </div>
   );
 }

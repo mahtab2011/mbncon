@@ -87,19 +87,62 @@ const leanSystems = [
   },
 ];
 
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 export default function KaizenSystemPage() {
+  const governanceItems = [
+    "Top management commitment",
+    "Employee participation",
+    "Daily operational discipline",
+    "Continuous improvement culture",
+    "Visual management",
+    "Standard work systems",
+    "Shop-floor observation",
+    "Operational measurement",
+  ];
+
+  const workplace5s = [
+    {
+      title: "Seiri",
+      subtitle: "Sort",
+    },
+    {
+      title: "Seiton",
+      subtitle: "Simplify",
+    },
+    {
+      title: "Seiso",
+      subtitle: "Sweep",
+    },
+    {
+      title: "Seiketsu",
+      subtitle: "Standardise",
+    },
+    {
+      title: "Shitsuke",
+      subtitle: "Sustain",
+    },
+  ];
+
   return (
     <main className="min-h-screen bg-slate-100 text-slate-900">
-
-      <section className="bg-linear-to-r from-emerald-950 via-blue-900 to-violet-900 px-6 py-16 text-white">
+      {/* HERO */}
+      <section className="bg-slate-950 px-6 py-16 text-white">
         <div className="mx-auto max-w-7xl">
-
           <p className="mb-4 text-sm font-bold uppercase tracking-[0.3em] text-yellow-300">
             Lean Manufacturing & Kaizen System
           </p>
 
           <h1 className="max-w-6xl text-5xl font-extrabold leading-tight">
-            Workplace Organisation, Continuous Improvement & Lean Operational Excellence
+            Workplace Organisation, Continuous Improvement & Lean Operational
+            Excellence
           </h1>
 
           <p className="mt-6 max-w-5xl text-xl leading-relaxed text-white/85">
@@ -109,15 +152,13 @@ export default function KaizenSystemPage() {
             improve productivity, quality, operational stability, teamwork,
             leadership, and business performance.
           </p>
-
         </div>
       </section>
 
       <section className="px-6 py-16">
         <div className="mx-auto max-w-7xl">
-
-          <div className="rounded-3xl bg-white p-10 shadow-md">
-
+          {/* KAIZEN PHILOSOPHY */}
+          <section className="rounded-3xl bg-white p-10 shadow-md">
             <h2 className="text-4xl font-extrabold text-emerald-950">
               Kaizen Philosophy
             </h2>
@@ -131,174 +172,161 @@ export default function KaizenSystemPage() {
             </p>
 
             <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+              {[
+                {
+                  title: "Small Improvements",
+                  color: "bg-emerald-100 text-emerald-950",
+                  text:
+                    "Continuous small improvements often create major long-term productivity gains.",
+                },
+                {
+                  title: "Employee Involvement",
+                  color: "bg-blue-100 text-blue-950",
+                  text:
+                    "All employees participate in identifying problems and suggesting improvement opportunities.",
+                },
+                {
+                  title: "Workplace Discipline",
+                  color: "bg-violet-100 text-violet-950",
+                  text:
+                    "Cleanliness, organisation, standardisation, and operational discipline create sustainable efficiency.",
+                },
+                {
+                  title: "Continuous Learning",
+                  color: "bg-yellow-100 text-yellow-950",
+                  text:
+                    "Teams learn from operational problems and continuously improve systems, methods, and behaviour.",
+                },
+              ].map((item) => {
+                const id = slugify(item.title);
 
-              <div className="rounded-2xl bg-emerald-100 p-6">
-                <h3 className="text-2xl font-extrabold text-emerald-950">
-                  Small Improvements
-                </h3>
+                return (
+                  <a
+                    key={item.title}
+                    href={`#${id}`}
+                    className={`scroll-mt-28 rounded-2xl p-6 transition duration-300 hover:-translate-y-1 hover:shadow-xl ${item.color}`}
+                  >
+                    <h3
+                      id={id}
+                      className="text-2xl font-extrabold"
+                    >
+                      {item.title}
+                    </h3>
 
-                <p className="mt-4 text-emerald-950">
-                  Continuous small improvements often create major long-term
-                  productivity gains.
-                </p>
-              </div>
-
-              <div className="rounded-2xl bg-blue-100 p-6">
-                <h3 className="text-2xl font-extrabold text-blue-950">
-                  Employee Involvement
-                </h3>
-
-                <p className="mt-4 text-blue-950">
-                  All employees participate in identifying problems and
-                  suggesting improvement opportunities.
-                </p>
-              </div>
-
-              <div className="rounded-2xl bg-violet-100 p-6">
-                <h3 className="text-2xl font-extrabold text-violet-950">
-                  Workplace Discipline
-                </h3>
-
-                <p className="mt-4 text-violet-950">
-                  Cleanliness, organisation, standardisation, and operational
-                  discipline create sustainable efficiency.
-                </p>
-              </div>
-
-              <div className="rounded-2xl bg-yellow-100 p-6">
-                <h3 className="text-2xl font-extrabold text-yellow-950">
-                  Continuous Learning
-                </h3>
-
-                <p className="mt-4 text-yellow-950">
-                  Teams learn from operational problems and continuously improve
-                  systems, methods, and behaviour.
-                </p>
-              </div>
-
+                    <p className="mt-4">
+                      {item.text}
+                    </p>
+                  </a>
+                );
+              })}
             </div>
-          </div>
+          </section>
 
-          <div className="mt-14">
-
+          {/* LEAN SYSTEMS */}
+          <section className="mt-14">
             <h2 className="text-4xl font-extrabold text-slate-900">
               Lean Manufacturing Operational Systems
             </h2>
 
             <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+              {leanSystems.map((item) => {
+                const id = slugify(item.title);
 
-              {leanSystems.map((item) => (
-                <div
-                  key={item.title}
-                  className={`rounded-3xl border p-8 shadow-md ${item.color}`}
-                >
-                  <h3 className="text-3xl font-extrabold">
-                    {item.title}
-                  </h3>
+                return (
+                  <section
+                    key={item.title}
+                    id={id}
+                    className={`scroll-mt-28 rounded-3xl border p-8 shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-xl ${item.color}`}
+                  >
+                    <h3 className="text-3xl font-extrabold">
+                      {item.title}
+                    </h3>
 
-                  <p className="mt-2 text-lg font-bold opacity-80">
-                    {item.subtitle}
-                  </p>
+                    <p className="mt-2 text-lg font-bold opacity-80">
+                      {item.subtitle}
+                    </p>
 
-                  <p className="mt-5 text-lg leading-relaxed">
-                    {item.text}
-                  </p>
-                </div>
-              ))}
-
+                    <p className="mt-5 text-lg leading-relaxed">
+                      {item.text}
+                    </p>
+                  </section>
+                );
+              })}
             </div>
-          </div>
+          </section>
 
-          <div className="mt-14 rounded-3xl bg-slate-900 p-10 text-white shadow-md">
-
+          {/* 5S */}
+          <section className="mt-14 rounded-3xl bg-slate-900 p-10 text-white shadow-md">
             <h2 className="text-4xl font-extrabold text-cyan-300">
               5S Workplace Organisation Methodology
             </h2>
 
             <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-5">
+              {workplace5s.map((item) => {
+                const id = slugify(item.title);
 
-              {[
-                {
-                  title: "Seiri",
-                  subtitle: "Sort",
-                },
-                {
-                  title: "Seiton",
-                  subtitle: "Simplify",
-                },
-                {
-                  title: "Seiso",
-                  subtitle: "Sweep",
-                },
-                {
-                  title: "Seiketsu",
-                  subtitle: "Standardise",
-                },
-                {
-                  title: "Shitsuke",
-                  subtitle: "Sustain",
-                },
-              ].map((item) => (
-                <div
-                  key={item.title}
-                  className="rounded-2xl bg-white/10 p-6"
-                >
-                  <h3 className="text-3xl font-extrabold text-yellow-300">
-                    {item.title}
-                  </h3>
+                return (
+                  <a
+                    key={item.title}
+                    href={`#${id}`}
+                    className="scroll-mt-28 rounded-2xl bg-white/10 p-6 transition duration-300 hover:bg-white/20 hover:shadow-xl"
+                  >
+                    <h3
+                      id={id}
+                      className="text-3xl font-extrabold text-yellow-300"
+                    >
+                      {item.title}
+                    </h3>
 
-                  <p className="mt-3 text-xl font-bold text-white">
-                    {item.subtitle}
-                  </p>
+                    <p className="mt-3 text-xl font-bold text-white">
+                      {item.subtitle}
+                    </p>
 
-                  <p className="mt-4 text-slate-300">
-                    Workplace organisation discipline to improve operational
-                    visibility, safety, productivity, and sustainability.
-                  </p>
-                </div>
-              ))}
-
+                    <p className="mt-4 text-slate-300">
+                      Workplace organisation discipline to improve operational
+                      visibility, safety, productivity, and sustainability.
+                    </p>
+                  </a>
+                );
+              })}
             </div>
-          </div>
+          </section>
 
-          <div className="mt-14 rounded-3xl bg-white p-10 shadow-md">
-
+          {/* GOVERNANCE */}
+          <section className="mt-14 rounded-3xl bg-white p-10 shadow-md">
             <h2 className="text-4xl font-extrabold text-slate-900">
               Lean Manufacturing Governance
             </h2>
 
             <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+              {governanceItems.map((item) => {
+                const id = slugify(item);
 
-              {[
-                "Top management commitment",
-                "Employee participation",
-                "Daily operational discipline",
-                "Continuous improvement culture",
-                "Visual management",
-                "Standard work systems",
-                "Shop-floor observation",
-                "Operational measurement",
-              ].map((item) => (
-                <div
-                  key={item}
-                  className="rounded-2xl border border-slate-200 bg-slate-50 p-6"
-                >
-                  <h3 className="text-xl font-extrabold text-slate-900">
-                    {item}
-                  </h3>
+                return (
+                  <a
+                    key={item}
+                    href={`#${id}`}
+                    className="scroll-mt-28 rounded-2xl border border-slate-200 bg-slate-50 p-6 transition duration-300 hover:-translate-y-1 hover:bg-white hover:shadow-xl"
+                  >
+                    <h3
+                      id={id}
+                      className="text-xl font-extrabold text-slate-900"
+                    >
+                      {item}
+                    </h3>
 
-                  <p className="mt-4 text-slate-700">
-                    Important operational requirement for successful Lean
-                    Manufacturing implementation and sustainment.
-                  </p>
-                </div>
-              ))}
-
+                    <p className="mt-4 text-slate-700">
+                      Important operational requirement for successful Lean
+                      Manufacturing implementation and sustainment.
+                    </p>
+                  </a>
+                );
+              })}
             </div>
-          </div>
+          </section>
 
-          <div className="mt-14 rounded-3xl bg-orange-100 p-10 shadow-md">
-
+          {/* FUTURE */}
+          <section className="mt-14 rounded-3xl bg-orange-100 p-10 shadow-md transition duration-300 hover:shadow-xl">
             <h2 className="text-4xl font-extrabold text-orange-950">
               Future Expansion
             </h2>
@@ -310,12 +338,9 @@ export default function KaizenSystemPage() {
               energy productivity, maintenance intelligence, and factory-wide
               continuous improvement tracking.
             </p>
-
-          </div>
-
+          </section>
         </div>
       </section>
-
     </main>
   );
 }

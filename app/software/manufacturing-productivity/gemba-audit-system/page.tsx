@@ -14,6 +14,15 @@ type AuditRow = {
   status: "Open" | "In Progress" | "Closed";
 };
 
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 export default function GembaAuditSystemPage() {
   const [rows, setRows] = useState<AuditRow[]>([
     {
@@ -96,16 +105,33 @@ export default function GembaAuditSystemPage() {
     });
   };
 
+  const principles = [
+    "Go to the actual place",
+    "Observe real work",
+    "Ask respectful questions",
+    "Record facts and actions",
+  ];
+
+  const gembaSteps = [
+    "Go to shop floor",
+    "Observe actual process",
+    "Compare with standard work",
+    "Record abnormality",
+    "Assign corrective action",
+  ];
+
   return (
     <main className="min-h-screen bg-slate-100 text-slate-900">
-      <section className="bg-linear-to-r from-emerald-950 via-blue-900 to-violet-900 px-6 py-16 text-white">
+      {/* HERO */}
+      <section className="bg-slate-950 px-6 py-16 text-white">
         <div className="mx-auto max-w-7xl">
           <p className="mb-4 text-sm font-bold uppercase tracking-[0.3em] text-yellow-300">
             Gemba Walk & Quality Audit System
           </p>
 
           <h1 className="max-w-6xl text-5xl font-extrabold leading-tight">
-            Go to the Actual Place, Observe the Work, and Sustain Operational Discipline
+            Go to the Actual Place, Observe the Work, and Sustain Operational
+            Discipline
           </h1>
 
           <p className="mt-6 max-w-5xl text-xl leading-relaxed text-white/85">
@@ -116,29 +142,39 @@ export default function GembaAuditSystemPage() {
         </div>
       </section>
 
+      {/* GEMBA PRINCIPLES */}
       <section className="px-6 py-16">
         <div className="mx-auto max-w-7xl">
           <div className="grid gap-6 md:grid-cols-4">
-            {[
-              "Go to the actual place",
-              "Observe real work",
-              "Ask respectful questions",
-              "Record facts and actions",
-            ].map((item) => (
-              <div key={item} className="rounded-3xl bg-blue-100 p-6 shadow-md">
-                <h2 className="text-xl font-extrabold text-blue-950">
-                  {item}
-                </h2>
-                <p className="mt-4 text-blue-950">
-                  Gemba discipline helps leaders understand real operational
-                  conditions instead of relying only on office reports.
-                </p>
-              </div>
-            ))}
+            {principles.map((item) => {
+              const id = slugify(item);
+
+              return (
+                <a
+                  key={item}
+                  href={`#${id}`}
+                  className="rounded-3xl bg-blue-100 p-6 shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-xl"
+                >
+                  <h2 className="text-xl font-extrabold text-blue-950">
+                    {item}
+                  </h2>
+
+                  <p className="mt-4 text-blue-950">
+                    Gemba discipline helps leaders understand real operational
+                    conditions instead of relying only on office reports.
+                  </p>
+                </a>
+              );
+            })}
           </div>
 
+          {/* MAIN GRID */}
           <div className="mt-12 grid gap-6 xl:grid-cols-3">
-            <div className="rounded-3xl bg-white p-8 shadow-md">
+            {/* FORM */}
+            <section
+              id={slugify("Audit Entry Form")}
+              className="scroll-mt-28 rounded-3xl bg-white p-8 shadow-md"
+            >
               <h2 className="text-3xl font-extrabold text-emerald-950">
                 Audit Entry Form
               </h2>
@@ -151,7 +187,10 @@ export default function GembaAuditSystemPage() {
                   ["actionOwner", "Action Owner"],
                 ].map(([key, label]) => (
                   <label key={key} className="block">
-                    <span className="font-bold text-slate-700">{label}</span>
+                    <span className="font-bold text-slate-700">
+                      {label}
+                    </span>
+
                     <input
                       value={String(form[key as keyof AuditRow])}
                       onChange={(e) =>
@@ -160,7 +199,7 @@ export default function GembaAuditSystemPage() {
                           [key]: e.target.value,
                         })
                       }
-                      className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 outline-none focus:border-emerald-600"
+                      className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 outline-none transition focus:border-emerald-600 focus:bg-white"
                       placeholder={`Enter ${label.toLowerCase()}`}
                     />
                   </label>
@@ -176,6 +215,7 @@ export default function GembaAuditSystemPage() {
                     <span className="font-bold text-slate-700">
                       {label} (%)
                     </span>
+
                     <input
                       type="number"
                       value={Number(form[key as keyof AuditRow])}
@@ -185,14 +225,17 @@ export default function GembaAuditSystemPage() {
                           [key]: Number(e.target.value),
                         })
                       }
-                      className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 outline-none focus:border-emerald-600"
+                      className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 outline-none transition focus:border-emerald-600 focus:bg-white"
                       placeholder={`Enter ${label.toLowerCase()}`}
                     />
                   </label>
                 ))}
 
                 <label className="block">
-                  <span className="font-bold text-slate-700">Status</span>
+                  <span className="font-bold text-slate-700">
+                    Status
+                  </span>
+
                   <select
                     value={form.status}
                     onChange={(e) =>
@@ -201,7 +244,7 @@ export default function GembaAuditSystemPage() {
                         status: e.target.value as AuditRow["status"],
                       })
                     }
-                    className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 outline-none focus:border-emerald-600"
+                    className="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 outline-none transition focus:border-emerald-600 focus:bg-white"
                   >
                     <option>Open</option>
                     <option>In Progress</option>
@@ -211,125 +254,147 @@ export default function GembaAuditSystemPage() {
 
                 <button
                   onClick={addAudit}
-                  className="w-full rounded-2xl bg-emerald-900 px-8 py-4 text-lg font-extrabold text-white shadow-md transition hover:bg-emerald-800"
+                  className="w-full rounded-2xl bg-emerald-900 px-8 py-4 text-lg font-extrabold text-white shadow-md transition duration-300 hover:bg-emerald-800 hover:shadow-xl"
                 >
                   Save Gemba Audit
                 </button>
               </div>
-            </div>
+            </section>
 
-            <div className="rounded-3xl bg-white p-8 shadow-md xl:col-span-2">
+            {/* DASHBOARD */}
+            <section
+              id={slugify("Live Gemba Audit Dashboard")}
+              className="scroll-mt-28 rounded-3xl bg-white p-8 shadow-md xl:col-span-2"
+            >
               <h2 className="text-3xl font-extrabold text-slate-900">
                 Live Gemba Audit Dashboard
               </h2>
 
               <div className="mt-8 space-y-6">
-                {analysedRows.map((row, index) => (
-                  <div
-                    key={index}
-                    className="rounded-3xl border border-slate-200 bg-slate-50 p-6"
-                  >
-                    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                      <div>
-                        <h3 className="text-2xl font-extrabold text-slate-900">
-                          {row.area}
-                        </h3>
-                        <p className="mt-1 text-lg text-slate-700">
-                          Auditor: {row.auditor}
-                        </p>
+                {analysedRows.map((row, index) => {
+                  const areaId = slugify(row.area);
+
+                  return (
+                    <div
+                      key={index}
+                      id={areaId}
+                      className="scroll-mt-28 rounded-3xl border border-slate-200 bg-slate-50 p-6 transition duration-300 hover:shadow-lg"
+                    >
+                      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                        <div>
+                          <h3 className="text-2xl font-extrabold text-slate-900">
+                            {row.area}
+                          </h3>
+
+                          <p className="mt-1 text-lg text-slate-700">
+                            Auditor: {row.auditor}
+                          </p>
+                        </div>
+
+                        <div className="rounded-2xl bg-slate-900 px-6 py-4 text-white">
+                          <p className="text-sm font-bold uppercase text-cyan-300">
+                            Overall Score
+                          </p>
+
+                          <p className="text-3xl font-extrabold">
+                            {row.overall.toFixed(1)}%
+                          </p>
+                        </div>
                       </div>
 
-                      <div className="rounded-2xl bg-slate-900 px-6 py-4 text-white">
-                        <p className="text-sm font-bold uppercase text-cyan-300">
-                          Overall Score
+                      <div className="mt-6 grid gap-4 md:grid-cols-4">
+                        <div className="rounded-2xl bg-emerald-100 p-4 transition hover:shadow-md">
+                          <p className="text-sm font-bold uppercase text-emerald-700">
+                            5S
+                          </p>
+
+                          <p className="mt-2 text-2xl font-extrabold text-emerald-950">
+                            {row.score5s}%
+                          </p>
+                        </div>
+
+                        <div className="rounded-2xl bg-blue-100 p-4 transition hover:shadow-md">
+                          <p className="text-sm font-bold uppercase text-blue-700">
+                            Safety
+                          </p>
+
+                          <p className="mt-2 text-2xl font-extrabold text-blue-950">
+                            {row.scoreSafety}%
+                          </p>
+                        </div>
+
+                        <div className="rounded-2xl bg-violet-100 p-4 transition hover:shadow-md">
+                          <p className="text-sm font-bold uppercase text-violet-700">
+                            Standard Work
+                          </p>
+
+                          <p className="mt-2 text-2xl font-extrabold text-violet-950">
+                            {row.scoreStandardWork}%
+                          </p>
+                        </div>
+
+                        <div className="rounded-2xl bg-red-100 p-4 transition hover:shadow-md">
+                          <p className="text-sm font-bold uppercase text-red-700">
+                            Quality
+                          </p>
+
+                          <p className="mt-2 text-2xl font-extrabold text-red-950">
+                            {row.scoreQuality}%
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="mt-6 rounded-2xl bg-yellow-50 p-5">
+                        <p className="text-lg text-yellow-950">
+                          <strong>Issue:</strong> {row.issue}
                         </p>
-                        <p className="text-3xl font-extrabold">
-                          {row.overall.toFixed(1)}%
+
+                        <p className="mt-2 text-lg text-yellow-950">
+                          <strong>Owner:</strong> {row.actionOwner}
+                        </p>
+
+                        <p className="mt-2 text-lg text-yellow-950">
+                          <strong>Status:</strong> {row.status} |{" "}
+                          <strong>Priority:</strong> {row.priority}
                         </p>
                       </div>
                     </div>
-
-                    <div className="mt-6 grid gap-4 md:grid-cols-4">
-                      <div className="rounded-2xl bg-emerald-100 p-4">
-                        <p className="text-sm font-bold uppercase text-emerald-700">
-                          5S
-                        </p>
-                        <p className="mt-2 text-2xl font-extrabold text-emerald-950">
-                          {row.score5s}%
-                        </p>
-                      </div>
-
-                      <div className="rounded-2xl bg-blue-100 p-4">
-                        <p className="text-sm font-bold uppercase text-blue-700">
-                          Safety
-                        </p>
-                        <p className="mt-2 text-2xl font-extrabold text-blue-950">
-                          {row.scoreSafety}%
-                        </p>
-                      </div>
-
-                      <div className="rounded-2xl bg-violet-100 p-4">
-                        <p className="text-sm font-bold uppercase text-violet-700">
-                          Standard Work
-                        </p>
-                        <p className="mt-2 text-2xl font-extrabold text-violet-950">
-                          {row.scoreStandardWork}%
-                        </p>
-                      </div>
-
-                      <div className="rounded-2xl bg-red-100 p-4">
-                        <p className="text-sm font-bold uppercase text-red-700">
-                          Quality
-                        </p>
-                        <p className="mt-2 text-2xl font-extrabold text-red-950">
-                          {row.scoreQuality}%
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="mt-6 rounded-2xl bg-yellow-50 p-5">
-                      <p className="text-lg text-yellow-950">
-                        <strong>Issue:</strong> {row.issue}
-                      </p>
-                      <p className="mt-2 text-lg text-yellow-950">
-                        <strong>Owner:</strong> {row.actionOwner}
-                      </p>
-                      <p className="mt-2 text-lg text-yellow-950">
-                        <strong>Status:</strong> {row.status} |{" "}
-                        <strong>Priority:</strong> {row.priority}
-                      </p>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
-            </div>
+            </section>
           </div>
 
-          <div className="mt-12 rounded-3xl bg-slate-900 p-8 text-white shadow-md">
+          {/* PROCEDURE */}
+          <section className="mt-12 rounded-3xl bg-slate-900 p-8 text-white shadow-md">
             <h2 className="text-3xl font-extrabold text-cyan-300">
               Standard Gemba Walk Procedure
             </h2>
 
             <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-5">
-              {[
-                "Go to shop floor",
-                "Observe actual process",
-                "Compare with standard work",
-                "Record abnormality",
-                "Assign corrective action",
-              ].map((item) => (
-                <div key={item} className="rounded-2xl bg-white/10 p-6">
-                  <h3 className="text-xl font-extrabold text-yellow-300">
-                    {item}
-                  </h3>
-                  <p className="mt-4 text-slate-300">
-                    Practical Gemba discipline for sustaining Lean, TQM,
-                    Kaizen, 5S, safety, and quality culture.
-                  </p>
-                </div>
-              ))}
+              {gembaSteps.map((item) => {
+                const id = slugify(item);
+
+                return (
+                  <a
+                    key={item}
+                    id={id}
+                    href={`#${id}`}
+                    className="scroll-mt-28 rounded-2xl bg-white/10 p-6 transition duration-300 hover:bg-white/20 hover:shadow-xl"
+                  >
+                    <h3 className="text-xl font-extrabold text-yellow-300">
+                      {item}
+                    </h3>
+
+                    <p className="mt-4 text-slate-300">
+                      Practical Gemba discipline for sustaining Lean, TQM,
+                      Kaizen, 5S, safety, and quality culture.
+                    </p>
+                  </a>
+                );
+              })}
             </div>
-          </div>
+          </section>
         </div>
       </section>
     </main>

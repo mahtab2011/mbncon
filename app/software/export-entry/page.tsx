@@ -5,6 +5,17 @@ import DashboardShell from "@/components/software/DashboardShell";
 import { addExportLog } from "@/lib/software/firestoreService";
 import { useLanguage } from "@/components/software/LanguageProvider";
 
+type ShipmentStatus = "On Time" | "Delayed" | "At Risk" | "Shipped";
+
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 export default function ExportEntryPage() {
   const { language } = useLanguage();
 
@@ -32,6 +43,9 @@ export default function ExportEntryPage() {
       placeholderBuyer: "Buyer name",
       placeholderPlanned: "2026-05-18",
       placeholderActual: "2026-05-20",
+      formTitle: "Commercial Export Data",
+      formNote:
+        "Use this form to record shipment performance, buyer exposure, and export delay risk.",
     },
     bn: {
       title: "এক্সপোর্ট ইন্টেলিজেন্স এন্ট্রি",
@@ -56,12 +70,15 @@ export default function ExportEntryPage() {
       placeholderBuyer: "বায়ারের নাম",
       placeholderPlanned: "2026-05-18",
       placeholderActual: "2026-05-20",
+      formTitle: "কমার্শিয়াল এক্সপোর্ট ডাটা",
+      formNote:
+        "শিপমেন্ট পারফরম্যান্স, বায়ার এক্সপোজার এবং এক্সপোর্ট বিলম্ব ঝুঁকি রেকর্ড করতে এই ফর্ম ব্যবহার করুন।",
     },
   };
 
   const t = text[language];
 
-  const statusLabels = {
+  const statusLabels: Record<ShipmentStatus, string> = {
     "On Time": t.onTime,
     Delayed: t.delayed,
     "At Risk": t.atRisk,
@@ -80,11 +97,25 @@ export default function ExportEntryPage() {
     plannedShipmentDate: "",
     actualShipmentDate: "",
     delayDays: "",
-    status: "At Risk",
+    status: "At Risk" as ShipmentStatus,
   });
 
-  const updateField = (field: string, value: string) => {
+  const updateField = (field: keyof typeof form, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const resetForm = () => {
+    setForm({
+      companyId: "demo-company",
+      factoryId: "demo-factory",
+      period: "",
+      buyer: "",
+      orderValue: "",
+      plannedShipmentDate: "",
+      actualShipmentDate: "",
+      delayDays: "",
+      status: "At Risk",
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -102,22 +133,11 @@ export default function ExportEntryPage() {
         plannedShipmentDate: form.plannedShipmentDate,
         actualShipmentDate: form.actualShipmentDate,
         delayDays: Number(form.delayDays),
-        status: form.status as "On Time" | "Delayed" | "At Risk" | "Shipped",
+        status: form.status,
       });
 
       setMessage(t.success);
-
-      setForm({
-        companyId: "demo-company",
-        factoryId: "demo-factory",
-        period: "",
-        buyer: "",
-        orderValue: "",
-        plannedShipmentDate: "",
-        actualShipmentDate: "",
-        delayDays: "",
-        status: "At Risk",
-      });
+      resetForm();
     } catch (error) {
       console.error(error);
       setMessage(t.error);
@@ -128,86 +148,113 @@ export default function ExportEntryPage() {
 
   return (
     <DashboardShell title={t.title} subtitle={t.subtitle}>
-      <form
-        onSubmit={handleSubmit}
-        className="max-w-4xl rounded-3xl border border-neutral-200 bg-white p-8 shadow-sm"
+      <section
+        id={slugify(t.title)}
+        className="scroll-mt-28 max-w-5xl rounded-3xl border border-neutral-200 bg-white p-8 shadow-sm"
       >
-        <div className="grid gap-6 md:grid-cols-2">
-          <Input
-            label={t.period}
-            value={form.period}
-            onChange={(v) => updateField("period", v)}
-            placeholder={t.placeholderPeriod}
-          />
+        <div className="mb-8 rounded-3xl border border-cyan-200 bg-cyan-50 p-6">
+          <p className="text-xs font-bold uppercase tracking-[0.25em] text-cyan-700">
+            MBNCON Export Intelligence
+          </p>
 
-          <Input
-            label={t.buyer}
-            value={form.buyer}
-            onChange={(v) => updateField("buyer", v)}
-            placeholder={t.placeholderBuyer}
-          />
+          <h1 className="mt-3 text-3xl font-black text-neutral-950">
+            {t.formTitle}
+          </h1>
 
-          <Input
-            label={t.orderValue}
-            value={form.orderValue}
-            onChange={(v) => updateField("orderValue", v)}
-          />
-
-          <Input
-            label={t.plannedShipmentDate}
-            value={form.plannedShipmentDate}
-            onChange={(v) => updateField("plannedShipmentDate", v)}
-            placeholder={t.placeholderPlanned}
-          />
-
-          <Input
-            label={t.actualShipmentDate}
-            value={form.actualShipmentDate}
-            onChange={(v) => updateField("actualShipmentDate", v)}
-            placeholder={t.placeholderActual}
-          />
-
-          <Input
-            label={t.delayDays}
-            value={form.delayDays}
-            onChange={(v) => updateField("delayDays", v)}
-          />
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-neutral-700">
+            {t.formNote}
+          </p>
         </div>
 
-        <label className="mt-6 block">
-          <span className="text-sm font-semibold text-neutral-700">
-            {t.shipmentStatus}
-          </span>
+        <form onSubmit={handleSubmit}>
+          <div className="grid gap-6 md:grid-cols-2">
+            <Input
+              label={t.period}
+              value={form.period}
+              onChange={(v) => updateField("period", v)}
+              placeholder={t.placeholderPeriod}
+            />
 
-          <select
-            value={form.status}
-            onChange={(e) => updateField("status", e.target.value)}
-            className="mt-2 w-full rounded-2xl border border-neutral-200 px-4 py-3 outline-none focus:border-cyan-500"
+            <Input
+              label={t.buyer}
+              value={form.buyer}
+              onChange={(v) => updateField("buyer", v)}
+              placeholder={t.placeholderBuyer}
+            />
+
+            <Input
+              label={t.orderValue}
+              value={form.orderValue}
+              onChange={(v) => updateField("orderValue", v)}
+              inputMode="decimal"
+              type="number"
+            />
+
+            <Input
+              label={t.plannedShipmentDate}
+              value={form.plannedShipmentDate}
+              onChange={(v) => updateField("plannedShipmentDate", v)}
+              placeholder={t.placeholderPlanned}
+              type="date"
+            />
+
+            <Input
+              label={t.actualShipmentDate}
+              value={form.actualShipmentDate}
+              onChange={(v) => updateField("actualShipmentDate", v)}
+              placeholder={t.placeholderActual}
+              type="date"
+            />
+
+            <Input
+              label={t.delayDays}
+              value={form.delayDays}
+              onChange={(v) => updateField("delayDays", v)}
+              inputMode="numeric"
+              type="number"
+            />
+          </div>
+
+          <label
+            id={slugify(t.shipmentStatus)}
+            className="mt-6 block scroll-mt-28"
           >
-            {(["On Time", "Delayed", "At Risk", "Shipped"] as const).map(
-              (status) => (
-                <option key={status} value={status}>
-                  {statusLabels[status]}
-                </option>
-              )
-            )}
-          </select>
-        </label>
+            <span className="text-sm font-semibold text-neutral-700">
+              {t.shipmentStatus}
+            </span>
 
-        <button
-          type="submit"
-          disabled={saving}
-          className="mt-8 rounded-2xl bg-black px-6 py-4 text-sm font-bold text-white hover:bg-neutral-800 disabled:opacity-50"
-        >
-          {saving ? t.saving : t.save}
-        </button>
+            <select
+              value={form.status}
+              onChange={(e) =>
+                updateField("status", e.target.value as ShipmentStatus)
+              }
+              className="mt-2 w-full rounded-2xl border border-neutral-200 px-4 py-3 outline-none transition focus:border-cyan-500"
+            >
+              {(["On Time", "Delayed", "At Risk", "Shipped"] as const).map(
+                (status) => (
+                  <option key={status} value={status}>
+                    {statusLabels[status]}
+                  </option>
+                )
+              )}
+            </select>
+          </label>
 
-        {message ? (
-          <p className="mt-5 text-sm font-semibold text-cyan-700">
-            {message}
-          </p>
-        ) : null}
-      </form>
+          <div className="mt-8 flex flex-wrap items-center gap-4">
+            <button
+              type="submit"
+              disabled={saving}
+              className="rounded-2xl bg-black px-6 py-4 text-sm font-bold text-white transition hover:-translate-y-1 hover:bg-neutral-800 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {saving ? t.saving : t.save}
+            </button>
+
+            {message ? (
+              <p className="text-sm font-semibold text-cyan-700">{message}</p>
+            ) : null}
+          </div>
+        </form>
+      </section>
     </DashboardShell>
   );
 }
@@ -217,24 +264,30 @@ function Input({
   value,
   onChange,
   placeholder,
+  type = "text",
+  inputMode,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
+  type?: string;
+  inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
 }) {
+  const id = slugify(label);
+
   return (
-    <label className="block">
-      <span className="text-sm font-semibold text-neutral-700">
-        {label}
-      </span>
+    <label id={id} className="block scroll-mt-28">
+      <span className="text-sm font-semibold text-neutral-700">{label}</span>
 
       <input
         required
+        type={type}
+        inputMode={inputMode}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="mt-2 w-full rounded-2xl border border-neutral-200 px-4 py-3 outline-none focus:border-cyan-500"
+        className="mt-2 w-full rounded-2xl border border-neutral-200 px-4 py-3 outline-none transition focus:border-cyan-500"
       />
     </label>
   );

@@ -1,5 +1,14 @@
 "use client";
 
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 export default function DashboardDemoPage() {
   const kpis = [
     {
@@ -31,13 +40,51 @@ export default function DashboardDemoPage() {
     "Material Waiting Time",
   ];
 
+  const aiInsights = [
+    "Cutting section delay increasing by 12%",
+    "Operator training recommended in stitching line",
+    "Rejection trend improved for Line 3",
+    "Machine downtime alert triggered",
+  ];
+
+  const dashboardSections = [
+    {
+      title: "Productivity Trend",
+      description:
+        "Weekly productivity visibility for management review and operational trend analysis.",
+      color: "bg-blue-100 border-blue-300 text-blue-950",
+    },
+    {
+      title: "Operator Productivity Visibility",
+      description:
+        "Line-level efficiency, rejection, and coaching visibility for supervisors and IE teams.",
+      color: "bg-violet-100 border-violet-300 text-violet-950",
+    },
+    {
+      title: "AI Productivity Assistant",
+      description:
+        "AI-generated operational observations and management escalation visibility.",
+      color: "bg-cyan-100 border-cyan-300 text-cyan-950",
+    },
+    {
+      title: "Current Bottlenecks",
+      description:
+        "Real-time operational bottleneck monitoring for immediate corrective action.",
+      color: "bg-red-100 border-red-300 text-red-950",
+    },
+    {
+      title: "Continuous Improvement",
+      description:
+        "Kaizen and operational improvement initiative tracking dashboard.",
+      color: "bg-emerald-100 border-emerald-300 text-emerald-950",
+    },
+  ];
+
   return (
     <main className="min-h-screen bg-slate-100 text-slate-900">
-
       {/* HERO */}
-      <section className="bg-linear-to-r from-blue-900 via-violet-800 to-red-700 px-6 py-16 text-white">
+      <section className="bg-slate-950 px-6 py-16 text-white">
         <div className="mx-auto max-w-7xl">
-
           <p className="mb-4 text-sm font-bold uppercase tracking-[0.3em] text-yellow-300">
             Dashboard Demo
           </p>
@@ -51,63 +98,90 @@ export default function DashboardDemoPage() {
             tracking, bottleneck analysis, quality visibility, workflow
             monitoring, and AI-guided operational insights.
           </p>
+        </div>
+      </section>
 
+      {/* NAVIGATION CARDS */}
+      <section className="px-6 py-14">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-5">
+            {dashboardSections.map((item) => {
+              const id = slugify(item.title);
+
+              return (
+                <a
+                  key={item.title}
+                  href={`#${id}`}
+                  className={`rounded-3xl border p-6 shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-xl ${item.color}`}
+                >
+                  <h2 className="text-xl font-extrabold">
+                    {item.title}
+                  </h2>
+
+                  <p className="mt-4 text-sm leading-relaxed">
+                    {item.description}
+                  </p>
+                </a>
+              );
+            })}
+          </div>
         </div>
       </section>
 
       {/* KPI CARDS */}
-      <section className="px-6 py-14">
+      <section className="px-6 pb-14">
         <div className="mx-auto max-w-7xl">
-
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+            {kpis.map((item) => {
+              const id = slugify(item.title);
 
-            {kpis.map((item) => (
-              <div
-                key={item.title}
-                className={`rounded-3xl border p-8 shadow-md ${item.color}`}
-              >
-                <p className="text-lg font-bold uppercase tracking-wide">
-                  {item.title}
-                </p>
+              return (
+                <a
+                  key={item.title}
+                  href={`#${id}`}
+                  className={`scroll-mt-28 rounded-3xl border p-8 shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-xl ${item.color}`}
+                >
+                  <p className="text-lg font-bold uppercase tracking-wide">
+                    {item.title}
+                  </p>
 
-                <h2 className="mt-6 text-5xl font-extrabold">
-                  {item.value}
-                </h2>
+                  <h2 className="mt-6 text-5xl font-extrabold">
+                    {item.value}
+                  </h2>
 
-                <p className="mt-4 text-lg">
-                  Real-time operational visibility and measurable
-                  productivity tracking.
-                </p>
-              </div>
-            ))}
-
+                  <p className="mt-4 text-lg">
+                    Real-time operational visibility and measurable
+                    productivity tracking.
+                  </p>
+                </a>
+              );
+            })}
           </div>
-
         </div>
       </section>
 
       {/* DASHBOARD GRID */}
       <section className="px-6 pb-20">
         <div className="mx-auto grid max-w-7xl gap-6 xl:grid-cols-3">
-
           {/* LEFT */}
           <div className="space-y-6 xl:col-span-2">
-
             {/* PRODUCTIVITY TREND */}
-            <div className="rounded-3xl bg-white p-8 shadow-md">
+            <section
+              id={slugify("Productivity Trend")}
+              className="scroll-mt-28 rounded-3xl bg-white p-8 shadow-md"
+            >
               <h3 className="text-3xl font-extrabold text-slate-900">
                 Productivity Trend
               </h3>
 
               <div className="mt-10 flex h-72 items-end gap-4 rounded-2xl bg-slate-100 p-6">
-
                 {[55, 68, 61, 74, 78, 82, 88].map((height, index) => (
                   <div
                     key={index}
                     className="flex flex-1 flex-col items-center"
                   >
                     <div
-                      className="w-full rounded-t-2xl bg-linear-to-t from-blue-700 to-cyan-400"
+                      className="w-full rounded-t-2xl bg-cyan-500 transition duration-300 hover:opacity-90"
                       style={{ height: `${height * 2}px` }}
                     />
 
@@ -116,12 +190,14 @@ export default function DashboardDemoPage() {
                     </p>
                   </div>
                 ))}
-
               </div>
-            </div>
+            </section>
 
             {/* OPERATOR TABLE */}
-            <div className="rounded-3xl bg-white p-8 shadow-md">
+            <section
+              id={slugify("Operator Productivity Visibility")}
+              className="scroll-mt-28 rounded-3xl bg-white p-8 shadow-md"
+            >
               <h3 className="text-3xl font-extrabold text-slate-900">
                 Operator Productivity Visibility
               </h3>
@@ -146,7 +222,7 @@ export default function DashboardDemoPage() {
                     ].map((row, index) => (
                       <tr
                         key={index}
-                        className="border-b border-slate-200"
+                        className="border-b border-slate-200 transition hover:bg-slate-50"
                       >
                         {row.map((cell, i) => (
                           <td
@@ -161,64 +237,62 @@ export default function DashboardDemoPage() {
                   </tbody>
                 </table>
               </div>
-            </div>
-
+            </section>
           </div>
 
           {/* RIGHT */}
           <div className="space-y-6">
-
             {/* AI PANEL */}
-            <div className="rounded-3xl bg-linear-to-br from-violet-900 to-blue-900 p-8 text-white shadow-md">
+            <section
+              id={slugify("AI Productivity Assistant")}
+              className="scroll-mt-28 rounded-3xl bg-slate-900 p-8 text-white shadow-md"
+            >
               <h3 className="text-3xl font-extrabold text-cyan-300">
                 AI Productivity Assistant
               </h3>
 
               <div className="mt-8 space-y-4">
-
-                {[
-                  "Cutting section delay increasing by 12%",
-                  "Operator training recommended in stitching line",
-                  "Rejection trend improved for Line 3",
-                  "Machine downtime alert triggered",
-                ].map((item) => (
+                {aiInsights.map((item) => (
                   <div
                     key={item}
-                    className="rounded-2xl bg-white/10 p-4"
+                    className="rounded-2xl bg-white/10 p-4 transition duration-300 hover:bg-white/20"
                   >
                     <p className="text-lg leading-relaxed">
                       {item}
                     </p>
                   </div>
                 ))}
-
               </div>
-            </div>
+            </section>
 
             {/* BOTTLENECKS */}
-            <div className="rounded-3xl bg-white p-8 shadow-md">
+            <section
+              id={slugify("Current Bottlenecks")}
+              className="scroll-mt-28 rounded-3xl bg-white p-8 shadow-md"
+            >
               <h3 className="text-3xl font-extrabold text-slate-900">
                 Current Bottlenecks
               </h3>
 
               <div className="mt-8 space-y-4">
-
                 {bottlenecks.map((item) => (
                   <div
                     key={item}
-                    className="rounded-2xl border border-red-200 bg-red-100 p-5"
+                    className="rounded-2xl border border-red-200 bg-red-100 p-5 transition duration-300 hover:shadow-md"
                   >
                     <p className="text-lg font-bold text-red-950">
                       {item}
                     </p>
                   </div>
                 ))}
-
               </div>
-            </div>
+            </section>
 
             {/* CONTINUOUS IMPROVEMENT */}
-            <div className="rounded-3xl bg-emerald-100 p-8 shadow-md">
+            <section
+              id={slugify("Continuous Improvement")}
+              className="scroll-mt-28 rounded-3xl bg-emerald-100 p-8 shadow-md transition duration-300 hover:shadow-xl"
+            >
               <h3 className="text-3xl font-extrabold text-emerald-950">
                 Continuous Improvement
               </h3>
@@ -228,13 +302,10 @@ export default function DashboardDemoPage() {
                 6 operational improvements successfully sustained
                 this quarter.
               </p>
-            </div>
-
+            </section>
           </div>
-
         </div>
       </section>
-
     </main>
   );
 }

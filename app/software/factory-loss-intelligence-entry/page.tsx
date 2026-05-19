@@ -5,6 +5,15 @@ import DashboardShell from "@/components/software/DashboardShell";
 import { useLanguage } from "@/components/software/LanguageProvider";
 import { addFactoryLossIntelligenceEntry } from "@/lib/software/firestoreService";
 
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 const content = {
   en: {
     title: "Factory Loss Intelligence Entry",
@@ -186,7 +195,10 @@ export default function FactoryLossIntelligenceEntryPage() {
   return (
     <DashboardShell title={t.title}>
       <div className="space-y-6">
-        <div className="rounded-3xl border border-red-100 bg-white p-8 shadow-sm">
+        <section
+          id={slugify(t.title)}
+          className="scroll-mt-28 rounded-3xl border border-red-100 bg-white p-8 shadow-sm"
+        >
           <p className="text-sm font-semibold uppercase tracking-widest text-red-700">
             {t.eyebrow}
           </p>
@@ -196,7 +208,7 @@ export default function FactoryLossIntelligenceEntryPage() {
           </h1>
 
           <p className="mt-4 max-w-5xl text-slate-600">{t.subtitle}</p>
-        </div>
+        </section>
 
         <form
           onSubmit={handleSubmit}
@@ -248,7 +260,9 @@ export default function FactoryLossIntelligenceEntryPage() {
               label="Recovery Opportunity Value"
               hint="Potential recovery amount."
               value={form.recoveryOpportunityValue}
-              onChange={(v) => updateField("recoveryOpportunityValue", v)}
+              onChange={(v) =>
+                updateField("recoveryOpportunityValue", v)
+              }
             />
 
             <ReadOnly
@@ -259,7 +273,7 @@ export default function FactoryLossIntelligenceEntryPage() {
             <ReadOnly label="Priority Level" value={priorityLevel} />
           </div>
 
-          <SectionTitle title="Operational Risk & Ownership" />
+          <SectionTitle title="Operational Risk and Ownership" />
 
           <div className="grid gap-6 md:grid-cols-2">
             <SelectInput
@@ -280,7 +294,9 @@ export default function FactoryLossIntelligenceEntryPage() {
               label="Responsible Department"
               hint="Department responsible for action."
               value={form.responsibleDepartment}
-              onChange={(v) => updateField("responsibleDepartment", v)}
+              onChange={(v) =>
+                updateField("responsibleDepartment", v)
+              }
             />
 
             <TextInput
@@ -293,11 +309,16 @@ export default function FactoryLossIntelligenceEntryPage() {
             <DateInput
               label="Target Recovery Date"
               value={form.targetRecoveryDate}
-              onChange={(v) => updateField("targetRecoveryDate", v)}
+              onChange={(v) =>
+                updateField("targetRecoveryDate", v)
+              }
             />
           </div>
 
-          <div className="mt-10 rounded-3xl border border-red-200 bg-red-50 p-6">
+          <section
+            id={slugify("AI Operational Recommendation")}
+            className="scroll-mt-28 mt-10 rounded-3xl border border-red-200 bg-red-50 p-6 transition hover:-translate-y-1 hover:shadow-lg"
+          >
             <h2 className="text-2xl font-bold text-red-900">
               AI Operational Recommendation
             </h2>
@@ -305,9 +326,9 @@ export default function FactoryLossIntelligenceEntryPage() {
             <p className="mt-4 text-lg leading-8 text-slate-700">
               {aiRecommendation}
             </p>
-          </div>
+          </section>
 
-          <SectionTitle title="Corrective & Preventive Actions" />
+          <SectionTitle title="Corrective and Preventive Actions" />
 
           <div className="grid gap-6">
             <TextArea
@@ -321,14 +342,18 @@ export default function FactoryLossIntelligenceEntryPage() {
               label="Corrective Action"
               hint="Immediate recovery action."
               value={form.correctiveAction}
-              onChange={(v) => updateField("correctiveAction", v)}
+              onChange={(v) =>
+                updateField("correctiveAction", v)
+              }
             />
 
             <TextArea
               label="Preventive Action"
               hint="Long-term prevention strategy."
               value={form.preventiveAction}
-              onChange={(v) => updateField("preventiveAction", v)}
+              onChange={(v) =>
+                updateField("preventiveAction", v)
+              }
             />
 
             <TextArea
@@ -339,11 +364,11 @@ export default function FactoryLossIntelligenceEntryPage() {
             />
           </div>
 
-          <div className="mt-8 flex items-center gap-4">
+          <div className="mt-8 flex flex-wrap items-center gap-4">
             <button
               type="submit"
               disabled={saving}
-              className="rounded-2xl bg-red-700 px-6 py-3 font-semibold text-white hover:bg-red-800 disabled:opacity-60"
+              className="rounded-2xl bg-red-700 px-6 py-3 font-semibold text-white transition hover:-translate-y-1 hover:bg-red-800 hover:shadow-lg disabled:opacity-60"
             >
               {saving ? t.saving : t.save}
             </button>
@@ -362,8 +387,13 @@ export default function FactoryLossIntelligenceEntryPage() {
 
 function SectionTitle({ title }: { title: string }) {
   return (
-    <div className="mb-6 mt-10 border-b border-slate-200 pb-3">
-      <h2 className="text-2xl font-bold text-slate-900">{title}</h2>
+    <div
+      id={slugify(title)}
+      className="scroll-mt-28 mb-6 mt-10 border-b border-slate-200 pb-3"
+    >
+      <h2 className="text-2xl font-bold text-slate-900">
+        {title}
+      </h2>
     </div>
   );
 }
@@ -380,14 +410,19 @@ function TextInput({
   onChange: (value: string) => void;
 }) {
   return (
-    <div className="space-y-2">
-      <label className="text-sm font-semibold text-slate-700">{label}</label>
+    <div
+      id={slugify(label)}
+      className="scroll-mt-28 space-y-2"
+    >
+      <label className="text-sm font-semibold text-slate-700">
+        {label}
+      </label>
 
       <input
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-red-500"
+        className="w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-red-500"
       />
 
       <p className="text-xs text-slate-500">{hint}</p>
@@ -407,8 +442,13 @@ function NumberInput({
   onChange: (value: string) => void;
 }) {
   return (
-    <div className="space-y-2">
-      <label className="text-sm font-semibold text-slate-700">{label}</label>
+    <div
+      id={slugify(label)}
+      className="scroll-mt-28 space-y-2"
+    >
+      <label className="text-sm font-semibold text-slate-700">
+        {label}
+      </label>
 
       <input
         type="number"
@@ -416,7 +456,7 @@ function NumberInput({
         min="0"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-red-500"
+        className="w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-red-500"
       />
 
       <p className="text-xs text-slate-500">{hint}</p>
@@ -436,13 +476,18 @@ function SelectInput({
   onChange: (value: string) => void;
 }) {
   return (
-    <div className="space-y-2">
-      <label className="text-sm font-semibold text-slate-700">{label}</label>
+    <div
+      id={slugify(label)}
+      className="scroll-mt-28 space-y-2"
+    >
+      <label className="text-sm font-semibold text-slate-700">
+        {label}
+      </label>
 
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-red-500"
+        className="w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-red-500"
       >
         {options.map((option) => (
           <option key={option} value={option}>
@@ -451,7 +496,9 @@ function SelectInput({
         ))}
       </select>
 
-      <p className="text-xs text-slate-500">Select from dropdown.</p>
+      <p className="text-xs text-slate-500">
+        Select from dropdown.
+      </p>
     </div>
   );
 }
@@ -466,14 +513,19 @@ function DateInput({
   onChange: (value: string) => void;
 }) {
   return (
-    <div className="space-y-2">
-      <label className="text-sm font-semibold text-slate-700">{label}</label>
+    <div
+      id={slugify(label)}
+      className="scroll-mt-28 space-y-2"
+    >
+      <label className="text-sm font-semibold text-slate-700">
+        {label}
+      </label>
 
       <input
         type="date"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-red-500"
+        className="w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-red-500"
       />
 
       <p className="text-xs text-slate-500">Select date.</p>
@@ -493,14 +545,19 @@ function TextArea({
   onChange: (value: string) => void;
 }) {
   return (
-    <div className="space-y-2">
-      <label className="text-sm font-semibold text-slate-700">{label}</label>
+    <div
+      id={slugify(label)}
+      className="scroll-mt-28 space-y-2"
+    >
+      <label className="text-sm font-semibold text-slate-700">
+        {label}
+      </label>
 
       <textarea
         rows={4}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none focus:border-red-500"
+        className="w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-red-500"
       />
 
       <p className="text-xs text-slate-500">{hint}</p>
@@ -508,16 +565,29 @@ function TextArea({
   );
 }
 
-function ReadOnly({ label, value }: { label: string; value: string }) {
+function ReadOnly({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) {
   return (
-    <div className="space-y-2">
-      <label className="text-sm font-semibold text-slate-700">{label}</label>
+    <div
+      id={slugify(label)}
+      className="scroll-mt-28 space-y-2"
+    >
+      <label className="text-sm font-semibold text-slate-700">
+        {label}
+      </label>
 
       <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-semibold text-slate-800">
         {value}
       </div>
 
-      <p className="text-xs text-slate-500">Auto calculated by the system.</p>
+      <p className="text-xs text-slate-500">
+        Auto calculated by the system.
+      </p>
     </div>
   );
 }

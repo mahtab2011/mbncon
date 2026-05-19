@@ -1,4 +1,5 @@
 "use client";
+
 import DashboardShell from "@/components/software/DashboardShell";
 import KpiCard from "@/components/software/KpiCard";
 import ScoreRing from "@/components/software/ScoreRing";
@@ -14,6 +15,15 @@ import {
   generateOperationalObservation,
   generateExecutiveSummary,
 } from "@/lib/software/aiObservations";
+
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
 
 export default function ExecutiveCommandCentrePage() {
   const productionForecast = exponentialSmoothing([
@@ -47,59 +57,105 @@ export default function ExecutiveCommandCentrePage() {
     forecastObservation,
   ]);
 
+  const kpiCards = [
+    {
+      title: "Production Efficiency",
+      value: "88%",
+      change: "+4.2% this month",
+      risk: "Low" as const,
+      href: "#executive-summary",
+    },
+    {
+      title: "Shipment Stability",
+      value: "92%",
+      change: "Strong delivery trend",
+      risk: "Low" as const,
+      href: "#forecast-intelligence",
+    },
+    {
+      title: "Operational Risk",
+      value: String(operationalRisk.score),
+      change: operationalRisk.level,
+      risk: operationalRisk.level,
+      href: "#operational-alerts",
+    },
+    {
+      title: "Forecast Accuracy",
+      value: `${productionForecast.averageAccuracy}%`,
+      change: productionForecast.trend,
+      risk: productionForecast.riskLevel,
+      href: "#forecast-intelligence",
+    },
+  ];
+
+  const scoreCards = [
+    {
+      label: "Operational Score",
+      score: Math.round(performance.score),
+      href: "#executive-summary",
+    },
+    {
+      label: "Forecast Accuracy",
+      score: Math.round(productionForecast.averageAccuracy),
+      href: "#forecast-intelligence",
+    },
+    {
+      label: "Risk Stability",
+      score: operationalRisk.score,
+      href: "#operational-alerts",
+    },
+  ];
+
   return (
     <DashboardShell
       title="Executive Command Centre"
       subtitle="AI-assisted manufacturing intelligence, operational forecasting, executive scoring, and consultancy decision-support system."
     >
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-        <KpiCard
-          title="Production Efficiency"
-          value="88%"
-          change="+4.2% this month"
-          risk="Low"
-        />
+      <section
+        id="command-centre-kpis"
+        className="grid scroll-mt-28 gap-6 md:grid-cols-2 xl:grid-cols-4"
+      >
+        {kpiCards.map((card) => (
+          <div
+            key={card.title}
+            onClick={() => {
+              window.location.href = card.href;
+            }}
+            id={slugify(card.title)}
+            className="cursor-pointer scroll-mt-28 transition hover:-translate-y-1 hover:scale-[1.01]"
+          >
+            <KpiCard
+              title={card.title}
+              value={card.value}
+              change={card.change}
+              risk={card.risk}
+            />
+          </div>
+        ))}
+      </section>
 
-        <KpiCard
-          title="Shipment Stability"
-          value="92%"
-          change="Strong delivery trend"
-          risk="Low"
-        />
+      <section
+        id="score-intelligence"
+        className="mt-10 grid scroll-mt-28 gap-6 lg:grid-cols-3"
+      >
+        {scoreCards.map((card) => (
+          <div
+            key={card.label}
+            onClick={() => {
+              window.location.href = card.href;
+            }}
+            id={slugify(card.label)}
+            className="cursor-pointer scroll-mt-28 transition hover:-translate-y-1 hover:scale-[1.01]"
+          >
+            <ScoreRing label={card.label} score={card.score} />
+          </div>
+        ))}
+      </section>
 
-        <KpiCard
-          title="Operational Risk"
-          value={String(operationalRisk.score)}
-          change={operationalRisk.level}
-          risk={operationalRisk.level}
-        />
-
-        <KpiCard
-          title="Forecast Accuracy"
-          value={`${productionForecast.averageAccuracy}%`}
-          change={productionForecast.trend}
-          risk={productionForecast.riskLevel}
-        />
-      </div>
-
-      <div className="mt-10 grid gap-6 lg:grid-cols-3">
-        <ScoreRing
-          label="Operational Score"
-          score={Math.round(performance.score)}
-        />
-
-        <ScoreRing
-          label="Forecast Accuracy"
-          score={Math.round(productionForecast.averageAccuracy)}
-        />
-
-        <ScoreRing
-          label="Risk Stability"
-          score={operationalRisk.score}
-        />
-      </div>
-
-      <div className="mt-10">
+      <section
+        id="forecast-intelligence"
+        className="mt-10 scroll-mt-28 transition hover:-translate-y-1 hover:scale-[1.01]"
+      >
         <ForecastCard
           title="Production Forecast Intelligence"
           current="91%"
@@ -107,33 +163,43 @@ export default function ExecutiveCommandCentrePage() {
           accuracy={`${productionForecast.averageAccuracy}%`}
           note={productionForecast.recommendation}
         />
-      </div>
+      </section>
 
-      <div className="mt-10 grid gap-6 lg:grid-cols-2">
-        <AlertPanel
-          title={operationalObservation.title}
-          message={operationalObservation.summary}
-          severity={
-            operationalObservation.priority === "Critical"
-              ? "danger"
-              : operationalObservation.priority === "High"
-              ? "warning"
-              : "info"
-          }
-        />
+      <section
+        id="operational-alerts"
+        className="mt-10 grid scroll-mt-28 gap-6 lg:grid-cols-2"
+      >
+        <div className="transition hover:-translate-y-1 hover:scale-[1.01]">
+          <AlertPanel
+            title={operationalObservation.title}
+            message={operationalObservation.summary}
+            severity={
+              operationalObservation.priority === "Critical"
+                ? "danger"
+                : operationalObservation.priority === "High"
+                ? "warning"
+                : "info"
+            }
+          />
+        </div>
 
-        <AlertPanel
-          title={forecastObservation.title}
-          message={forecastObservation.summary}
-          severity={
-            forecastObservation.priority === "High"
-              ? "warning"
-              : "info"
-          }
-        />
-      </div>
+        <div className="transition hover:-translate-y-1 hover:scale-[1.01]">
+          <AlertPanel
+            title={forecastObservation.title}
+            message={forecastObservation.summary}
+            severity={
+              forecastObservation.priority === "High"
+                ? "warning"
+                : "info"
+            }
+          />
+        </div>
+      </section>
 
-      <div className="mt-10 rounded-3xl border border-neutral-200 bg-white p-8 shadow-sm">
+      <section
+        id="executive-summary"
+        className="mt-10 scroll-mt-28 rounded-3xl border border-neutral-200 bg-white p-8 shadow-sm"
+      >
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-semibold uppercase tracking-widest text-neutral-500">
@@ -153,7 +219,7 @@ export default function ExecutiveCommandCentrePage() {
         </p>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-2">
-          <div className="rounded-2xl bg-neutral-50 p-6">
+          <div className="rounded-2xl bg-neutral-50 p-6 transition hover:-translate-y-1 hover:bg-neutral-100">
             <h3 className="text-lg font-bold text-neutral-900">
               Operational Recommendation
             </h3>
@@ -163,7 +229,7 @@ export default function ExecutiveCommandCentrePage() {
             </p>
           </div>
 
-          <div className="rounded-2xl bg-neutral-50 p-6">
+          <div className="rounded-2xl bg-neutral-50 p-6 transition hover:-translate-y-1 hover:bg-neutral-100">
             <h3 className="text-lg font-bold text-neutral-900">
               Forecast Recommendation
             </h3>
@@ -173,7 +239,19 @@ export default function ExecutiveCommandCentrePage() {
             </p>
           </div>
         </div>
-      </div>
+
+        <div className="mt-8 rounded-2xl border border-cyan-100 bg-cyan-50 p-6">
+          <p className="text-sm font-semibold uppercase tracking-widest text-cyan-700">
+            AI Recommendation
+          </p>
+
+          <p className="mt-4 text-sm leading-8 text-neutral-700">
+            Management should review operational score, forecast accuracy, risk
+            stability, and production forecast together before making
+            production, shipment, manpower, or corrective action decisions.
+          </p>
+        </div>
+      </section>
     </DashboardShell>
   );
 }

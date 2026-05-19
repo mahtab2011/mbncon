@@ -62,7 +62,7 @@ export default function EmpowermentIntelligencePage() {
           </div>
 
           <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
-            <div className="rounded-3xl border border-indigo-500/20 bg-slate-900 p-8">
+            <div className="rounded-3xl border border-indigo-500/20 bg-slate-900 p-8 transition hover:-translate-y-1 hover:border-indigo-400 hover:shadow-2xl">
               <h3 className="text-2xl font-bold text-indigo-300">
                 Delegation Systems
               </h3>
@@ -73,10 +73,10 @@ export default function EmpowermentIntelligencePage() {
               </p>
             </div>
 
-            <div className="rounded-3xl border border-purple-500/20 bg-slate-900 p-8">
-              <h3 className="text-2xl font-bold text-purple-300">
-                Employee Participation
-              </h3>
+            <div className="rounded-3xl border border-purple-500/20 bg-slate-900 p-8 transition hover:-translate-y-1 hover:border-purple-400 hover:shadow-2xl">
+  <h3 className="text-2xl font-bold text-purple-300">
+    Employee Participation
+  </h3>
 
               <p className="mt-4 leading-8 text-slate-300">
                 Encourage employees to participate in problem-solving,
@@ -85,7 +85,7 @@ export default function EmpowermentIntelligencePage() {
               </p>
             </div>
 
-            <div className="rounded-3xl border border-cyan-500/20 bg-slate-900 p-8">
+            <div className="rounded-3xl border border-cyan-500/20 bg-slate-900 p-8 transition hover:-translate-y-1 hover:border-cyan-400 hover:shadow-2xl">
               <h3 className="text-2xl font-bold text-cyan-300">
                 Decision Ownership
               </h3>
@@ -96,7 +96,7 @@ export default function EmpowermentIntelligencePage() {
               </p>
             </div>
 
-            <div className="rounded-3xl border border-emerald-500/20 bg-slate-900 p-8">
+            <div className="rounded-3xl border border-emerald-500/20 bg-slate-900 p-8 transition hover:-translate-y-1 hover:border-emerald-400 hover:shadow-2xl">
               <h3 className="text-2xl font-bold text-emerald-300">
                 Trust Culture
               </h3>
@@ -107,7 +107,7 @@ export default function EmpowermentIntelligencePage() {
               </p>
             </div>
 
-            <div className="rounded-3xl border border-amber-500/20 bg-slate-900 p-8">
+            <div className="rounded-3xl border border-amber-500/20 bg-slate-900 p-8 transition hover:-translate-y-1 hover:border-amber-400 hover:shadow-2xl">
               <h3 className="text-2xl font-bold text-amber-300">
                 Capability Development
               </h3>
@@ -118,7 +118,7 @@ export default function EmpowermentIntelligencePage() {
               </p>
             </div>
 
-            <div className="rounded-3xl border border-rose-500/20 bg-slate-900 p-8">
+            <div className="rounded-3xl border border-rose-500/20 bg-slate-900 p-8 transition hover:-translate-y-1 hover:border-rose-400 hover:shadow-2xl">
               <h3 className="text-2xl font-bold text-rose-300">
                 Continuous Improvement
               </h3>

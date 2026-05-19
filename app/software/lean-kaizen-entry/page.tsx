@@ -4,6 +4,15 @@ import { useState } from "react";
 import DashboardShell from "@/components/software/DashboardShell";
 import { useLanguage } from "@/components/software/LanguageProvider";
 
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 const content = {
   en: {
     title: "Lean & Kaizen Entry",
@@ -126,6 +135,7 @@ export default function LeanKaizenEntryPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     setSaving(true);
     setMessage("");
 
@@ -139,7 +149,10 @@ export default function LeanKaizenEntryPage() {
   return (
     <DashboardShell title={t.title}>
       <div className="space-y-6">
-        <div className="rounded-3xl border border-cyan-100 bg-white p-8 shadow-sm">
+        <section
+          id="lean-kaizen-entry-overview"
+          className="scroll-mt-28 rounded-3xl border border-cyan-100 bg-white p-8 shadow-sm"
+        >
           <p className="text-sm font-semibold uppercase tracking-widest text-cyan-700">
             {t.eyebrow}
           </p>
@@ -148,8 +161,24 @@ export default function LeanKaizenEntryPage() {
             {t.title}
           </h1>
 
-          <p className="mt-4 max-w-4xl text-slate-600">{t.subtitle}</p>
-        </div>
+          <p className="mt-4 max-w-4xl text-slate-600">
+            {t.subtitle}
+          </p>
+
+          <div className="mt-6 flex flex-wrap gap-3">
+            {Object.entries(t.fields)
+              .slice(0, 6)
+              .map(([key, label]) => (
+                <a
+                  key={key}
+                  href={`#${slugify(key)}`}
+                  className="rounded-full border border-cyan-200 bg-cyan-50 px-4 py-2 text-sm font-medium text-cyan-800 transition hover:-translate-y-1 hover:bg-cyan-100"
+                >
+                  {label}
+                </a>
+              ))}
+          </div>
+        </section>
 
         <form
           onSubmit={handleSubmit}
@@ -157,40 +186,46 @@ export default function LeanKaizenEntryPage() {
         >
           <div className="grid gap-6 md:grid-cols-2">
             {Object.entries(t.fields).map(([key, label]) => (
-              <div key={key} className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700">
-                  {label}
-                </label>
+              <section
+                key={key}
+                id={slugify(key)}
+                className="scroll-mt-28 rounded-2xl border border-slate-100 bg-slate-50 p-5 transition hover:-translate-y-1 hover:border-cyan-200 hover:bg-white hover:shadow-md"
+              >
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-slate-700">
+                    {label}
+                  </label>
 
-                {key === "currentProblem" ||
-                key === "rootCause" ||
-                key === "proposedImprovement" ||
-                key === "employeeSuggestion" ||
-                key === "managementDecision" ||
-                key === "remarks" ? (
-                  <textarea
-                    rows={4}
-                    value={form[key as keyof typeof form]}
-                    onChange={(e) => updateField(key, e.target.value)}
-                    className="w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-cyan-500"
-                  />
-                ) : (
-                  <input
-                    type="text"
-                    value={form[key as keyof typeof form]}
-                    onChange={(e) => updateField(key, e.target.value)}
-                    className="w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-cyan-500"
-                  />
-                )}
-              </div>
+                  {key === "currentProblem" ||
+                  key === "rootCause" ||
+                  key === "proposedImprovement" ||
+                  key === "employeeSuggestion" ||
+                  key === "managementDecision" ||
+                  key === "remarks" ? (
+                    <textarea
+                      rows={4}
+                      value={form[key as keyof typeof form]}
+                      onChange={(e) => updateField(key, e.target.value)}
+                      className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 outline-none transition focus:border-cyan-500"
+                    />
+                  ) : (
+                    <input
+                      type="text"
+                      value={form[key as keyof typeof form]}
+                      onChange={(e) => updateField(key, e.target.value)}
+                      className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 outline-none transition focus:border-cyan-500"
+                    />
+                  )}
+                </div>
+              </section>
             ))}
           </div>
 
-          <div className="mt-8 flex items-center gap-4">
+          <div className="mt-8 flex flex-wrap items-center gap-4">
             <button
               type="submit"
               disabled={saving}
-              className="rounded-2xl bg-cyan-700 px-6 py-3 font-semibold text-white transition hover:bg-cyan-800 disabled:opacity-60"
+              className="rounded-2xl bg-cyan-700 px-6 py-3 font-semibold text-white transition hover:-translate-y-1 hover:bg-cyan-800 disabled:opacity-60"
             >
               {saving ? t.saving : t.save}
             </button>

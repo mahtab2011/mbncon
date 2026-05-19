@@ -1,5 +1,14 @@
 "use client";
 
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 export default function ProblemSolvingWorkflowPage() {
   const workflow = [
     {
@@ -46,11 +55,9 @@ export default function ProblemSolvingWorkflowPage() {
 
   return (
     <main className="min-h-screen bg-slate-100 text-slate-900">
-
       {/* HERO */}
-      <section className="bg-linear-to-r from-red-900 via-violet-900 to-blue-900 px-6 py-16 text-white">
+      <section className="bg-slate-950 px-6 py-16 text-white">
         <div className="mx-auto max-w-7xl">
-
           <p className="mb-4 text-sm font-bold uppercase tracking-[0.3em] text-yellow-300">
             Problem-Solving Workflow Demo
           </p>
@@ -64,50 +71,50 @@ export default function ProblemSolvingWorkflowPage() {
             identifying root causes, generating solutions, testing
             improvements, and sustaining measurable productivity gains.
           </p>
-
         </div>
       </section>
 
       {/* FLOW */}
       <section className="px-6 py-20">
         <div className="mx-auto max-w-7xl">
-
           <div className="space-y-8">
+            {workflow.map((item, index) => {
+              const id = slugify(item.title);
 
-            {workflow.map((item, index) => (
-              <div
-                key={item.title}
-                className={`rounded-3xl border p-8 shadow-md ${item.color}`}
-              >
-                <div className="flex flex-col gap-6 md:flex-row md:items-start">
+              return (
+                <a
+                  key={item.title}
+                  href={`#${id}`}
+                  className={`scroll-mt-28 block rounded-3xl border p-8 shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-xl ${item.color}`}
+                >
+                  <div
+                    id={id}
+                    className="flex flex-col gap-6 md:flex-row md:items-start"
+                  >
+                    <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white text-3xl font-extrabold shadow-md">
+                      {index + 1}
+                    </div>
 
-                  <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white text-3xl font-extrabold shadow-md">
-                    {index + 1}
+                    <div className="flex-1">
+                      <h2 className="text-3xl font-extrabold">
+                        {item.title}
+                      </h2>
+
+                      <p className="mt-5 text-xl leading-relaxed">
+                        {item.text}
+                      </p>
+                    </div>
                   </div>
-
-                  <div className="flex-1">
-                    <h2 className="text-3xl font-extrabold">
-                      {item.title}
-                    </h2>
-
-                    <p className="mt-5 text-xl leading-relaxed">
-                      {item.text}
-                    </p>
-                  </div>
-
-                </div>
-              </div>
-            ))}
-
+                </a>
+              );
+            })}
           </div>
-
         </div>
       </section>
 
       {/* GROW MODEL */}
       <section className="bg-white px-6 py-20">
         <div className="mx-auto max-w-7xl">
-
           <div className="max-w-4xl">
             <p className="mb-4 text-sm font-bold uppercase tracking-[0.25em] text-blue-700">
               Coaching & Leadership Support
@@ -125,7 +132,6 @@ export default function ProblemSolvingWorkflowPage() {
           </div>
 
           <div className="mt-14 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-
             {[
               {
                 letter: "G",
@@ -151,77 +157,80 @@ export default function ProblemSolvingWorkflowPage() {
                 text: "Select actions, responsibilities, timelines, and measurable follow-up.",
                 color: "bg-violet-100 border-violet-300 text-violet-950",
               },
-            ].map((item) => (
-              <div
-                key={item.letter}
-                className={`rounded-3xl border p-8 shadow-md ${item.color}`}
-              >
-                <div className="text-6xl font-extrabold opacity-80">
-                  {item.letter}
-                </div>
+            ].map((item) => {
+              const id = slugify(item.title);
 
-                <h3 className="mt-5 text-3xl font-extrabold">
-                  {item.title}
-                </h3>
+              return (
+                <section
+                  key={item.letter}
+                  id={id}
+                  className={`scroll-mt-28 rounded-3xl border p-8 shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-xl ${item.color}`}
+                >
+                  <div className="text-6xl font-extrabold opacity-80">
+                    {item.letter}
+                  </div>
 
-                <p className="mt-5 text-lg leading-relaxed">
-  {item.text}
-</p>
+                  <h3 className="mt-5 text-3xl font-extrabold">
+                    {item.title}
+                  </h3>
 
-<div className="mt-6 rounded-2xl bg-white/60 p-4">
-  <p className="text-sm font-bold uppercase tracking-wide">
-    Standard Procedures
-  </p>
+                  <p className="mt-5 text-lg leading-relaxed">
+                    {item.text}
+                  </p>
 
-  <ul className="mt-3 space-y-2 text-base leading-relaxed">
-    {item.letter === "G" && (
-      <>
-        <li>• Define measurable objectives</li>
-        <li>• Identify stakeholders</li>
-        <li>• Clarify operational expectations</li>
-        <li>• Establish KPI baseline</li>
-      </>
-    )}
+                  <div className="mt-6 rounded-2xl bg-white/60 p-4">
+                    <p className="text-sm font-bold uppercase tracking-wide">
+                      Standard Procedures
+                    </p>
 
-    {item.letter === "R" && (
-      <>
-        <li>• Collect operational data</li>
-        <li>• Analyse bottlenecks</li>
-        <li>• Observe workflow conditions</li>
-        <li>• Identify root causes</li>
-      </>
-    )}
+                    <ul className="mt-3 space-y-2 text-base leading-relaxed">
+                      {item.letter === "G" && (
+                        <>
+                          <li>• Define measurable objectives</li>
+                          <li>• Identify stakeholders</li>
+                          <li>• Clarify operational expectations</li>
+                          <li>• Establish KPI baseline</li>
+                        </>
+                      )}
 
-    {item.letter === "O" && (
-      <>
-        <li>• Conduct brainstorming sessions</li>
-        <li>• Expand secondary problems</li>
-        <li>• Identify tertiary problems</li>
-        <li>• Generate practical solutions</li>
-      </>
-    )}
+                      {item.letter === "R" && (
+                        <>
+                          <li>• Collect operational data</li>
+                          <li>• Analyse bottlenecks</li>
+                          <li>• Observe workflow conditions</li>
+                          <li>• Identify root causes</li>
+                        </>
+                      )}
 
-    {item.letter === "W" && (
-      <>
-        <li>• Select top 3 solutions</li>
-        <li>• Launch pilot projects</li>
-        <li>• Measure operational results</li>
-        <li>• Standardise successful improvements</li>
-      </>
-    )}
-  </ul>
-</div>
-              </div>
-            ))}
+                      {item.letter === "O" && (
+                        <>
+                          <li>• Conduct brainstorming sessions</li>
+                          <li>• Expand secondary problems</li>
+                          <li>• Identify tertiary problems</li>
+                          <li>• Generate practical solutions</li>
+                        </>
+                      )}
 
+                      {item.letter === "W" && (
+                        <>
+                          <li>• Select top 3 solutions</li>
+                          <li>• Launch pilot projects</li>
+                          <li>• Measure operational results</li>
+                          <li>• Standardise successful improvements</li>
+                        </>
+                      )}
+                    </ul>
+                  </div>
+                </section>
+              );
+            })}
           </div>
-
         </div>
       </section>
+
       {/* IMPLEMENTATION GOVERNANCE */}
       <section className="bg-slate-900 px-6 py-20 text-white">
         <div className="mx-auto max-w-7xl">
-
           <div className="max-w-5xl">
             <p className="mb-4 text-sm font-bold uppercase tracking-[0.25em] text-cyan-300">
               Implementation Governance
@@ -240,86 +249,65 @@ export default function ProblemSolvingWorkflowPage() {
           </div>
 
           <div className="mt-14 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {[
+              {
+                title: "Bottleneck Identification",
+                color: "text-cyan-300",
+                text:
+                  "Identify operational bottlenecks through production analysis, rejection reports, customer complaints, downtime tracking, workflow observation, activity sampling, value stream mapping, and capacity utilisation review.",
+              },
+              {
+                title: "Employee Involvement",
+                color: "text-emerald-300",
+                text:
+                  "Employees participate through brainstorming, teamwork, operational feedback, improvement suggestions, small-group problem solving, and ownership-based engagement.",
+              },
+              {
+                title: "Resistance Management",
+                color: "text-yellow-300",
+                text:
+                  "Resistance is managed through communication, transparency, training, leadership support, realistic targets, and showing employees how operational improvement strengthens long-term organisational stability and career growth.",
+              },
+              {
+                title: "Goal Setting & Ownership",
+                color: "text-pink-300",
+                text:
+                  "Improvement goals should be measurable, achievable, time-bound, visible, and jointly owned by management and operational teams.",
+              },
+              {
+                title: "Failure & Contingency Planning",
+                color: "text-violet-300",
+                text:
+                  "If targets are not achieved, organisations should reassess workflow assumptions, revise budgets, reset milestones, strengthen training, and deploy contingency plans rather than abandoning improvement initiatives.",
+              },
+              {
+                title: "Continuous Improvement Culture",
+                color: "text-rose-300",
+                text:
+                  "Sustainable productivity requires ongoing measurement, leadership commitment, regular review meetings, coaching, performance visibility, and continuous small-step operational improvement.",
+              },
+            ].map((item) => {
+              const id = slugify(item.title);
 
-            <div className="rounded-2xl bg-slate-800 p-6">
-              <h3 className="text-2xl font-bold text-cyan-300">
-                Bottleneck Identification
-              </h3>
+              return (
+                <section
+                  key={item.title}
+                  id={id}
+                  className="scroll-mt-28 rounded-2xl bg-slate-800 p-6 transition duration-300 hover:-translate-y-1 hover:bg-slate-700 hover:shadow-xl"
+                >
+                  <h3 className={`text-2xl font-bold ${item.color}`}>
+                    {item.title}
+                  </h3>
 
-              <p className="mt-4 leading-relaxed text-slate-300">
-                Identify operational bottlenecks through production analysis,
-                rejection reports, customer complaints, downtime tracking,
-                workflow observation, activity sampling, value stream mapping,
-                and capacity utilisation review.
-              </p>
-            </div>
-
-            <div className="rounded-2xl bg-slate-800 p-6">
-              <h3 className="text-2xl font-bold text-emerald-300">
-                Employee Involvement
-              </h3>
-
-              <p className="mt-4 leading-relaxed text-slate-300">
-                Employees participate through brainstorming, teamwork,
-                operational feedback, improvement suggestions, small-group
-                problem solving, and ownership-based engagement.
-              </p>
-            </div>
-
-            <div className="rounded-2xl bg-slate-800 p-6">
-              <h3 className="text-2xl font-bold text-yellow-300">
-                Resistance Management
-              </h3>
-
-              <p className="mt-4 leading-relaxed text-slate-300">
-                Resistance is managed through communication, transparency,
-                training, leadership support, realistic targets, and showing
-                employees how operational improvement strengthens long-term
-                organisational stability and career growth.
-              </p>
-            </div>
-
-            <div className="rounded-2xl bg-slate-800 p-6">
-              <h3 className="text-2xl font-bold text-pink-300">
-                Goal Setting & Ownership
-              </h3>
-
-              <p className="mt-4 leading-relaxed text-slate-300">
-                Improvement goals should be measurable, achievable, time-bound,
-                visible, and jointly owned by management and operational teams.
-              </p>
-            </div>
-
-            <div className="rounded-2xl bg-slate-800 p-6">
-              <h3 className="text-2xl font-bold text-violet-300">
-                Failure & Contingency Planning
-              </h3>
-
-              <p className="mt-4 leading-relaxed text-slate-300">
-                If targets are not achieved, organisations should reassess
-                workflow assumptions, revise budgets, reset milestones,
-                strengthen training, and deploy contingency plans rather than
-                abandoning improvement initiatives.
-              </p>
-            </div>
-
-            <div className="rounded-2xl bg-slate-800 p-6">
-              <h3 className="text-2xl font-bold text-rose-300">
-                Continuous Improvement Culture
-              </h3>
-
-              <p className="mt-4 leading-relaxed text-slate-300">
-                Sustainable productivity requires ongoing measurement,
-                leadership commitment, regular review meetings, coaching,
-                performance visibility, and continuous small-step operational
-                improvement.
-              </p>
-            </div>
-
+                  <p className="mt-4 leading-relaxed text-slate-300">
+                    {item.text}
+                  </p>
+                </section>
+              );
+            })}
           </div>
         </div>
       </section>
-
     </main>
   );
 }

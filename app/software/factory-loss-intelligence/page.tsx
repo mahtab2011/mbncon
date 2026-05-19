@@ -2,6 +2,15 @@
 
 import Link from "next/link";
 
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 const lossAreas = [
   "Material over-ordering loss",
   "Poor material quality loss",
@@ -18,18 +27,28 @@ const lossAreas = [
   "Customer complaint and claim risk",
 ];
 
+const kpis = [
+  ["Loss Areas", "13"],
+  ["Profit Risk", "High"],
+  ["Action Priority", "Immediate"],
+  ["Consultancy Value", "Very High"],
+];
+
 export default function FactoryLossIntelligencePage() {
   return (
     <main className="min-h-screen bg-slate-950 text-white">
       <section className="mx-auto max-w-7xl px-6 py-12">
         <Link
           href="/"
-          className="rounded-full border border-white/20 px-4 py-2 text-sm text-slate-200 hover:bg-white/10"
+          className="rounded-full border border-white/20 px-4 py-2 text-sm text-slate-200 transition hover:-translate-y-1 hover:bg-white/10 hover:shadow-lg"
         >
           ← Back to Dashboard
         </Link>
 
-        <div className="mt-8 rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl">
+        <section
+          id={slugify("Factory Loss Intelligence")}
+          className="scroll-mt-28 mt-8 rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl"
+        >
           <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-red-300">
             MBNCON Cost & Loss Intelligence
           </p>
@@ -43,33 +62,38 @@ export default function FactoryLossIntelligencePage() {
             rework, rejection, shipment, and customer claim areas before they
             damage profit.
           </p>
-        </div>
+        </section>
 
-        <section className="mt-10 grid gap-6 md:grid-cols-4">
-          {[
-            ["Loss Areas", "13"],
-            ["Profit Risk", "High"],
-            ["Action Priority", "Immediate"],
-            ["Consultancy Value", "Very High"],
-          ].map(([label, value]) => (
-            <div
+        <section
+          id={slugify("Factory Loss KPI Cards")}
+          className="scroll-mt-28 mt-10 grid gap-6 md:grid-cols-4"
+        >
+          {kpis.map(([label, value]) => (
+            <a
               key={label}
-              className="rounded-2xl border border-white/10 bg-white/5 p-6"
+              href={`#${slugify(label)}`}
+              id={slugify(label)}
+              className="scroll-mt-28 rounded-2xl border border-white/10 bg-white/5 p-6 transition hover:-translate-y-1 hover:border-red-300/50 hover:bg-red-400/10 hover:shadow-xl"
             >
               <p className="text-sm text-slate-400">{label}</p>
               <p className="mt-3 text-2xl font-bold text-red-300">{value}</p>
-            </div>
+            </a>
           ))}
         </section>
 
-        <section className="mt-10 rounded-3xl border border-white/10 bg-slate-900 p-8">
+        <section
+          id={slugify("Hidden Loss Map")}
+          className="scroll-mt-28 mt-10 rounded-3xl border border-white/10 bg-slate-900 p-8"
+        >
           <h2 className="text-2xl font-bold">Hidden Loss Map</h2>
 
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             {lossAreas.map((item, index) => (
-              <div
+              <a
                 key={item}
-                className="flex gap-4 rounded-2xl border border-white/10 bg-white/5 p-4"
+                href={`#${slugify(item)}`}
+                id={slugify(item)}
+                className="scroll-mt-28 flex gap-4 rounded-2xl border border-white/10 bg-white/5 p-4 transition hover:-translate-y-1 hover:border-red-300/50 hover:bg-red-400/10 hover:shadow-xl"
               >
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-400 font-bold text-slate-950">
                   {index + 1}
@@ -82,12 +106,15 @@ export default function FactoryLossIntelligencePage() {
                     recovery action.
                   </p>
                 </div>
-              </div>
+              </a>
             ))}
           </div>
         </section>
 
-        <section className="mt-10 rounded-3xl border border-red-400/30 bg-red-400/10 p-8">
+        <section
+          id={slugify("Consultancy Application")}
+          className="scroll-mt-28 mt-10 rounded-3xl border border-red-400/30 bg-red-400/10 p-8 transition hover:-translate-y-1 hover:shadow-xl"
+        >
           <h2 className="text-2xl font-bold text-red-200">
             Consultancy Application
           </h2>

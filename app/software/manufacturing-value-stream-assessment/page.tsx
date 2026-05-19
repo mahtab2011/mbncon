@@ -20,6 +20,15 @@ const createItems = (items: string[]): AssessmentItem[] =>
     notes: "",
   }));
 
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 export default function ManufacturingValueStreamAssessmentPage() {
   const [sections, setSections] = useState<SectionType[]>([
     {
@@ -274,185 +283,218 @@ export default function ManufacturingValueStreamAssessmentPage() {
   );
 
   return (
-    <main className="min-h-screen bg-neutral-950 px-6 py-12 text-white">
+    <main className="min-h-screen bg-slate-100 px-6 py-12 text-slate-900">
       <div className="mx-auto max-w-7xl">
-        <div className="rounded-3xl bg-linear-to-r from-blue-700 to-indigo-700 p-10 shadow-2xl">
+        <section className="rounded-3xl bg-slate-950 p-10 text-white shadow-2xl">
           <h1 className="text-5xl font-bold">
             MBNCON Manufacturing Intelligence Assessment System
           </h1>
 
-          <p className="mt-5 max-w-4xl text-lg leading-8 text-blue-100">
+          <p className="mt-5 max-w-4xl text-lg leading-8 text-slate-300">
             Integrated Lean Manufacturing, Adaptive Leadership, Operational
             Excellence and Value Stream Mapping platform for analysing costs,
             bottlenecks, losses, delays, quality risks and customer impact
             across the full manufacturing journey.
           </p>
-        </div>
+        </section>
 
-        <div className="mt-10 grid gap-6 md:grid-cols-4">
-          <div className="rounded-2xl bg-neutral-900 p-6">
-            <p className="text-neutral-400">Overall Score</p>
-            <h2 className="mt-3 text-4xl font-bold text-blue-300">
-              {totalScore}%
-            </h2>
-          </div>
+        <section className="mt-10 grid gap-6 md:grid-cols-4">
+          {[
+            {
+              title: "Overall Score",
+              value: `${totalScore}%`,
+              color: "text-blue-700",
+            },
+            {
+              title: "Total Points",
+              value: `${totalRawScore}/${maxScore}`,
+              color: "text-green-700",
+            },
+            {
+              title: "Strongest Area",
+              value: strongestSection.title,
+              color: "text-emerald-700",
+            },
+            {
+              title: "Weakest Area",
+              value: weakestSection.title,
+              color: "text-red-700",
+            },
+          ].map((item) => {
+            const id = slugify(item.title);
 
-          <div className="rounded-2xl bg-neutral-900 p-6">
-            <p className="text-neutral-400">Total Points</p>
-            <h2 className="mt-3 text-4xl font-bold text-green-300">
-              {totalRawScore}/{maxScore}
-            </h2>
-          </div>
+            return (
+              <a
+                key={item.title}
+                href={`#${id}`}
+                className="scroll-mt-28 rounded-2xl bg-white p-6 shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-xl"
+              >
+                <p
+                  id={id}
+                  className="text-slate-500"
+                >
+                  {item.title}
+                </p>
 
-          <div className="rounded-2xl bg-neutral-900 p-6">
-            <p className="text-neutral-400">Strongest Area</p>
-            <h2 className="mt-3 text-xl font-bold text-emerald-300">
-              {strongestSection.title}
-            </h2>
-          </div>
+                <h2 className={`mt-3 text-3xl font-bold ${item.color}`}>
+                  {item.value}
+                </h2>
+              </a>
+            );
+          })}
+        </section>
 
-          <div className="rounded-2xl bg-neutral-900 p-6">
-            <p className="text-neutral-400">Weakest Area</p>
-            <h2 className="mt-3 text-xl font-bold text-red-300">
-              {weakestSection.title}
-            </h2>
-          </div>
-        </div>
-
-        <div className="mt-10 rounded-2xl border border-neutral-800 bg-neutral-900 p-6">
+        <section className="mt-10 rounded-2xl border border-slate-200 bg-white p-6 shadow-md">
           <h2 className="text-2xl font-bold">
             Section Score Breakdown
           </h2>
 
           <div className="mt-6 space-y-4">
-            {sectionScores.map((section) => (
-              <div key={section.title}>
-                <div className="flex justify-between text-sm">
-                  <span>{section.title}</span>
-                  <span>{section.percent}%</span>
-                </div>
+            {sectionScores.map((section) => {
+              const id = slugify(section.title);
 
-                <div className="mt-2 h-3 rounded-full bg-neutral-800">
-                  <div
-                    className="h-3 rounded-full bg-blue-500"
-                    style={{ width: `${section.percent}%` }}
-                  />
+              return (
+                <div
+                  key={section.title}
+                  id={id}
+                  className="scroll-mt-28 transition duration-300 hover:scale-[1.01]"
+                >
+                  <div className="flex justify-between text-sm">
+                    <span>{section.title}</span>
+                    <span>{section.percent}%</span>
+                  </div>
+
+                  <div className="mt-2 h-3 rounded-full bg-slate-200">
+                    <div
+                      className="h-3 rounded-full bg-blue-500"
+                      style={{ width: `${section.percent}%` }}
+                    />
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
-        </div>
+        </section>
 
-        <div className="mt-10 space-y-10">
-          {sections.map((section, sectionIndex) => (
-            <div
-              key={section.title}
-              className="rounded-2xl border border-neutral-800 bg-neutral-900 p-6"
-            >
-              <h2 className="mb-6 text-2xl font-bold">
-                {section.title}
-              </h2>
+        <section className="mt-10 space-y-10">
+          {sections.map((section, sectionIndex) => {
+            const sectionId = slugify(section.title);
 
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse">
-                  <thead>
-                    <tr className="bg-neutral-800">
-                      <th className="p-4 text-left">
-                        Assessment Criteria
-                      </th>
-                      <th className="p-4 text-left">
-                        Score (0-10)
-                      </th>
-                      <th className="p-4 text-left">
-                        Risk Level
-                      </th>
-                      <th className="p-4 text-left">
-                        Qualitative Notes
-                      </th>
-                    </tr>
-                  </thead>
+            return (
+              <section
+                key={section.title}
+                id={sectionId}
+                className="scroll-mt-28 rounded-2xl border border-slate-200 bg-white p-6 shadow-md transition duration-300 hover:shadow-xl"
+              >
+                <h2 className="mb-6 text-2xl font-bold">
+                  {section.title}
+                </h2>
 
-                  <tbody>
-                    {section.items.map((item, itemIndex) => {
-                      let risk = "Stable";
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="bg-slate-200">
+                        <th className="p-4 text-left">
+                          Assessment Criteria
+                        </th>
+                        <th className="p-4 text-left">
+                          Score (0-10)
+                        </th>
+                        <th className="p-4 text-left">
+                          Risk Level
+                        </th>
+                        <th className="p-4 text-left">
+                          Qualitative Notes
+                        </th>
+                      </tr>
+                    </thead>
 
-                      if (item.score <= 3) risk = "Critical";
-                      else if (item.score <= 5) risk = "High Risk";
-                      else if (item.score <= 7) risk = "Moderate";
+                    <tbody>
+                      {section.items.map((item, itemIndex) => {
+                        let risk = "Stable";
 
-                      return (
-                        <tr
-                          key={item.name}
-                          className="border-b border-neutral-800"
-                        >
-                          <td className="p-4">
-                            {item.name}
-                          </td>
+                        if (item.score <= 3) risk = "Critical";
+                        else if (item.score <= 5) risk = "High Risk";
+                        else if (item.score <= 7) risk = "Moderate";
 
-                          <td className="p-4">
-                            <input
-                              type="number"
-                              min={0}
-                              max={10}
-                              value={item.score}
-                              onChange={(e) =>
-                                updateScore(
-                                  sectionIndex,
-                                  itemIndex,
-                                  Number(e.target.value)
-                                )
-                              }
-                              className="w-24 rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-white"
-                            />
-                          </td>
+                        const riskClass =
+                          risk === "Critical"
+                            ? "bg-red-100 text-red-800"
+                            : risk === "High Risk"
+                            ? "bg-orange-100 text-orange-800"
+                            : risk === "Moderate"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : "bg-green-100 text-green-800";
 
-                          <td className="p-4">
-                            <span
-                              className={`rounded-full px-3 py-1 text-sm ${
-                                risk === "Critical"
-                                  ? "bg-red-700"
-                                  : risk === "High Risk"
-                                  ? "bg-orange-700"
-                                  : risk === "Moderate"
-                                  ? "bg-yellow-600 text-black"
-                                  : "bg-green-700"
-                              }`}
-                            >
-                              {risk}
-                            </span>
-                          </td>
+                        return (
+                          <tr
+                            key={item.name}
+                            className="border-b border-slate-200 transition duration-300 hover:bg-blue-50"
+                          >
+                            <td className="p-4">
+                              {item.name}
+                            </td>
 
-                          <td className="p-4">
-                            <textarea
-                              value={item.notes}
-                              onChange={(e) =>
-                                updateNotes(
-                                  sectionIndex,
-                                  itemIndex,
-                                  e.target.value
-                                )
-                              }
-                              placeholder="Costs, bottlenecks, loss, delay, risk, leadership issue, supplier issue..."
-                              className="min-h-20 w-full min-w-65 rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-white"
-                            />
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          ))}
-        </div>
+                            <td className="p-4">
+                              <input
+                                type="number"
+                                min={0}
+                                max={10}
+                                value={item.score}
+                                onChange={(e) =>
+                                  updateScore(
+                                    sectionIndex,
+                                    itemIndex,
+                                    Number(e.target.value)
+                                  )
+                                }
+                                className="w-24 rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-slate-900 outline-none transition focus:border-blue-600 focus:bg-white"
+                              />
+                            </td>
 
-        <div className="mt-12 rounded-2xl bg-linear-to-r from-blue-700 to-indigo-700 p-8">
+                            <td className="p-4">
+                              <span
+                                className={`rounded-full px-3 py-1 text-sm font-bold ${riskClass}`}
+                              >
+                                {risk}
+                              </span>
+                            </td>
+
+                            <td className="p-4">
+                              <textarea
+                                value={item.notes}
+                                onChange={(e) =>
+                                  updateNotes(
+                                    sectionIndex,
+                                    itemIndex,
+                                    e.target.value
+                                  )
+                                }
+                                placeholder="Costs, bottlenecks, loss, delay, risk, leadership issue, supplier issue..."
+                                className="min-h-20 w-full min-w-65 rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-slate-900 outline-none transition focus:border-blue-600 focus:bg-white"
+                              />
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+            );
+          })}
+        </section>
+
+        <section
+          id={slugify("Final Assessment Dashboard")}
+          className="scroll-mt-28 mt-12 rounded-2xl bg-slate-950 p-8 text-white shadow-2xl"
+        >
           <h2 className="mb-4 text-3xl font-bold">
             Final Assessment Dashboard
           </h2>
 
           <div className="grid gap-6 md:grid-cols-2">
-            <div className="rounded-xl bg-white/10 p-6">
+            <div className="rounded-xl bg-white/10 p-6 transition duration-300 hover:bg-white/20">
               <p className="mb-2 text-lg">
                 Overall Score
               </p>
@@ -462,7 +504,7 @@ export default function ManufacturingValueStreamAssessmentPage() {
               </div>
             </div>
 
-            <div className="rounded-xl bg-white/10 p-6">
+            <div className="rounded-xl bg-white/10 p-6 transition duration-300 hover:bg-white/20">
               <p className="mb-2 text-lg">
                 Final Recommendation
               </p>
@@ -473,7 +515,7 @@ export default function ManufacturingValueStreamAssessmentPage() {
             </div>
           </div>
 
-          <div className="mt-6 rounded-xl bg-white/10 p-6">
+          <div className="mt-6 rounded-xl bg-white/10 p-6 transition duration-300 hover:bg-white/20">
             <p className="text-lg font-semibold">
               Suggested Action
             </p>
@@ -482,7 +524,7 @@ export default function ManufacturingValueStreamAssessmentPage() {
               {finalAction}
             </p>
           </div>
-        </div>
+        </section>
       </div>
     </main>
   );

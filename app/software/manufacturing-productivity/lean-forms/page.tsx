@@ -11,282 +11,329 @@ const forms = [
   "Quality Defect Report",
 ];
 
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 export default function LeanFormsPage() {
   const [activeForm, setActiveForm] = useState(forms[0]);
 
   return (
-    <main className="min-h-screen bg-linear-to-b from-white to-blue-50 text-gray-900">
-      <section className="mx-auto max-w-7xl px-6 py-20">
-        <h1 className="text-5xl font-extrabold">
-          Lean Manufacturing Forms System
-        </h1>
+    <main className="min-h-screen bg-slate-100 text-slate-900">
+      {/* HERO */}
+      <section className="bg-slate-950 px-6 py-16 text-white">
+        <div className="mx-auto max-w-7xl">
+          <p className="text-sm font-bold uppercase tracking-[0.3em] text-yellow-300">
+            Lean Manufacturing Forms System
+          </p>
 
-        <p className="mt-6 max-w-4xl text-xl leading-9 text-gray-700">
-          Intelligent digital lean-management forms for Kaizen, 5S, Gemba,
-          Muda reduction, quality control, and productivity improvement.
-        </p>
+          <h1 className="mt-4 text-5xl font-extrabold leading-tight">
+            Intelligent Lean Manufacturing Operational Forms
+          </h1>
 
-        <div className="mt-12 grid gap-4 md:grid-cols-3">
-          {forms.map((form) => (
-            <button
-              key={form}
-              onClick={() => setActiveForm(form)}
-              className={`rounded-2xl p-5 text-left font-bold transition ${
-                activeForm === form
-                  ? "bg-blue-700 text-white"
-                  : "bg-white shadow hover:bg-blue-50"
-              }`}
-            >
-              {form}
-            </button>
-          ))}
+          <p className="mt-6 max-w-5xl text-xl leading-relaxed text-white/85">
+            Intelligent digital lean-management forms for Kaizen, 5S, Gemba,
+            Muda reduction, quality control, downtime analysis, and productivity
+            improvement across manufacturing operations.
+          </p>
         </div>
+      </section>
 
-        <div className="mt-16 rounded-3xl bg-white p-10 shadow-2xl">
-          <h2 className="text-4xl font-bold">{activeForm}</h2>
+      {/* FORM NAVIGATION */}
+      <section className="px-6 py-16">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid gap-4 md:grid-cols-3 xl:grid-cols-6">
+            {forms.map((form) => {
+              const id = slugify(form);
 
-          {/* KAIZEN */}
-          {activeForm === "Kaizen Suggestion Form" && (
-            <form className="mt-10 grid gap-6 md:grid-cols-2">
-              <input
-                className="rounded-xl border p-4"
-                placeholder="Employee Name"
-              />
+              return (
+                <button
+                  key={form}
+                  onClick={() => setActiveForm(form)}
+                  className={`scroll-mt-28 rounded-2xl p-5 text-left font-bold transition duration-300 hover:-translate-y-1 hover:shadow-xl ${
+                    activeForm === form
+                      ? "bg-blue-700 text-white"
+                      : "bg-white shadow hover:bg-blue-50"
+                  }`}
+                >
+                  <span id={id}>{form}</span>
+                </button>
+              );
+            })}
+          </div>
 
-              <input
-                className="rounded-xl border p-4"
-                placeholder="Department"
-              />
+          {/* ACTIVE FORM CONTAINER */}
+          <section className="mt-16 rounded-3xl bg-white p-10 shadow-2xl">
+            <h2 className="text-4xl font-bold text-slate-900">
+              {activeForm}
+            </h2>
 
-              <textarea
-                className="min-h-32 rounded-xl border p-4 md:col-span-2"
-                placeholder="Current Problem"
-              />
+            {/* KAIZEN */}
+            {activeForm === "Kaizen Suggestion Form" && (
+              <form
+                id={slugify(activeForm)}
+                className="scroll-mt-28 mt-10 grid gap-6 md:grid-cols-2"
+              >
+                <input
+                  className="rounded-xl border border-slate-300 bg-slate-50 p-4 outline-none transition focus:border-blue-600 focus:bg-white"
+                  placeholder="Employee Name"
+                />
 
-              <textarea
-                className="min-h-32 rounded-xl border p-4 md:col-span-2"
-                placeholder="Suggested Improvement"
-              />
+                <input
+                  className="rounded-xl border border-slate-300 bg-slate-50 p-4 outline-none transition focus:border-blue-600 focus:bg-white"
+                  placeholder="Department"
+                />
 
-              <input
-                className="rounded-xl border p-4"
-                placeholder="Expected Saving"
-              />
+                <textarea
+                  className="min-h-32 rounded-xl border border-slate-300 bg-slate-50 p-4 outline-none transition focus:border-blue-600 focus:bg-white md:col-span-2"
+                  placeholder="Current Problem"
+                />
 
-              <input
-                className="rounded-xl border p-4"
-                placeholder="Implementation Time"
-              />
+                <textarea
+                  className="min-h-32 rounded-xl border border-slate-300 bg-slate-50 p-4 outline-none transition focus:border-blue-600 focus:bg-white md:col-span-2"
+                  placeholder="Suggested Improvement"
+                />
 
-              <button className="rounded-full bg-blue-700 px-8 py-4 font-bold text-white md:col-span-2">
-                Submit Kaizen
-              </button>
-            </form>
-          )}
+                <input
+                  className="rounded-xl border border-slate-300 bg-slate-50 p-4 outline-none transition focus:border-blue-600 focus:bg-white"
+                  placeholder="Expected Saving"
+                />
 
-          {/* 5S */}
-          {activeForm === "5S Audit Checklist" && (
-            <form className="mt-10 grid gap-6 md:grid-cols-2">
-              <input
-                className="rounded-xl border p-4"
-                placeholder="Area / Department"
-              />
+                <input
+                  className="rounded-xl border border-slate-300 bg-slate-50 p-4 outline-none transition focus:border-blue-600 focus:bg-white"
+                  placeholder="Implementation Time"
+                />
 
-              <input
-                className="rounded-xl border p-4"
-                placeholder="Auditor Name"
-              />
+                <button className="rounded-full bg-blue-700 px-8 py-4 font-bold text-white transition hover:bg-blue-800 hover:shadow-xl md:col-span-2">
+                  Submit Kaizen
+                </button>
+              </form>
+            )}
 
-              <input
-                className="rounded-xl border p-4"
-                placeholder="Sort Score"
-              />
+            {/* 5S */}
+            {activeForm === "5S Audit Checklist" && (
+              <form
+                id={slugify(activeForm)}
+                className="scroll-mt-28 mt-10 grid gap-6 md:grid-cols-2"
+              >
+                <input
+                  className="rounded-xl border border-slate-300 bg-slate-50 p-4 outline-none transition focus:border-blue-600 focus:bg-white"
+                  placeholder="Area / Department"
+                />
 
-              <input
-                className="rounded-xl border p-4"
-                placeholder="Set in Order Score"
-              />
+                <input
+                  className="rounded-xl border border-slate-300 bg-slate-50 p-4 outline-none transition focus:border-blue-600 focus:bg-white"
+                  placeholder="Auditor Name"
+                />
 
-              <input
-                className="rounded-xl border p-4"
-                placeholder="Shine Score"
-              />
+                <input
+                  className="rounded-xl border border-slate-300 bg-slate-50 p-4 outline-none transition focus:border-blue-600 focus:bg-white"
+                  placeholder="Sort Score"
+                />
 
-              <input
-                className="rounded-xl border p-4"
-                placeholder="Standardize Score"
-              />
+                <input
+                  className="rounded-xl border border-slate-300 bg-slate-50 p-4 outline-none transition focus:border-blue-600 focus:bg-white"
+                  placeholder="Set in Order Score"
+                />
 
-              <input
-                className="rounded-xl border p-4"
-                placeholder="Sustain Score"
-              />
+                <input
+                  className="rounded-xl border border-slate-300 bg-slate-50 p-4 outline-none transition focus:border-blue-600 focus:bg-white"
+                  placeholder="Shine Score"
+                />
 
-              <textarea
-                className="min-h-32 rounded-xl border p-4 md:col-span-2"
-                placeholder="Improvement Actions"
-              />
+                <input
+                  className="rounded-xl border border-slate-300 bg-slate-50 p-4 outline-none transition focus:border-blue-600 focus:bg-white"
+                  placeholder="Standardize Score"
+                />
 
-              <button className="rounded-full bg-blue-700 px-8 py-4 font-bold text-white md:col-span-2">
-                Submit 5S Audit
-              </button>
-            </form>
-          )}
+                <input
+                  className="rounded-xl border border-slate-300 bg-slate-50 p-4 outline-none transition focus:border-blue-600 focus:bg-white"
+                  placeholder="Sustain Score"
+                />
 
-          {/* GEMBA */}
-          {activeForm === "Gemba Walk Report" && (
-            <form className="mt-10 grid gap-6 md:grid-cols-2">
-              <input
-                className="rounded-xl border p-4"
-                placeholder="Observation Area"
-              />
+                <textarea
+                  className="min-h-32 rounded-xl border border-slate-300 bg-slate-50 p-4 outline-none transition focus:border-blue-600 focus:bg-white md:col-span-2"
+                  placeholder="Improvement Actions"
+                />
 
-              <input
-                className="rounded-xl border p-4"
-                placeholder="Supervisor"
-              />
+                <button className="rounded-full bg-blue-700 px-8 py-4 font-bold text-white transition hover:bg-blue-800 hover:shadow-xl md:col-span-2">
+                  Submit 5S Audit
+                </button>
+              </form>
+            )}
 
-              <textarea
-                className="min-h-32 rounded-xl border p-4 md:col-span-2"
-                placeholder="Observed Issues"
-              />
+            {/* GEMBA */}
+            {activeForm === "Gemba Walk Report" && (
+              <form
+                id={slugify(activeForm)}
+                className="scroll-mt-28 mt-10 grid gap-6 md:grid-cols-2"
+              >
+                <input
+                  className="rounded-xl border border-slate-300 bg-slate-50 p-4 outline-none transition focus:border-blue-600 focus:bg-white"
+                  placeholder="Observation Area"
+                />
 
-              <textarea
-                className="min-h-32 rounded-xl border p-4 md:col-span-2"
-                placeholder="Immediate Corrective Actions"
-              />
+                <input
+                  className="rounded-xl border border-slate-300 bg-slate-50 p-4 outline-none transition focus:border-blue-600 focus:bg-white"
+                  placeholder="Supervisor"
+                />
 
-              <input
-                className="rounded-xl border p-4"
-                placeholder="Responsible Person"
-              />
+                <textarea
+                  className="min-h-32 rounded-xl border border-slate-300 bg-slate-50 p-4 outline-none transition focus:border-blue-600 focus:bg-white md:col-span-2"
+                  placeholder="Observed Issues"
+                />
 
-              <input
-                type="date"
-                className="rounded-xl border p-4"
-              />
+                <textarea
+                  className="min-h-32 rounded-xl border border-slate-300 bg-slate-50 p-4 outline-none transition focus:border-blue-600 focus:bg-white md:col-span-2"
+                  placeholder="Immediate Corrective Actions"
+                />
 
-              <button className="rounded-full bg-blue-700 px-8 py-4 font-bold text-white md:col-span-2">
-                Submit Gemba Report
-              </button>
-            </form>
-          )}
+                <input
+                  className="rounded-xl border border-slate-300 bg-slate-50 p-4 outline-none transition focus:border-blue-600 focus:bg-white"
+                  placeholder="Responsible Person"
+                />
 
-          {/* MUDA */}
-          {activeForm === "Muda Waste Reporting" && (
-            <form className="mt-10 grid gap-6 md:grid-cols-2">
-              <select className="rounded-xl border p-4">
-                <option>Overproduction</option>
-                <option>Waiting</option>
-                <option>Transport</option>
-                <option>Inventory</option>
-                <option>Motion</option>
-                <option>Defects</option>
-              </select>
+                <input
+                  type="date"
+                  className="rounded-xl border border-slate-300 bg-slate-50 p-4 outline-none transition focus:border-blue-600 focus:bg-white"
+                />
 
-              <input
-                className="rounded-xl border p-4"
-                placeholder="Department"
-              />
+                <button className="rounded-full bg-blue-700 px-8 py-4 font-bold text-white transition hover:bg-blue-800 hover:shadow-xl md:col-span-2">
+                  Submit Gemba Report
+                </button>
+              </form>
+            )}
 
-              <textarea
-                className="min-h-32 rounded-xl border p-4 md:col-span-2"
-                placeholder="Waste Description"
-              />
+            {/* MUDA */}
+            {activeForm === "Muda Waste Reporting" && (
+              <form
+                id={slugify(activeForm)}
+                className="scroll-mt-28 mt-10 grid gap-6 md:grid-cols-2"
+              >
+                <select className="rounded-xl border border-slate-300 bg-slate-50 p-4 outline-none transition focus:border-blue-600 focus:bg-white">
+                  <option>Overproduction</option>
+                  <option>Waiting</option>
+                  <option>Transport</option>
+                  <option>Inventory</option>
+                  <option>Motion</option>
+                  <option>Defects</option>
+                </select>
 
-              <input
-                className="rounded-xl border p-4"
-                placeholder="Estimated Cost Impact"
-              />
+                <input
+                  className="rounded-xl border border-slate-300 bg-slate-50 p-4 outline-none transition focus:border-blue-600 focus:bg-white"
+                  placeholder="Department"
+                />
 
-              <input
-                className="rounded-xl border p-4"
-                placeholder="Suggested Reduction Method"
-              />
+                <textarea
+                  className="min-h-32 rounded-xl border border-slate-300 bg-slate-50 p-4 outline-none transition focus:border-blue-600 focus:bg-white md:col-span-2"
+                  placeholder="Waste Description"
+                />
 
-              <button className="rounded-full bg-blue-700 px-8 py-4 font-bold text-white md:col-span-2">
-                Submit Waste Report
-              </button>
-            </form>
-          )}
+                <input
+                  className="rounded-xl border border-slate-300 bg-slate-50 p-4 outline-none transition focus:border-blue-600 focus:bg-white"
+                  placeholder="Estimated Cost Impact"
+                />
 
-          {/* DOWNTIME */}
-          {activeForm === "Downtime Analysis" && (
-            <form className="mt-10 grid gap-6 md:grid-cols-2">
-              <input
-                className="rounded-xl border p-4"
-                placeholder="Machine Name"
-              />
+                <input
+                  className="rounded-xl border border-slate-300 bg-slate-50 p-4 outline-none transition focus:border-blue-600 focus:bg-white"
+                  placeholder="Suggested Reduction Method"
+                />
 
-              <input
-                className="rounded-xl border p-4"
-                placeholder="Operator"
-              />
+                <button className="rounded-full bg-blue-700 px-8 py-4 font-bold text-white transition hover:bg-blue-800 hover:shadow-xl md:col-span-2">
+                  Submit Waste Report
+                </button>
+              </form>
+            )}
 
-              <input
-                type="datetime-local"
-                className="rounded-xl border p-4"
-              />
+            {/* DOWNTIME */}
+            {activeForm === "Downtime Analysis" && (
+              <form
+                id={slugify(activeForm)}
+                className="scroll-mt-28 mt-10 grid gap-6 md:grid-cols-2"
+              >
+                <input
+                  className="rounded-xl border border-slate-300 bg-slate-50 p-4 outline-none transition focus:border-blue-600 focus:bg-white"
+                  placeholder="Machine Name"
+                />
 
-              <input
-                type="datetime-local"
-                className="rounded-xl border p-4"
-              />
+                <input
+                  className="rounded-xl border border-slate-300 bg-slate-50 p-4 outline-none transition focus:border-blue-600 focus:bg-white"
+                  placeholder="Operator"
+                />
 
-              <textarea
-                className="min-h-32 rounded-xl border p-4 md:col-span-2"
-                placeholder="Downtime Reason"
-              />
+                <input
+                  type="datetime-local"
+                  className="rounded-xl border border-slate-300 bg-slate-50 p-4 outline-none transition focus:border-blue-600 focus:bg-white"
+                />
 
-              <textarea
-                className="min-h-32 rounded-xl border p-4 md:col-span-2"
-                placeholder="Corrective Action"
-              />
+                <input
+                  type="datetime-local"
+                  className="rounded-xl border border-slate-300 bg-slate-50 p-4 outline-none transition focus:border-blue-600 focus:bg-white"
+                />
 
-              <button className="rounded-full bg-blue-700 px-8 py-4 font-bold text-white md:col-span-2">
-                Submit Downtime Report
-              </button>
-            </form>
-          )}
+                <textarea
+                  className="min-h-32 rounded-xl border border-slate-300 bg-slate-50 p-4 outline-none transition focus:border-blue-600 focus:bg-white md:col-span-2"
+                  placeholder="Downtime Reason"
+                />
 
-          {/* QUALITY */}
-          {activeForm === "Quality Defect Report" && (
-            <form className="mt-10 grid gap-6 md:grid-cols-2">
-              <input
-                className="rounded-xl border p-4"
-                placeholder="Product Name"
-              />
+                <textarea
+                  className="min-h-32 rounded-xl border border-slate-300 bg-slate-50 p-4 outline-none transition focus:border-blue-600 focus:bg-white md:col-span-2"
+                  placeholder="Corrective Action"
+                />
 
-              <input
-                className="rounded-xl border p-4"
-                placeholder="Batch Number"
-              />
+                <button className="rounded-full bg-blue-700 px-8 py-4 font-bold text-white transition hover:bg-blue-800 hover:shadow-xl md:col-span-2">
+                  Submit Downtime Report
+                </button>
+              </form>
+            )}
 
-              <input
-                className="rounded-xl border p-4"
-                placeholder="Defect Quantity"
-              />
+            {/* QUALITY */}
+            {activeForm === "Quality Defect Report" && (
+              <form
+                id={slugify(activeForm)}
+                className="scroll-mt-28 mt-10 grid gap-6 md:grid-cols-2"
+              >
+                <input
+                  className="rounded-xl border border-slate-300 bg-slate-50 p-4 outline-none transition focus:border-blue-600 focus:bg-white"
+                  placeholder="Product Name"
+                />
 
-              <input
-                className="rounded-xl border p-4"
-                placeholder="Inspector Name"
-              />
+                <input
+                  className="rounded-xl border border-slate-300 bg-slate-50 p-4 outline-none transition focus:border-blue-600 focus:bg-white"
+                  placeholder="Batch Number"
+                />
 
-              <textarea
-                className="min-h-32 rounded-xl border p-4 md:col-span-2"
-                placeholder="Defect Description"
-              />
+                <input
+                  className="rounded-xl border border-slate-300 bg-slate-50 p-4 outline-none transition focus:border-blue-600 focus:bg-white"
+                  placeholder="Defect Quantity"
+                />
 
-              <textarea
-                className="min-h-32 rounded-xl border p-4 md:col-span-2"
-                placeholder="Root Cause Analysis"
-              />
+                <input
+                  className="rounded-xl border border-slate-300 bg-slate-50 p-4 outline-none transition focus:border-blue-600 focus:bg-white"
+                  placeholder="Inspector Name"
+                />
 
-              <button className="rounded-full bg-blue-700 px-8 py-4 font-bold text-white md:col-span-2">
-                Submit Quality Report
-              </button>
-            </form>
-          )}
+                <textarea
+                  className="min-h-32 rounded-xl border border-slate-300 bg-slate-50 p-4 outline-none transition focus:border-blue-600 focus:bg-white md:col-span-2"
+                  placeholder="Defect Description"
+                />
+
+                <textarea
+                  className="min-h-32 rounded-xl border border-slate-300 bg-slate-50 p-4 outline-none transition focus:border-blue-600 focus:bg-white md:col-span-2"
+                  placeholder="Root Cause Analysis"
+                />
+
+                <button className="rounded-full bg-blue-700 px-8 py-4 font-bold text-white transition hover:bg-blue-800 hover:shadow-xl md:col-span-2">
+                  Submit Quality Report
+                </button>
+              </form>
+            )}
+          </section>
         </div>
       </section>
     </main>
