@@ -23,6 +23,15 @@ type LeakageItem = {
   executiveAction: string;
 };
 
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 function numberValue(value: any): number {
   const n = Number(value);
   return Number.isFinite(n) ? n : 0;
@@ -35,6 +44,38 @@ function getSeverity(score: number): "Low" | "Medium" | "High" | "Critical" {
   return "Low";
 }
 
+function getSeverityBadgeClass(severity: LeakageItem["severity"]) {
+  if (severity === "Critical") {
+    return "bg-red-600 text-white";
+  }
+
+  if (severity === "High") {
+    return "bg-orange-500 text-white";
+  }
+
+  if (severity === "Medium") {
+    return "bg-yellow-500 text-slate-950";
+  }
+
+  return "bg-emerald-500 text-slate-950";
+}
+
+function getSeverityBarClass(severity: LeakageItem["severity"]) {
+  if (severity === "Critical") {
+    return "bg-red-600";
+  }
+
+  if (severity === "High") {
+    return "bg-orange-500";
+  }
+
+  if (severity === "Medium") {
+    return "bg-yellow-500";
+  }
+
+  return "bg-emerald-500";
+}
+
 function generateProfitLeakage(
   productionLogs: RecordType[],
   wastageLogs: RecordType[],
@@ -44,13 +85,15 @@ function generateProfitLeakage(
 ): LeakageItem[] {
   const productionLeakage = productionLogs.reduce(
     (sum, item) =>
-      sum + numberValue(item.lossAmount || item.delayCost || item.productionLoss),
+      sum +
+      numberValue(item.lossAmount || item.delayCost || item.productionLoss),
     0
   );
 
   const wastageLeakage = wastageLogs.reduce(
     (sum, item) =>
-      sum + numberValue(item.wastageCost || item.lossAmount || item.materialLoss),
+      sum +
+      numberValue(item.wastageCost || item.lossAmount || item.materialLoss),
     0
   );
 
@@ -64,14 +107,17 @@ function generateProfitLeakage(
 
   const factoryLossLeakage = factoryLossEntries.reduce(
     (sum, item) =>
-      sum + numberValue(item.lossAmount || item.financialImpact || item.costImpact),
+      sum +
+      numberValue(item.lossAmount || item.financialImpact || item.costImpact),
     0
   );
 
   const recoveryLeakage = postOrderEntries.reduce(
     (sum, item) =>
       sum +
-      numberValue(item.unrecoveredAmount || item.balanceLoss || item.remainingLoss),
+      numberValue(
+        item.unrecoveredAmount || item.balanceLoss || item.remainingLoss
+      ),
     0
   );
 
@@ -167,7 +213,9 @@ export default function ProfitLeakageIntelligencePage() {
   const [productionLogs, setProductionLogs] = useState<RecordType[]>([]);
   const [wastageLogs, setWastageLogs] = useState<RecordType[]>([]);
   const [maintenanceLogs, setMaintenanceLogs] = useState<RecordType[]>([]);
-  const [factoryLossEntries, setFactoryLossEntries] = useState<RecordType[]>([]);
+  const [factoryLossEntries, setFactoryLossEntries] = useState<RecordType[]>(
+    []
+  );
   const [postOrderEntries, setPostOrderEntries] = useState<RecordType[]>([]);
 
   useEffect(() => {
@@ -175,80 +223,36 @@ export default function ProfitLeakageIntelligencePage() {
       try {
         const safeFetch = async (fn: () => Promise<any>) => {
           try {
-            return await Promise.race([
+            const result = await Promise.race([
               fn(),
               new Promise((resolve) => setTimeout(() => resolve([]), 3000)),
             ]);
+
+            return Array.isArray(result) ? result : [];
           } catch {
             return [];
           }
         };
 
-        const productionResult = Array.isArray(
-  await Promise.race([
-    safeFetch(() => getProductionLogs("demo-factory")),
-    new Promise((resolve) => setTimeout(() => resolve([]), 3000)),
-  ])
-)
-  ? await Promise.race([
-      safeFetch(() => getProductionLogs("demo-factory")),
-      new Promise((resolve) => setTimeout(() => resolve([]), 3000)),
-    ])
-  : [];
+        const [
+          productionResult,
+          wastageResult,
+          maintenanceResult,
+          factoryLossResult,
+          postOrderResult,
+        ] = await Promise.all([
+          safeFetch(() => getProductionLogs("demo-factory")),
+          safeFetch(() => getWastageLogs("demo-factory")),
+          safeFetch(() => getMaintenanceLogs("demo-factory")),
+          safeFetch(() => getFactoryLossIntelligenceEntries("demo-factory")),
+          safeFetch(() => getPostOrderIntelligenceEntries("demo-factory")),
+        ]);
 
-const wastageResult = Array.isArray(
-  await Promise.race([
-    safeFetch(() => getWastageLogs("demo-factory")),
-    new Promise((resolve) => setTimeout(() => resolve([]), 3000)),
-  ])
-)
-  ? await Promise.race([
-      safeFetch(() => getWastageLogs("demo-factory")),
-      new Promise((resolve) => setTimeout(() => resolve([]), 3000)),
-    ])
-  : [];
-
-const maintenanceResult = Array.isArray(
-  await Promise.race([
-    safeFetch(() => getMaintenanceLogs("demo-factory")),
-    new Promise((resolve) => setTimeout(() => resolve([]), 3000)),
-  ])
-)
-  ? await Promise.race([
-      safeFetch(() => getMaintenanceLogs("demo-factory")),
-      new Promise((resolve) => setTimeout(() => resolve([]), 3000)),
-    ])
-  : [];
-
-const factoryLossResult = Array.isArray(
-  await Promise.race([
-    safeFetch(() => getFactoryLossIntelligenceEntries("demo-factory")),
-    new Promise((resolve) => setTimeout(() => resolve([]), 3000)),
-  ])
-)
-  ? await Promise.race([
-      safeFetch(() => getFactoryLossIntelligenceEntries("demo-factory")),
-      new Promise((resolve) => setTimeout(() => resolve([]), 3000)),
-    ])
-  : [];
-
-const postOrderResult = Array.isArray(
-  await Promise.race([
-    safeFetch(() => getPostOrderIntelligenceEntries("demo-factory")),
-    new Promise((resolve) => setTimeout(() => resolve([]), 3000)),
-  ])
-)
-  ? await Promise.race([
-      safeFetch(() => getPostOrderIntelligenceEntries("demo-factory")),
-      new Promise((resolve) => setTimeout(() => resolve([]), 3000)),
-    ])
-  : [];
-
-        setProductionLogs(Array.isArray(productionResult) ? productionResult : []);
-        setWastageLogs(Array.isArray(wastageResult) ? wastageResult : []);
-        setMaintenanceLogs(Array.isArray(maintenanceResult) ? maintenanceResult : []);
-        setFactoryLossEntries(Array.isArray(factoryLossResult) ? factoryLossResult : []);
-        setPostOrderEntries(Array.isArray(postOrderResult) ? postOrderResult : []);
+        setProductionLogs(productionResult);
+        setWastageLogs(wastageResult);
+        setMaintenanceLogs(maintenanceResult);
+        setFactoryLossEntries(factoryLossResult);
+        setPostOrderEntries(postOrderResult);
       } catch (error) {
         console.error("Profit leakage intelligence loading error:", error);
       } finally {
@@ -288,152 +292,224 @@ const postOrderResult = Array.isArray(
 
   const topLeakage = leakageItems[0];
 
+  const intelligenceCards = [
+    {
+      title: "Largest Leakage Area",
+      value: topLeakage?.department || "N/A",
+      description: `£${(topLeakage?.leakageAmount || 0).toLocaleString()}`,
+      target: topLeakage?.department || "leakage-details",
+      className: "border-red-700 bg-red-950/50 text-red-200",
+    },
+    {
+      title: "Critical Leakage Areas",
+      value: criticalCount.toString(),
+      description: "Areas requiring executive recovery attention.",
+      target: "Leakage Details",
+      className: "border-orange-700 bg-orange-950/50 text-orange-200",
+    },
+    {
+      title: "Total Estimated Leakage",
+      value: `£${totalLeakage.toLocaleString()}`,
+      description:
+        "Combined detected leakage from available intelligence data.",
+      target: "Executive Recovery Summary",
+      className: "border-slate-700 bg-slate-900 text-slate-300",
+    },
+  ];
+
   return (
     <DashboardShell title="AI Profit Leakage Intelligence">
-      <main className="min-h-screen bg-slate-950 text-white p-6">
-        <div className="max-w-7xl mx-auto space-y-6">
-          <section>
-            <p className="text-sm text-slate-400">
+      <main className="min-h-screen bg-slate-950 p-6 text-white">
+        <div className="mx-auto max-w-7xl space-y-8">
+          <section className="rounded-3xl border border-white/10 bg-slate-900/70 p-8 shadow-2xl">
+            <p className="text-sm font-semibold uppercase tracking-[0.25em] text-red-300">
               MBNCON AI Profit Protection Intelligence
             </p>
 
-            <h1 className="text-4xl font-bold mt-2">
+            <h1 className="mt-3 text-4xl font-extrabold md:text-5xl">
               AI Profit Leakage Intelligence Engine
             </h1>
 
-            <p className="text-slate-300 mt-4 max-w-4xl">
+            <p className="mt-5 max-w-4xl text-lg leading-8 text-slate-300">
               This module identifies hidden profit leakage across production,
-              quality, maintenance, factory loss, and commercial recovery areas.
+              quality, maintenance, factory loss, and commercial recovery areas
+              using live Firestore intelligence data.
             </p>
           </section>
 
           {loading ? (
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-              Loading profit leakage intelligence...
-            </div>
+            <section className="rounded-3xl border border-slate-800 bg-slate-900 p-8 shadow-md">
+              <p className="text-lg font-semibold text-slate-200">
+                Loading profit leakage intelligence...
+              </p>
+
+              <p className="mt-3 text-sm text-slate-400">
+                Enterprise-safe Firestore loading is active with timeout
+                protection.
+              </p>
+            </section>
           ) : (
             <>
-              <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-red-950 border border-red-700 rounded-2xl p-5">
-                  <p className="text-red-300 text-sm">Largest Leakage Area</p>
-                  <h2 className="text-2xl font-bold mt-2">
-                    {topLeakage?.department || "N/A"}
-                  </h2>
-                  <p className="text-red-200 mt-3">
-                    £{topLeakage?.leakageAmount.toLocaleString() || 0}
-                  </p>
-                </div>
+              <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                {intelligenceCards.map((card) => {
+                  const targetId = slugify(card.target);
 
-                <div className="bg-orange-950 border border-orange-700 rounded-2xl p-5">
-                  <p className="text-orange-300 text-sm">Critical Leakage Areas</p>
-                  <h2 className="text-3xl font-bold mt-2">{criticalCount}</h2>
-                  <p className="text-orange-200 mt-3">
-                    Areas requiring executive recovery attention.
-                  </p>
-                </div>
+                  return (
+                    <a
+                      key={card.title}
+                      href={`#${targetId}`}
+                      className={`rounded-2xl border p-5 shadow-md transition duration-300 hover:-translate-y-1 hover:border-white/30 hover:shadow-xl ${card.className}`}
+                    >
+                      <p className="text-sm opacity-80">{card.title}</p>
 
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-                  <p className="text-slate-400 text-sm">Total Estimated Leakage</p>
-                  <h2 className="text-3xl font-bold mt-2">
-                    £{totalLeakage.toLocaleString()}
-                  </h2>
-                  <p className="text-slate-300 mt-3">
-                    Combined detected leakage from available intelligence data.
-                  </p>
-                </div>
-              </section>
+                      <h2 className="mt-2 text-3xl font-bold">
+                        {card.value}
+                      </h2>
 
-              <section className="grid grid-cols-1 gap-5">
-                {leakageItems.map((item) => (
-                  <div
-                    key={item.department}
-                    className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4"
-                  >
-                    <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-                      <div>
-                        <p className="text-slate-400 text-sm">
-                          Department Leakage Intelligence
-                        </p>
-                        <h2 className="text-2xl font-bold mt-1">
-                          {item.department}
-                        </h2>
-                      </div>
-
-                      <span
-                        className={
-                          item.severity === "Critical"
-                            ? "px-4 py-2 rounded-full bg-red-600 text-white text-sm font-semibold"
-                            : item.severity === "High"
-                            ? "px-4 py-2 rounded-full bg-orange-500 text-white text-sm font-semibold"
-                            : item.severity === "Medium"
-                            ? "px-4 py-2 rounded-full bg-yellow-500 text-slate-950 text-sm font-semibold"
-                            : "px-4 py-2 rounded-full bg-emerald-500 text-slate-950 text-sm font-semibold"
-                        }
-                      >
-                        {item.severity}
-                      </span>
-                    </div>
-
-                    <div>
-                      <p className="text-slate-400 text-sm">
-                        Leakage Score: {item.leakageScore}/100
+                      <p className="mt-3 text-sm opacity-90">
+                        {card.description}
                       </p>
 
-                      <div className="w-full bg-slate-800 rounded-full h-4 mt-2 overflow-hidden">
-                        <div
-                          className={
-                            item.severity === "Critical"
-                              ? "bg-red-600 h-4"
-                              : item.severity === "High"
-                              ? "bg-orange-500 h-4"
-                              : item.severity === "Medium"
-                              ? "bg-yellow-500 h-4"
-                              : "bg-emerald-500 h-4"
-                          }
-                          style={{ width: `${item.leakageScore}%` }}
-                        />
+                      <p className="mt-5 text-xs font-semibold opacity-70">
+                        View intelligence →
+                      </p>
+                    </a>
+                  );
+                })}
+              </section>
+
+              <section
+                id={slugify("Leakage Details")}
+                className="scroll-mt-28 space-y-5"
+              >
+                {leakageItems.map((item) => {
+                  const itemId = slugify(item.department);
+
+                  return (
+                    <section
+                      key={item.department}
+                      id={itemId}
+                      className="scroll-mt-28 space-y-5 rounded-3xl border border-slate-800 bg-slate-900 p-6 shadow-md transition duration-300 hover:border-slate-700 hover:shadow-xl"
+                    >
+                      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                        <div>
+                          <p className="text-sm text-slate-400">
+                            Department Leakage Intelligence
+                          </p>
+
+                          <h2 className="mt-1 text-3xl font-bold">
+                            {item.department}
+                          </h2>
+                        </div>
+
+                        <span
+                          className={`rounded-full px-4 py-2 text-sm font-semibold ${getSeverityBadgeClass(
+                            item.severity
+                          )}`}
+                        >
+                          {item.severity}
+                        </span>
                       </div>
+
+                      <div>
+                        <p className="text-sm text-slate-400">
+                          Leakage Score: {item.leakageScore}/100
+                        </p>
+
+                        <div className="mt-2 h-4 w-full overflow-hidden rounded-full bg-slate-800">
+                          <div
+                            className={`h-4 transition-all duration-500 ${getSeverityBarClass(
+                              item.severity
+                            )}`}
+                            style={{ width: `${item.leakageScore}%` }}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+                        <div className="rounded-xl border border-slate-800 bg-slate-950 p-4 transition duration-300 hover:-translate-y-1 hover:border-red-500/50 hover:shadow-lg">
+                          <h3 className="font-semibold text-red-300">
+                            Estimated Leakage
+                          </h3>
+
+                          <p className="mt-2 text-sm text-slate-300">
+                            £{item.leakageAmount.toLocaleString()}
+                          </p>
+                        </div>
+
+                        <div className="rounded-xl border border-slate-800 bg-slate-950 p-4 transition duration-300 hover:-translate-y-1 hover:border-orange-500/50 hover:shadow-lg">
+                          <h3 className="font-semibold text-orange-300">
+                            Probable Cause
+                          </h3>
+
+                          <p className="mt-2 text-sm leading-6 text-slate-300">
+                            {item.cause}
+                          </p>
+                        </div>
+
+                        <div className="rounded-xl border border-slate-800 bg-slate-950 p-4 transition duration-300 hover:-translate-y-1 hover:border-sky-500/50 hover:shadow-lg">
+                          <h3 className="font-semibold text-sky-300">
+                            Recovery Opportunity
+                          </h3>
+
+                          <p className="mt-2 text-sm leading-6 text-slate-300">
+                            {item.recoveryOpportunity}
+                          </p>
+                        </div>
+
+                        <div className="rounded-xl border border-slate-800 bg-slate-950 p-4 transition duration-300 hover:-translate-y-1 hover:border-emerald-500/50 hover:shadow-lg">
+                          <h3 className="font-semibold text-emerald-300">
+                            Executive Action
+                          </h3>
+
+                          <p className="mt-2 text-sm leading-6 text-slate-300">
+                            {item.executiveAction}
+                          </p>
+                        </div>
+                      </div>
+                    </section>
+                  );
+                })}
+              </section>
+
+              <section
+                id={slugify("Executive Recovery Summary")}
+                className="scroll-mt-28 rounded-3xl border border-emerald-500/30 bg-emerald-950/30 p-8 shadow-md transition duration-300 hover:border-emerald-400/50 hover:shadow-xl"
+              >
+                <p className="text-sm font-semibold uppercase tracking-[0.25em] text-emerald-300">
+                  Executive Recovery Summary
+                </p>
+
+                <h2 className="mt-3 text-3xl font-extrabold text-white">
+                  Profit Protection Action Layer
+                </h2>
+
+                <p className="mt-5 max-w-5xl text-lg leading-8 text-emerald-100">
+                  MBNCON profit leakage intelligence helps directors identify
+                  where money is being lost, which departments need recovery
+                  action, and where executive escalation can protect margin
+                  before losses become permanent.
+                </p>
+
+                <div className="mt-8 grid gap-5 md:grid-cols-3">
+                  {[
+                    "Prioritise high-value leakage recovery",
+                    "Assign department-level recovery owners",
+                    "Track leakage reduction through executive follow-up",
+                  ].map((item) => (
+                    <div
+                      key={item}
+                      className="rounded-2xl border border-emerald-500/20 bg-slate-950/60 p-5 transition duration-300 hover:-translate-y-1 hover:border-emerald-400/50 hover:shadow-lg"
+                    >
+                      <p className="font-semibold text-white">{item}</p>
+
+                      <p className="mt-3 text-sm leading-6 text-emerald-100">
+                        Consultancy-demo executive UX prepared for margin
+                        protection and operational recovery.
+                      </p>
                     </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                      <div className="bg-slate-950 border border-slate-800 rounded-xl p-4">
-                        <h3 className="text-red-300 font-semibold">
-                          Estimated Leakage
-                        </h3>
-                        <p className="text-slate-300 text-sm mt-2">
-                          £{item.leakageAmount.toLocaleString()}
-                        </p>
-                      </div>
-
-                      <div className="bg-slate-950 border border-slate-800 rounded-xl p-4">
-                        <h3 className="text-orange-300 font-semibold">
-                          Probable Cause
-                        </h3>
-                        <p className="text-slate-300 text-sm mt-2">
-                          {item.cause}
-                        </p>
-                      </div>
-
-                      <div className="bg-slate-950 border border-slate-800 rounded-xl p-4">
-                        <h3 className="text-sky-300 font-semibold">
-                          Recovery Opportunity
-                        </h3>
-                        <p className="text-slate-300 text-sm mt-2">
-                          {item.recoveryOpportunity}
-                        </p>
-                      </div>
-
-                      <div className="bg-slate-950 border border-slate-800 rounded-xl p-4">
-                        <h3 className="text-emerald-300 font-semibold">
-                          Executive Action
-                        </h3>
-                        <p className="text-slate-300 text-sm mt-2">
-                          {item.executiveAction}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </section>
             </>
           )}

@@ -3,6 +3,15 @@
 import DashboardShell from "@/components/software/DashboardShell";
 import { getBnTheory } from "@/lib/software/bnTheory";
 
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 const manualSections = [
   {
     id: "introduction",
@@ -159,97 +168,213 @@ const guidanceLinks = [
   ["Report Generator Guide", "#report-generator"],
 ];
 
+const kpiCards = [
+  {
+    title: "Manual Coverage",
+    value: "14",
+    description:
+      "Covers platform navigation, daily entries, governance, AI escalation, and launch readiness.",
+    target: "manual-sections",
+    className: "border-cyan-200 bg-cyan-50 text-cyan-950",
+  },
+  {
+    title: "Guides Ready",
+    value: "10",
+    description:
+      "Clickable guidance cards help users jump quickly to operational procedures.",
+    target: "module-guides",
+    className: "border-emerald-200 bg-emerald-50 text-emerald-950",
+  },
+  {
+    title: "Bilingual Support",
+    value: "EN + BN",
+    description:
+      "English and Bangla guidance supports supervisors, managers, directors, and novice users.",
+    target: "intelligence-layer",
+    className: "border-blue-200 bg-blue-50 text-blue-950",
+  },
+  {
+    title: "Launch Readiness",
+    value: "Checklist",
+    description:
+      "Deployment, route, Firestore, role, mobile, bilingual, and Vercel checks are included.",
+    target: "launch-readiness",
+    className: "border-orange-200 bg-orange-50 text-orange-950",
+  },
+];
+
 export default function TrainingManualPage() {
   return (
     <DashboardShell
       title="How to Use This Productivity Model | এই প্রোডাক্টিভিটি মডেল কীভাবে ব্যবহার করবেন"
       subtitle="Step-by-step English & Bangla operational guide for 110+ enterprise intelligence modules."
     >
-      <main className="space-y-8">
-        <section
-          id="top"
-          className="scroll-mt-32 rounded-3xl border border-cyan-200 bg-cyan-50 p-6 sm:p-8"
-        >
-          <h1 className="text-3xl font-bold text-cyan-950 sm:text-4xl">
-            How to Use This Productivity Model
-          </h1>
+      <main className="min-h-screen bg-slate-100 p-6 text-slate-900">
+        <div className="mx-auto max-w-7xl space-y-8">
+          <section
+            id="top"
+            className="scroll-mt-32 rounded-3xl bg-slate-950 p-8 text-white shadow-2xl sm:p-10"
+          >
+            <p className="text-sm font-semibold uppercase tracking-[0.25em] text-cyan-300">
+              MBNCON Enterprise Training Manual
+            </p>
 
-          <p className="mt-4 text-base leading-relaxed text-cyan-900 sm:text-lg">
-            A practical step-by-step guide so a novice user, supervisor,
-            manager or director can understand and operate the MBNCON
-            Manufacturing Intelligence Platform.
-          </p>
+            <h1 className="mt-4 text-3xl font-extrabold leading-tight sm:text-5xl">
+              How to Use This Productivity Model
+            </h1>
 
-          <p className="mt-6 text-base leading-relaxed text-cyan-900 sm:text-lg">
-            {getBnTheory("platformPurpose")}
-          </p>
-        </section>
+            <p className="mt-5 max-w-5xl text-base leading-8 text-slate-300 sm:text-lg">
+              A practical step-by-step guide so a novice user, supervisor,
+              manager or director can understand and operate the MBNCON
+              Manufacturing Intelligence Platform.
+            </p>
 
-        <section className="grid gap-6">
-          {manualSections.map((section) => (
-            <div
-              key={section.id}
-              id={section.id}
-              className="scroll-mt-32 rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm sm:p-8"
-            >
-              <h2 className="text-2xl font-bold text-neutral-950">
-                {section.title}
-              </h2>
+            <p className="mt-6 max-w-5xl text-base leading-8 text-cyan-100 sm:text-lg">
+              {getBnTheory("platformPurpose")}
+            </p>
+          </section>
 
-              <div className="mt-5 space-y-4">
-                {section.content.map((paragraph) => (
-                  <p
-                    key={paragraph}
-                    className="text-base leading-relaxed text-neutral-700"
-                  >
-                    {paragraph}
-                  </p>
-                ))}
-              </div>
+          <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+            {kpiCards.map((card) => {
+              const targetId = slugify(card.target);
 
-              <div className="mt-6 flex flex-wrap items-center gap-4">
-                {"moduleHref" in section ? (
-                  <a
-                    href={section.moduleHref}
-                    className="rounded-full border border-cyan-200 bg-cyan-50 px-4 py-2 text-sm font-semibold text-cyan-700 transition hover:bg-cyan-100"
-                  >
-                    {section.moduleLabel || "Open Related Module"} →
-                  </a>
-                ) : null}
-
+              return (
                 <a
-                  href="#top"
-                  className="text-sm font-semibold text-cyan-700 hover:text-cyan-900"
+                  key={card.title}
+                  href={`#${targetId}`}
+                  className={`rounded-3xl border p-6 shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-xl ${card.className}`}
                 >
-                  Back to top ↑
+                  <p className="text-sm font-semibold uppercase tracking-wide opacity-80">
+                    {card.title}
+                  </p>
+
+                  <h2 className="mt-3 text-3xl font-extrabold">
+                    {card.value}
+                  </h2>
+
+                  <p className="mt-4 leading-7">{card.description}</p>
+
+                  <p className="mt-5 text-sm font-bold opacity-70">
+                    View section →
+                  </p>
                 </a>
-              </div>
-            </div>
-          ))}
-        </section>
+              );
+            })}
+          </section>
 
-        <section className="rounded-3xl border border-emerald-200 bg-emerald-50 p-6 sm:p-8">
-          <h2 className="text-2xl font-bold text-emerald-950 sm:text-3xl">
-            Module-by-Module Guides | মডিউলভিত্তিক গাইড
-          </h2>
-
-          <p className="mt-4 text-neutral-700">
-            Click a guide card to jump to the relevant section inside this
-            training manual.
-          </p>
-
-          <div className="mt-6 grid gap-4 md:grid-cols-2">
-            {guidanceLinks.map(([item, href]) => (
-              <a
-                key={item}
-                href={href}
-                className="rounded-2xl border border-emerald-200 bg-white p-4 text-sm font-medium text-neutral-800 transition hover:border-emerald-500 hover:bg-emerald-100"
+          <section
+            id="manual-sections"
+            className="scroll-mt-28 grid gap-6"
+          >
+            {manualSections.map((section) => (
+              <section
+                key={section.id}
+                id={section.id}
+                className="scroll-mt-32 rounded-3xl border border-neutral-200 bg-white p-6 shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-xl sm:p-8"
               >
-                {item} →
-              </a>
+                <h2 className="text-2xl font-bold text-neutral-950">
+                  {section.title}
+                </h2>
+
+                <div className="mt-5 space-y-4">
+                  {section.content.map((paragraph) => (
+                    <p
+                      key={paragraph}
+                      className="text-base leading-relaxed text-neutral-700"
+                    >
+                      {paragraph}
+                    </p>
+                  ))}
+                </div>
+
+                <div className="mt-6 flex flex-wrap items-center gap-4">
+                  {"moduleHref" in section ? (
+                    <a
+                      href={section.moduleHref}
+                      className="rounded-full border border-cyan-200 bg-cyan-50 px-4 py-2 text-sm font-semibold text-cyan-700 transition duration-300 hover:bg-cyan-100 hover:shadow-md"
+                    >
+                      {section.moduleLabel || "Open Related Module"} →
+                    </a>
+                  ) : null}
+
+                  <a
+                    href="#top"
+                    className="text-sm font-semibold text-cyan-700 transition duration-300 hover:text-cyan-900"
+                  >
+                    Back to top ↑
+                  </a>
+                </div>
+              </section>
             ))}
-          </div>
-        </section>
+          </section>
+
+          <section
+            id="module-guides"
+            className="scroll-mt-28 rounded-3xl border border-emerald-200 bg-emerald-50 p-6 shadow-md transition duration-300 hover:shadow-xl sm:p-8"
+          >
+            <h2 className="text-2xl font-bold text-emerald-950 sm:text-3xl">
+              Module-by-Module Guides | মডিউলভিত্তিক গাইড
+            </h2>
+
+            <p className="mt-4 text-neutral-700">
+              Click a guide card to jump to the relevant section inside this
+              training manual.
+            </p>
+
+            <div className="mt-6 grid gap-4 md:grid-cols-2">
+              {guidanceLinks.map(([item, href]) => (
+                <a
+                  key={item}
+                  href={href}
+                  className="rounded-2xl border border-emerald-200 bg-white p-4 text-sm font-medium text-neutral-800 transition duration-300 hover:-translate-y-1 hover:border-emerald-500 hover:bg-emerald-100 hover:shadow-lg"
+                >
+                  {item} →
+                </a>
+              ))}
+            </div>
+          </section>
+
+          <section
+            id="intelligence-layer"
+            className="scroll-mt-28 rounded-3xl bg-slate-950 p-8 text-white shadow-md transition duration-300 hover:shadow-xl"
+          >
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-cyan-300">
+              Enterprise Training Intelligence Layer
+            </p>
+
+            <h2 className="mt-3 text-3xl font-extrabold">
+              Bilingual Operational Guidance for Factory Teams
+            </h2>
+
+            <p className="mt-5 max-w-5xl text-lg leading-8 text-slate-300">
+              This manual supports directors, managers, supervisors, quality
+              teams, maintenance teams, production teams, finance users,
+              commercial teams, and novice users with practical English and
+              Bangla guidance for operating the MBNCON enterprise manufacturing
+              intelligence platform.
+            </p>
+
+            <div className="mt-8 grid gap-5 md:grid-cols-3">
+              {[
+                "Novice-user operational guidance",
+                "Director-level review structure",
+                "Launch-readiness checklist support",
+              ].map((item) => (
+                <div
+                  key={item}
+                  className="rounded-2xl bg-white/10 p-5 transition duration-300 hover:-translate-y-1 hover:bg-white/15 hover:shadow-xl"
+                >
+                  <p className="font-semibold text-white">{item}</p>
+
+                  <p className="mt-3 text-sm leading-6 text-slate-300">
+                    Enterprise-safe guidance prepared for training,
+                    onboarding, consultancy delivery, and platform adoption.
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
+        </div>
       </main>
     </DashboardShell>
   );

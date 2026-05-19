@@ -1,6 +1,16 @@
 "use client";
 
 import Link from "next/link";
+import DashboardShell from "@/components/software/DashboardShell";
+
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
 
 const planningAreas = [
   {
@@ -104,137 +114,231 @@ const lossRisks = [
   },
 ];
 
+const kpis = [
+  {
+    title: "Line Efficiency",
+    value: "Tracked",
+    description:
+      "Production efficiency visibility prepared for operational analysis.",
+    style:
+      "border-violet-400/30 bg-violet-400/10 text-violet-200",
+  },
+  {
+    title: "Bottleneck Risk",
+    value: "Visible",
+    description:
+      "AI bottleneck escalation structure enabled for factory visibility.",
+    style:
+      "border-red-400/30 bg-red-400/10 text-red-200",
+  },
+  {
+    title: "Planning Accuracy",
+    value: "Measured",
+    description:
+      "Compare planning commitment against real production execution.",
+    style:
+      "border-cyan-400/30 bg-cyan-400/10 text-cyan-200",
+  },
+  {
+    title: "Shipment Risk",
+    value: "Monitored",
+    description:
+      "Shipment delay intelligence linked with production recovery flow.",
+    style:
+      "border-orange-400/30 bg-orange-400/10 text-orange-200",
+  },
+];
+
 export default function ProductionPlanningLineBalancingPage() {
   return (
-    <main className="min-h-screen bg-slate-950 text-white">
-      <section className="mx-auto max-w-7xl px-6 py-12">
-        <Link
-          href="/software"
-          className="rounded-full border border-white/20 px-4 py-2 text-sm text-slate-200 hover:bg-white/10"
-        >
-          ← Back to Dashboard
-        </Link>
+    <DashboardShell title="Production Planning & Line Balancing">
+      <main className="min-h-screen bg-slate-950 text-white">
+        <section className="mx-auto max-w-7xl px-6 py-12">
+          <div id="top" />
 
-        <div className="mt-8 rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl">
-          <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-violet-300">
-            MBNCON Production Intelligence
-          </p>
+          <Link
+            href="/software"
+            className="rounded-full border border-white/20 px-4 py-2 text-sm text-slate-200 transition duration-300 hover:bg-white/10"
+          >
+            ← Back to Dashboard
+          </Link>
 
-          <h1 className="text-4xl font-bold md:text-5xl">
-            Production Planning & Line Balancing
-          </h1>
+          <section className="mt-8 rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl">
+            <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-violet-300">
+              MBNCON Production Intelligence
+            </p>
 
-          <p className="mt-4 max-w-3xl text-lg text-slate-300">
-            Track capacity, hourly targets, SMV, bottlenecks, operator balance,
-            machine availability, changeover loss, planning accuracy, WIP
-            movement, and shipment commitment risk.
-          </p>
-        </div>
+            <h1 className="text-4xl font-bold md:text-5xl">
+              Production Planning & Line Balancing
+            </h1>
 
-        <section className="mt-10 grid gap-6 md:grid-cols-4">
-          {[
-            ["Line Efficiency", "Tracked"],
-            ["Bottleneck Risk", "Visible"],
-            ["Planning Accuracy", "Measured"],
-            ["Shipment Risk", "Monitored"],
-          ].map(([label, value]) => (
-            <div
-              key={label}
-              className="rounded-2xl border border-white/10 bg-white/5 p-6"
-            >
-              <p className="text-sm text-slate-400">{label}</p>
-              <p className="mt-3 text-2xl font-bold text-violet-300">
-                {value}
-              </p>
-            </div>
-          ))}
-        </section>
+            <p className="mt-4 max-w-4xl text-lg leading-8 text-slate-300">
+              Track capacity, hourly targets, SMV, bottlenecks, operator
+              balance, machine availability, changeover loss, planning
+              accuracy, WIP movement, and shipment commitment risk across
+              manufacturing operations.
+            </p>
+          </section>
 
-        <section className="mt-10 grid gap-6 md:grid-cols-2">
-          <div className="rounded-3xl border border-white/10 bg-slate-900 p-8">
-            <h2 className="text-2xl font-bold text-violet-200">
-              Planning & Balancing Areas
-            </h2>
+          <section className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+            {kpis.map((item) => {
+              const id = slugify(item.title);
 
-            <div className="mt-6 space-y-3">
-              {planningAreas.map((item, index) => (
+              return (
                 <a
-                  key={item.id}
-                  href={`#${item.id}`}
-                  className="flex gap-3 rounded-xl border border-white/10 bg-white/5 p-3 transition hover:border-violet-400 hover:bg-violet-400/10"
+                  key={item.title}
+                  href={`#${id}`}
+                  className={`rounded-3xl border p-6 shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-xl ${item.style}`}
                 >
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-violet-400 text-sm font-bold text-slate-950">
-                    {index + 1}
-                  </span>
+                  <p className="text-sm font-semibold uppercase tracking-wide opacity-80">
+                    {item.title}
+                  </p>
 
-                  <span className="text-sm text-slate-200">{item.title}</span>
+                  <p className="mt-3 text-3xl font-extrabold">
+                    {item.value}
+                  </p>
+
+                  <p className="mt-4 text-sm leading-7 opacity-90">
+                    {item.description}
+                  </p>
+
+                  <div className="mt-5 text-sm font-semibold opacity-80">
+                    View intelligence →
+                  </div>
                 </a>
-              ))}
-            </div>
-          </div>
+              );
+            })}
+          </section>
 
-          <div className="rounded-3xl border border-white/10 bg-slate-900 p-8">
-            <h2 className="text-2xl font-bold text-violet-200">
-              Production Loss Risks
-            </h2>
+          <section className="mt-10 grid gap-6 md:grid-cols-2">
+            <div className="rounded-3xl border border-white/10 bg-slate-900 p-8 shadow-md transition duration-300 hover:shadow-xl">
+              <div
+                id={slugify("Planning Areas")}
+                className="scroll-mt-28"
+              />
 
-            <div className="mt-6 space-y-3">
-              {lossRisks.map((item, index) => (
-                <a
-                  key={item.id}
-                  href={`#${item.id}`}
-                  className="flex gap-3 rounded-xl border border-white/10 bg-white/5 p-3 transition hover:border-violet-400 hover:bg-violet-400/10"
-                >
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-violet-400 text-sm font-bold text-slate-950">
-                    {index + 1}
-                  </span>
-
-                  <span className="text-sm text-slate-200">{item.title}</span>
-                </a>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="mt-12 space-y-6">
-          {[...planningAreas, ...lossRisks].map((item) => (
-            <div
-              key={item.id}
-              id={item.id}
-              className="scroll-mt-28 rounded-3xl border border-white/10 bg-slate-900 p-8"
-            >
               <h2 className="text-2xl font-bold text-violet-200">
-                {item.title}
+                Planning & Balancing Areas
               </h2>
 
-              <p className="mt-4 leading-relaxed text-slate-300">
-                {item.detail}
-              </p>
+              <div className="mt-6 space-y-3">
+                {planningAreas.map((item, index) => (
+                  <a
+                    key={item.id}
+                    href={`#${item.id}`}
+                    className="flex gap-3 rounded-xl border border-white/10 bg-white/5 p-4 transition duration-300 hover:border-violet-400 hover:bg-violet-400/10 hover:shadow-lg"
+                  >
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-violet-400 text-sm font-bold text-slate-950">
+                      {index + 1}
+                    </span>
 
-              <div className="mt-5">
-                <a
-                  href="#top"
-                  className="text-sm font-semibold text-violet-300 hover:text-violet-100"
-                >
-                  Back to top ↑
-                </a>
+                    <span className="text-sm leading-6 text-slate-200">
+                      {item.title}
+                    </span>
+                  </a>
+                ))}
               </div>
             </div>
-          ))}
-        </section>
 
-        <section className="mt-10 rounded-3xl border border-violet-400/30 bg-violet-400/10 p-8">
-          <h2 className="text-2xl font-bold text-violet-200">
-            Consultancy Application
-          </h2>
+            <div className="rounded-3xl border border-white/10 bg-slate-900 p-8 shadow-md transition duration-300 hover:shadow-xl">
+              <div
+                id={slugify("Production Loss Risks")}
+                className="scroll-mt-28"
+              />
 
-          <p className="mt-4 text-slate-200">
-            This module helps factories improve line efficiency, reduce
-            bottlenecks, balance operators, control WIP, reduce overtime, and
-            protect shipment commitments through better production planning.
-          </p>
+              <h2 className="text-2xl font-bold text-violet-200">
+                Production Loss Risks
+              </h2>
+
+              <div className="mt-6 space-y-3">
+                {lossRisks.map((item, index) => (
+                  <a
+                    key={item.id}
+                    href={`#${item.id}`}
+                    className="flex gap-3 rounded-xl border border-white/10 bg-white/5 p-4 transition duration-300 hover:border-violet-400 hover:bg-violet-400/10 hover:shadow-lg"
+                  >
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-violet-400 text-sm font-bold text-slate-950">
+                      {index + 1}
+                    </span>
+
+                    <span className="text-sm leading-6 text-slate-200">
+                      {item.title}
+                    </span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          <section className="mt-12 space-y-6">
+            {[...planningAreas, ...lossRisks].map((item) => (
+              <section
+                key={item.id}
+                id={item.id}
+                className="scroll-mt-28 rounded-3xl border border-white/10 bg-slate-900 p-8 shadow-md transition duration-300 hover:shadow-xl"
+              >
+                <h2 className="text-2xl font-bold text-violet-200">
+                  {item.title}
+                </h2>
+
+                <p className="mt-4 leading-8 text-slate-300">
+                  {item.detail}
+                </p>
+
+                <div className="mt-6">
+                  <a
+                    href="#top"
+                    className="text-sm font-semibold text-violet-300 transition duration-300 hover:text-violet-100"
+                  >
+                    Back to top ↑
+                  </a>
+                </div>
+              </section>
+            ))}
+          </section>
+
+          <section className="mt-10 rounded-3xl border border-violet-400/30 bg-violet-400/10 p-8 shadow-md transition duration-300 hover:shadow-xl">
+            <div
+              id={slugify("Consultancy Application")}
+              className="scroll-mt-28"
+            />
+
+            <h2 className="text-2xl font-bold text-violet-200">
+              Consultancy Application
+            </h2>
+
+            <p className="mt-4 max-w-5xl leading-8 text-slate-200">
+              This module helps factories improve line efficiency, reduce
+              bottlenecks, balance operators, control WIP, reduce overtime,
+              improve planning accuracy, and protect shipment commitments
+              through structured production planning intelligence and AI-driven
+              operational visibility.
+            </p>
+
+            <div className="mt-8 grid gap-5 md:grid-cols-3">
+              {[
+                "Line balancing visibility",
+                "Operational bottleneck escalation",
+                "Production planning recovery support",
+              ].map((item) => (
+                <div
+                  key={item}
+                  className="rounded-2xl border border-white/10 bg-white/5 p-5 transition duration-300 hover:-translate-y-1 hover:bg-white/10 hover:shadow-lg"
+                >
+                  <p className="font-semibold text-white">
+                    {item}
+                  </p>
+
+                  <p className="mt-3 text-sm leading-6 text-slate-300">
+                    Consultancy-demo executive UX prepared for manufacturing
+                    intelligence expansion.
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
         </section>
-      </section>
-    </main>
+      </main>
+    </DashboardShell>
   );
 }

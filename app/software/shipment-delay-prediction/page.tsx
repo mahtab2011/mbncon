@@ -22,6 +22,15 @@ type ShipmentPrediction = {
   recoveryAction: string;
 };
 
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 function numberValue(value: any): number {
   const n = Number(value);
   return Number.isFinite(n) ? n : 0;
@@ -34,6 +43,38 @@ function riskLevel(score: number): "Low" | "Medium" | "High" | "Critical" {
   return "Low";
 }
 
+function badgeClass(level: ShipmentPrediction["riskLevel"]) {
+  if (level === "Critical") {
+    return "bg-red-600 text-white";
+  }
+
+  if (level === "High") {
+    return "bg-orange-500 text-white";
+  }
+
+  if (level === "Medium") {
+    return "bg-yellow-500 text-slate-950";
+  }
+
+  return "bg-emerald-500 text-slate-950";
+}
+
+function barClass(level: ShipmentPrediction["riskLevel"]) {
+  if (level === "Critical") {
+    return "bg-red-600";
+  }
+
+  if (level === "High") {
+    return "bg-orange-500";
+  }
+
+  if (level === "Medium") {
+    return "bg-yellow-500";
+  }
+
+  return "bg-emerald-500";
+}
+
 function generateShipmentPredictions(
   orders: RecordType[],
   productionLogs: RecordType[],
@@ -42,7 +83,10 @@ function generateShipmentPredictions(
 ): ShipmentPrediction[] {
   const productionLoss = productionLogs.reduce(
     (sum, item) =>
-      sum + numberValue(item.lossAmount || item.delayCost || item.productionLoss),
+      sum +
+      numberValue(
+        item.lossAmount || item.delayCost || item.productionLoss
+      ),
     0
   );
 
@@ -54,13 +98,18 @@ function generateShipmentPredictions(
 
   const wastageLoss = wastageLogs.reduce(
     (sum, item) =>
-      sum + numberValue(item.wastageCost || item.lossAmount || item.materialLoss),
+      sum +
+      numberValue(
+        item.wastageCost || item.lossAmount || item.materialLoss
+      ),
     0
   );
 
   const baseRisk = Math.min(
     100,
-    Math.round(productionLoss / 1500 + downtimeHours * 3 + wastageLoss / 2500)
+    Math.round(
+      productionLoss / 1500 + downtimeHours * 3 + wastageLoss / 2500
+    )
   );
 
   const sourceOrders =
@@ -77,8 +126,12 @@ function generateShipmentPredictions(
 
   return sourceOrders
     .map((order, index) => {
-      const orderQty = numberValue(order.orderQty || order.quantity || order.qty);
+      const orderQty = numberValue(
+        order.orderQty || order.quantity || order.qty
+      );
+
       const quantityRisk = orderQty > 50000 ? 15 : orderQty > 20000 ? 8 : 3;
+
       const score = Math.min(100, baseRisk + quantityRisk + index * 2);
 
       return {
@@ -88,17 +141,22 @@ function generateShipmentPredictions(
           order.poNumber ||
           order.id ||
           `Order ${index + 1}`,
+
         buyer:
           order.buyerName ||
           order.buyer ||
           order.customerName ||
           "Buyer not specified",
+
         delayProbability: score,
+
         riskLevel: riskLevel(score),
+
         riskReason:
           score >= 60
             ? "Production loss, machine downtime, wastage, or order volume may affect shipment readiness."
             : "Shipment risk is currently manageable based on available operational data.",
+
         expectedImpact:
           score >= 80
             ? "Possible missed shipment date, buyer escalation, air freight cost, or margin damage."
@@ -107,6 +165,7 @@ function generateShipmentPredictions(
             : score >= 40
             ? "Moderate monitoring required to avoid late-stage shipment pressure."
             : "No immediate shipment danger detected.",
+
         recoveryAction:
           score >= 80
             ? "Immediate executive review, daily production recovery plan, material readiness check, and buyer communication."
@@ -131,53 +190,33 @@ export default function ShipmentDelayPredictionPage() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const safeFetch = async (fn: () => Promise<any>) => {
+        const safeFetch = async (
+          fn: () => Promise<any>
+        ): Promise<RecordType[]> => {
           try {
-            return await Promise.race([
+            const result = await Promise.race([
               fn(),
               new Promise((resolve) => setTimeout(() => resolve([]), 3000)),
             ]);
+
+            return Array.isArray(result) ? (result as RecordType[]) : [];
           } catch {
             return [];
           }
         };
 
-        const buyerOrders = Array.isArray(
-  await safeFetch(() => getBuyerOrderEntries("demo-factory"))
-)
-  ? ((await safeFetch(() =>
-      getBuyerOrderEntries("demo-factory")
-    )) as RecordType[])
-  : [];
+        const [buyerOrders, production, maintenance, wastage] =
+          await Promise.all([
+            safeFetch(() => getBuyerOrderEntries("demo-factory")),
+            safeFetch(() => getProductionLogs("demo-factory")),
+            safeFetch(() => getMaintenanceLogs("demo-factory")),
+            safeFetch(() => getWastageLogs("demo-factory")),
+          ]);
 
-const production = Array.isArray(
-  await safeFetch(() => getProductionLogs("demo-factory"))
-)
-  ? ((await safeFetch(() =>
-      getProductionLogs("demo-factory")
-    )) as RecordType[])
-  : [];
-
-const maintenance = Array.isArray(
-  await safeFetch(() => getMaintenanceLogs("demo-factory"))
-)
-  ? ((await safeFetch(() =>
-      getMaintenanceLogs("demo-factory")
-    )) as RecordType[])
-  : [];
-
-const wastage = Array.isArray(
-  await safeFetch(() => getWastageLogs("demo-factory"))
-)
-  ? ((await safeFetch(() =>
-      getWastageLogs("demo-factory")
-    )) as RecordType[])
-  : [];
-
-        setOrders(buyerOrders || []);
-        setProductionLogs(production || []);
-        setMaintenanceLogs(maintenance || []);
-        setWastageLogs(wastage || []);
+        setOrders(buyerOrders);
+        setProductionLogs(production);
+        setMaintenanceLogs(maintenance);
+        setWastageLogs(wastage);
       } catch (error) {
         console.error("Shipment delay prediction loading error:", error);
       } finally {
@@ -209,139 +248,217 @@ const wastage = Array.isArray(
 
   const topRisk = predictions[0];
 
+  const intelligenceCards = [
+    {
+      title: "Highest Delay Risk",
+      value: topRisk?.orderRef || "N/A",
+      description: `Probability: ${topRisk?.delayProbability || 0}%`,
+      target: topRisk?.orderRef || "shipment-delay-details",
+      className: "border-red-700 bg-red-950/50 text-red-200",
+    },
+    {
+      title: "Critical Delay Risks",
+      value: criticalCount.toString(),
+      description: "Orders requiring immediate executive attention.",
+      target: "Shipment Delay Details",
+      className: "border-orange-700 bg-orange-950/50 text-orange-200",
+    },
+    {
+      title: "High Delay Risks",
+      value: highCount.toString(),
+      description: "Orders requiring factory director follow-up.",
+      target: "Executive Recovery Intelligence",
+      className: "border-slate-700 bg-slate-900 text-slate-300",
+    },
+  ];
+
   return (
     <DashboardShell title="AI Shipment Delay Prediction">
-      <main className="min-h-screen bg-slate-950 text-white p-6">
-        <div className="max-w-7xl mx-auto space-y-6">
-          <section>
-            <p className="text-sm text-slate-400">
+      <main className="min-h-screen bg-slate-950 p-6 text-white">
+        <div className="mx-auto max-w-7xl space-y-8">
+          <section className="rounded-3xl border border-white/10 bg-slate-900/70 p-8 shadow-2xl">
+            <p className="text-sm font-semibold uppercase tracking-[0.25em] text-red-300">
               MBNCON AI Export Manufacturing Intelligence
             </p>
 
-            <h1 className="text-4xl font-bold mt-2">
+            <h1 className="mt-3 text-4xl font-extrabold md:text-5xl">
               AI Shipment Delay Prediction Engine
             </h1>
 
-            <p className="text-slate-300 mt-4 max-w-4xl">
+            <p className="mt-5 max-w-4xl text-lg leading-8 text-slate-300">
               This module predicts shipment delay risk using buyer orders,
-              production loss, machine downtime, wastage, and operational pressure.
+              production loss, machine downtime, wastage, and operational
+              pressure.
             </p>
           </section>
 
           {loading ? (
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-              Loading shipment delay prediction intelligence...
-            </div>
+            <section className="rounded-3xl border border-slate-800 bg-slate-900 p-8 shadow-md">
+              <p className="text-lg font-semibold text-slate-200">
+                Loading shipment delay prediction intelligence...
+              </p>
+
+              <p className="mt-3 text-sm text-slate-400">
+                Enterprise-safe Firestore loading is active with timeout
+                protection.
+              </p>
+            </section>
           ) : (
             <>
-              <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-red-950 border border-red-700 rounded-2xl p-5">
-                  <p className="text-red-300 text-sm">Highest Delay Risk</p>
-                  <h2 className="text-2xl font-bold mt-2">
-                    {topRisk?.orderRef || "N/A"}
-                  </h2>
-                  <p className="text-red-200 mt-3">
-                    Probability: {topRisk?.delayProbability || 0}%
-                  </p>
-                </div>
+              <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                {intelligenceCards.map((card) => {
+                  const targetId = slugify(card.target);
 
-                <div className="bg-orange-950 border border-orange-700 rounded-2xl p-5">
-                  <p className="text-orange-300 text-sm">Critical Delay Risks</p>
-                  <h2 className="text-3xl font-bold mt-2">{criticalCount}</h2>
-                  <p className="text-orange-200 mt-3">
-                    Orders requiring immediate executive attention.
-                  </p>
-                </div>
+                  return (
+                    <a
+                      key={card.title}
+                      href={`#${targetId}`}
+                      className={`rounded-2xl border p-5 shadow-md transition duration-300 hover:-translate-y-1 hover:border-white/30 hover:shadow-xl ${card.className}`}
+                    >
+                      <p className="text-sm opacity-80">{card.title}</p>
 
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-                  <p className="text-slate-400 text-sm">High Delay Risks</p>
-                  <h2 className="text-3xl font-bold mt-2">{highCount}</h2>
-                  <p className="text-slate-300 mt-3">
-                    Orders requiring factory director follow-up.
-                  </p>
-                </div>
-              </section>
+                      <h2 className="mt-2 text-3xl font-bold">
+                        {card.value}
+                      </h2>
 
-              <section className="grid grid-cols-1 gap-5">
-                {predictions.map((item) => (
-                  <div
-                    key={item.orderRef}
-                    className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4"
-                  >
-                    <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-                      <div>
-                        <p className="text-slate-400 text-sm">{item.buyer}</p>
-                        <h2 className="text-2xl font-bold mt-1">
-                          {item.orderRef}
-                        </h2>
-                      </div>
-
-                      <span
-                        className={
-                          item.riskLevel === "Critical"
-                            ? "px-4 py-2 rounded-full bg-red-600 text-white text-sm font-semibold"
-                            : item.riskLevel === "High"
-                            ? "px-4 py-2 rounded-full bg-orange-500 text-white text-sm font-semibold"
-                            : item.riskLevel === "Medium"
-                            ? "px-4 py-2 rounded-full bg-yellow-500 text-slate-950 text-sm font-semibold"
-                            : "px-4 py-2 rounded-full bg-emerald-500 text-slate-950 text-sm font-semibold"
-                        }
-                      >
-                        {item.riskLevel}
-                      </span>
-                    </div>
-
-                    <div>
-                      <p className="text-slate-400 text-sm">
-                        Delay Probability: {item.delayProbability}%
+                      <p className="mt-3 text-sm opacity-90">
+                        {card.description}
                       </p>
 
-                      <div className="w-full bg-slate-800 rounded-full h-4 mt-2 overflow-hidden">
-                        <div
-                          className={
-                            item.riskLevel === "Critical"
-                              ? "bg-red-600 h-4"
-                              : item.riskLevel === "High"
-                              ? "bg-orange-500 h-4"
-                              : item.riskLevel === "Medium"
-                              ? "bg-yellow-500 h-4"
-                              : "bg-emerald-500 h-4"
-                          }
-                          style={{ width: `${item.delayProbability}%` }}
-                        />
+                      <p className="mt-5 text-xs font-semibold opacity-70">
+                        View intelligence →
+                      </p>
+                    </a>
+                  );
+                })}
+              </section>
+
+              <section
+                id={slugify("Shipment Delay Details")}
+                className="scroll-mt-28 space-y-5"
+              >
+                {predictions.map((item) => {
+                  const itemId = slugify(item.orderRef);
+
+                  return (
+                    <section
+                      key={item.orderRef}
+                      id={itemId}
+                      className="scroll-mt-28 space-y-5 rounded-3xl border border-slate-800 bg-slate-900 p-6 shadow-md transition duration-300 hover:border-slate-700 hover:shadow-xl"
+                    >
+                      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                        <div>
+                          <p className="text-sm text-slate-400">
+                            {item.buyer}
+                          </p>
+
+                          <h2 className="mt-1 text-3xl font-bold">
+                            {item.orderRef}
+                          </h2>
+                        </div>
+
+                        <span
+                          className={`rounded-full px-4 py-2 text-sm font-semibold ${badgeClass(
+                            item.riskLevel
+                          )}`}
+                        >
+                          {item.riskLevel}
+                        </span>
                       </div>
+
+                      <div>
+                        <p className="text-sm text-slate-400">
+                          Delay Probability: {item.delayProbability}%
+                        </p>
+
+                        <div className="mt-2 h-4 w-full overflow-hidden rounded-full bg-slate-800">
+                          <div
+                            className={`h-4 transition-all duration-500 ${barClass(
+                              item.riskLevel
+                            )}`}
+                            style={{
+                              width: `${item.delayProbability}%`,
+                            }}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                        <div className="rounded-xl border border-slate-800 bg-slate-950 p-4 transition duration-300 hover:-translate-y-1 hover:border-red-500/50 hover:shadow-lg">
+                          <h3 className="font-semibold text-red-300">
+                            Risk Reason
+                          </h3>
+
+                          <p className="mt-2 text-sm leading-6 text-slate-300">
+                            {item.riskReason}
+                          </p>
+                        </div>
+
+                        <div className="rounded-xl border border-slate-800 bg-slate-950 p-4 transition duration-300 hover:-translate-y-1 hover:border-orange-500/50 hover:shadow-lg">
+                          <h3 className="font-semibold text-orange-300">
+                            Expected Impact
+                          </h3>
+
+                          <p className="mt-2 text-sm leading-6 text-slate-300">
+                            {item.expectedImpact}
+                          </p>
+                        </div>
+
+                        <div className="rounded-xl border border-slate-800 bg-slate-950 p-4 transition duration-300 hover:-translate-y-1 hover:border-sky-500/50 hover:shadow-lg">
+                          <h3 className="font-semibold text-sky-300">
+                            Recovery Action
+                          </h3>
+
+                          <p className="mt-2 text-sm leading-6 text-slate-300">
+                            {item.recoveryAction}
+                          </p>
+                        </div>
+                      </div>
+                    </section>
+                  );
+                })}
+              </section>
+
+              <section
+                id={slugify("Executive Recovery Intelligence")}
+                className="scroll-mt-28 rounded-3xl border border-emerald-500/30 bg-emerald-950/30 p-8 shadow-md transition duration-300 hover:border-emerald-400/50 hover:shadow-xl"
+              >
+                <p className="text-sm font-semibold uppercase tracking-[0.25em] text-emerald-300">
+                  Executive Recovery Intelligence
+                </p>
+
+                <h2 className="mt-3 text-3xl font-extrabold text-white">
+                  Shipment Protection & Recovery Layer
+                </h2>
+
+                <p className="mt-5 max-w-5xl text-lg leading-8 text-emerald-100">
+                  MBNCON shipment prediction intelligence helps directors
+                  identify high-risk export orders, escalate operational
+                  bottlenecks, protect buyer confidence, reduce air shipment
+                  exposure, and improve shipment recovery planning before delays
+                  become critical.
+                </p>
+
+                <div className="mt-8 grid gap-5 md:grid-cols-3">
+                  {[
+                    "Early shipment risk visibility",
+                    "Executive recovery escalation",
+                    "Buyer commitment protection",
+                  ].map((item) => (
+                    <div
+                      key={item}
+                      className="rounded-2xl border border-emerald-500/20 bg-slate-950/60 p-5 transition duration-300 hover:-translate-y-1 hover:border-emerald-400/50 hover:shadow-lg"
+                    >
+                      <p className="font-semibold text-white">{item}</p>
+
+                      <p className="mt-3 text-sm leading-6 text-emerald-100">
+                        Consultancy-demo executive UX prepared for export
+                        manufacturing intelligence and shipment recovery
+                        control.
+                      </p>
                     </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="bg-slate-950 border border-slate-800 rounded-xl p-4">
-                        <h3 className="text-red-300 font-semibold">
-                          Risk Reason
-                        </h3>
-                        <p className="text-slate-300 text-sm mt-2">
-                          {item.riskReason}
-                        </p>
-                      </div>
-
-                      <div className="bg-slate-950 border border-slate-800 rounded-xl p-4">
-                        <h3 className="text-amber-300 font-semibold">
-                          Expected Impact
-                        </h3>
-                        <p className="text-slate-300 text-sm mt-2">
-                          {item.expectedImpact}
-                        </p>
-                      </div>
-
-                      <div className="bg-slate-950 border border-slate-800 rounded-xl p-4">
-                        <h3 className="text-sky-300 font-semibold">
-                          Recovery Action
-                        </h3>
-                        <p className="text-slate-300 text-sm mt-2">
-                          {item.recoveryAction}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </section>
             </>
           )}
