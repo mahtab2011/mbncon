@@ -3,12 +3,11 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title:
-    "MBNCON | Manufacturing Intelligence, Productivity & AI Business Systems",
-
+    "MBNCON | Enterprise Intelligence, Productivity & AI Business Systems",
   description:
-    "MBNCON provides AI-assisted manufacturing intelligence, executive dashboards, operational excellence systems, productivity improvement, Lean manufacturing support, KPI visibility, business analytics, risk analysis, and enterprise transformation consultancy for manufacturing, logistics, retail, hospitality, supply chain, and business operations worldwide.",
-
+    "MBNCON provides enterprise intelligence, manufacturing productivity systems, executive dashboards, operational excellence, leadership development, Industry 4.0 readiness, AI-assisted analytics, Lean, Kaizen, TQM, supply chain intelligence, risk visibility, and business transformation consultancy.",
   keywords: [
+    "enterprise intelligence",
     "manufacturing intelligence",
     "AI manufacturing software",
     "executive dashboard",
@@ -18,156 +17,116 @@ export const metadata: Metadata = {
     "lean manufacturing",
     "kaizen system",
     "TQM manufacturing",
-    "business analytics",
-    "manufacturing consultancy",
-    "factory efficiency improvement",
-    "AI business systems",
+    "leadership development",
+    "skill matrix",
+    "value added productivity",
+    "root cause analysis",
+    "value stream mapping",
     "supply chain intelligence",
     "production planning software",
     "manufacturing KPI dashboard",
     "industrial engineering",
     "risk management intelligence",
     "enterprise productivity",
+    "Industry 4.0",
     "MBNCON",
   ],
-
   openGraph: {
     title:
-      "MBNCON | Manufacturing Intelligence, Productivity & AI Business Systems",
-
+      "MBNCON | Enterprise Intelligence, Productivity & AI Business Systems",
     description:
-      "AI-assisted manufacturing intelligence, executive dashboards, productivity systems, operational excellence, Lean, Kaizen, TQM, analytics, and enterprise transformation consultancy.",
-
+      "Enterprise intelligence platform for productivity, leadership, manufacturing excellence, operational control, Lean, Kaizen, TQM, analytics, and transformation readiness.",
     url: "https://www.mbncon.com",
-
     siteName: "MBNCON",
-
     locale: "en_GB",
-
     type: "website",
   },
-
   robots: {
     index: true,
     follow: true,
   },
 };
 
-type SoftwareCard = {
+type GatewayCard = {
   title: string;
+  description: string;
   href: string;
   style: string;
 };
 
-function slugify(value: string) {
-  return value
-    .toLowerCase()
-    .trim()
-    .replace(/&/g, "and")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
-
-const softwareCards: SoftwareCard[] = [
+const gatewayCards: GatewayCard[] = [
   {
-    title: "Manufacturing Productivity System",
-    href: "/software",
-    style: "border-red-300 bg-red-100 text-red-950",
-  },
-  {
-    title: "Warehouse Productivity System",
-    href: "/software",
-    style: "border-orange-300 bg-orange-100 text-orange-950",
-  },
-  {
-    title: "Supply Chain Visibility System",
-    href: "/software",
+    title: "Executive Intelligence & Enterprise Control",
+    description:
+      "Executive dashboards, reports, factory health, command centres, management review and strategic control.",
+    href: "/software#executive-intelligence-and-enterprise-control",
     style: "border-blue-300 bg-blue-100 text-blue-950",
   },
   {
-    title: "Value-Added Productivity System",
-    href: "/software",
+    title: "Leadership, Human Performance & Skill Development",
+    description:
+      "Leadership, Inner Game of Tennis, Inner Game of Management, skill matrix, adaptive leadership and empowerment intelligence.",
+    href: "/software#leadership-human-performance-and-skill-development",
     style: "border-emerald-300 bg-emerald-100 text-emerald-950",
   },
   {
-    title: "Retail Productivity & Teamwork System",
-    href: "/software",
+    title: "Productivity Improvement & Operational Excellence",
+    description:
+      "Root cause analysis, value stream mapping, bottleneck identification, OEE, Kaizen, Lean and value-added productivity.",
+    href: "/software#productivity-improvement-and-operational-excellence",
+    style: "border-yellow-300 bg-yellow-100 text-yellow-950",
+  },
+  {
+    title: "Production, Maintenance & Factory Operations",
+    description:
+      "Production planning, forecasting, machine utilisation, downtime, maintenance and factory loss intelligence.",
+    href: "/software#production-maintenance-and-factory-operations",
+    style: "border-red-300 bg-red-100 text-red-950",
+  },
+  {
+    title: "Quality, TQM, Compliance & Business Excellence",
+    description:
+      "Quality control, TQM, compliance, rework reduction, raw material quality and business excellence maturity.",
+    href: "/software#quality-tqm-compliance-and-business-excellence",
+    style: "border-purple-300 bg-purple-100 text-purple-950",
+  },
+  {
+    title: "Supply Chain, Logistics, Inventory & Materials",
+    description:
+      "Supplier performance, shipment, warehouse, transport, inventory, components and material visibility.",
+    href: "/software#supply-chain-logistics-inventory-and-materials",
+    style: "border-orange-300 bg-orange-100 text-orange-950",
+  },
+  {
+    title: "Buyer, Commercial & Profitability Intelligence",
+    description:
+      "Buyer risk, order profitability, profit leakage, cashflow, merchandising and commercial decision visibility.",
+    href: "/software#buyer-commercial-and-profitability-intelligence",
     style: "border-pink-300 bg-pink-100 text-pink-950",
   },
   {
-    title: "Restaurant Kitchen Operations System",
-    href: "/software",
-    style: "border-amber-300 bg-amber-100 text-amber-950",
+    title: "Risk, Recovery, Alerts & Transformation",
+    description:
+      "Risk escalation, shipment recovery, cashflow risk, change management and digital transformation readiness.",
+    href: "/software#risk-recovery-alerts-and-transformation",
+    style: "border-slate-300 bg-slate-100 text-slate-950",
   },
   {
-    title: "Staff Planning & Deployment System",
-    href: "/software",
-    style: "border-violet-300 bg-violet-100 text-violet-950",
-  },
-  {
-    title: "Banking & Insurance Productivity System",
-    href: "/software",
+    title: "Energy, Sustainability, Governance & Security",
+    description:
+      "ESG, utilities, energy optimisation, cost reduction, evidence control, access control and governance.",
+    href: "/software#energy-sustainability-governance-and-security",
     style: "border-teal-300 bg-teal-100 text-teal-950",
-  },
-  {
-    title: "Corporate Office Productivity System",
-    href: "/software",
-    style: "border-sky-300 bg-sky-100 text-sky-950",
-  },
-  {
-    title: "Store Management & Shelf Productivity System",
-    href: "/software",
-    style: "border-lime-300 bg-lime-100 text-lime-950",
-  },
-  {
-    title: "Small Business Accounting & Cash Point System",
-    href: "/software",
-    style: "border-green-300 bg-green-100 text-green-950",
-  },
-  {
-    title: "AI Sales Productivity System",
-    href: "/software",
-    style: "border-rose-300 bg-rose-100 text-rose-950",
-  },
-  {
-    title: "Marketing Productivity & Campaign System",
-    href: "/software",
-    style: "border-fuchsia-300 bg-fuchsia-100 text-fuchsia-950",
-  },
-  {
-    title: "Butcher Shop Operations & Cost Control System",
-    href: "/software",
-    style: "border-stone-300 bg-stone-100 text-stone-950",
-  },
-  {
-    title: "Excel, Tableau & AI Dashboard System",
-    href: "/software",
-    style: "border-indigo-300 bg-indigo-100 text-indigo-950",
   },
 ];
 
-const platformHighlights = [
-  {
-    title: "AI Manufacturing Intelligence",
-    description:
-      "Executive dashboards, productivity intelligence, risk analysis, forecasting, and operational visibility.",
-    className:
-      "border-yellow-300/30 bg-yellow-300/10 text-yellow-200",
-  },
-  {
-    title: "Consultancy & Transformation",
-    description:
-      "Lean systems, Kaizen, TQM, operational excellence, cost reduction, and workflow improvement support.",
-    className:
-      "border-cyan-300/30 bg-cyan-300/10 text-cyan-200",
-  },
-  {
-    title: "Enterprise Productivity Systems",
-    description:
-      "Practical software environments for manufacturing, logistics, hospitality, retail, and office operations.",
-    className:
-      "border-emerald-300/30 bg-emerald-300/10 text-emerald-200",
-  },
+const highlights = [
+  "Industry 4.0 readiness",
+  "AI-assisted enterprise intelligence",
+  "Leadership and skill development",
+  "Operational excellence systems",
+  "Productivity and cost control",
+  "Risk, quality and supply chain visibility",
 ];
 
 export default function HomePage() {
@@ -175,167 +134,150 @@ export default function HomePage() {
     <main className="min-h-screen bg-white text-neutral-900">
       <div id="top" />
 
-      <section className="bg-emerald-500 px-4 py-3 text-center text-sm font-semibold text-white sm:text-base">
+      <section className="bg-emerald-600 px-4 py-3 text-center text-sm font-semibold text-white sm:text-base">
         We aim to deliver a minimum{" "}
-        <span className="text-lg font-extrabold text-yellow-300">
-          20%
-        </span>{" "}
+        <span className="text-lg font-extrabold text-yellow-300">20%</span>{" "}
         efficiency improvement within three to six months, subject to agreed
         scope and measurable baseline.
       </section>
 
-      <section className="bg-blue-900 px-6 py-20 text-white">
-        <div className="mx-auto max-w-6xl">
+      <section className="bg-blue-950 px-6 py-20 text-white">
+        <div className="mx-auto max-w-7xl">
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-cyan-300">
-            MBNCON Enterprise Intelligence
+            MBNCON Enterprise Intelligence Platform
           </p>
 
-          <h1 className="mt-4 text-5xl font-extrabold leading-tight text-blue-100">
-            MBN Consulting
+          <h1 className="mt-5 max-w-6xl text-4xl font-extrabold leading-tight text-blue-100 sm:text-5xl lg:text-6xl">
+            Enterprise Intelligence for Productivity, Leadership, Operational
+            Excellence and AI-Era Transformation
           </h1>
 
-          <p className="mt-6 max-w-4xl text-xl leading-9 text-white/90">
-            Operational Excellence, Business Systems, Productivity
-            Improvement, and AI-Guided Transformation for Manufacturing,
-            Hospitality, Logistics, Retail, Banking, Insurance, Corporate
-            Offices, and Supply Chain Operations.
+          <p className="mt-6 max-w-5xl text-lg leading-9 text-white/90 sm:text-xl">
+            MBNCON helps organisations improve visibility, productivity,
+            leadership capability, operational control, quality, profitability,
+            supply chain coordination, risk recovery and enterprise
+            transformation in the Fourth Industrial Revolution and AI evolution
+            era.
           </p>
 
           <div className="mt-10 flex flex-wrap gap-4">
             <Link
               href="/software"
-              className="rounded-2xl bg-white px-6 py-4 font-semibold text-blue-900 shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-xl"
+              className="rounded-2xl bg-white px-6 py-4 font-semibold text-blue-950 shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-xl"
             >
-              Request Consultation
+              Explore Enterprise Platform
             </Link>
 
             <Link
-              href="/software"
+              href="/software#module-explorer"
               className="rounded-2xl border border-white px-6 py-4 font-semibold text-white transition duration-300 hover:-translate-y-1 hover:bg-white/10 hover:shadow-xl"
             >
-              Explore Services
+              View Module Groups
+            </Link>
+
+            <Link
+              href="#contact"
+              className="rounded-2xl border border-cyan-300 px-6 py-4 font-semibold text-cyan-100 transition duration-300 hover:-translate-y-1 hover:bg-cyan-300/10 hover:shadow-xl"
+            >
+              Contact MBN Consulting
             </Link>
           </div>
 
-          <div className="mt-10 grid gap-4 md:grid-cols-3">
-            {platformHighlights.map((item) => (
+          <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {highlights.map((item) => (
               <section
-                key={item.title}
-                className={`rounded-2xl border p-5 transition duration-300 hover:-translate-y-1 hover:shadow-xl ${item.className}`}
+                key={item}
+                className="rounded-2xl border border-white/10 bg-white/10 p-5 shadow-md transition duration-300 hover:-translate-y-1 hover:border-cyan-300/40 hover:shadow-xl"
               >
-                <h3 className="text-xl font-bold">{item.title}</h3>
-
-                <p className="mt-3 text-sm leading-7 text-white/90">
-                  {item.description}
-                </p>
+                <p className="font-semibold text-cyan-100">{item}</p>
               </section>
             ))}
           </div>
         </div>
       </section>
 
-      <section
-        id={slugify("Practical Business Transformation")}
-        className="scroll-mt-28 px-6 py-16"
-      >
-        <div className="mx-auto max-w-6xl">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-violet-700">
-            Business Transformation
+      <section className="px-6 py-16">
+        <div className="mx-auto max-w-7xl">
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-cyan-700">
+            Why We Built This Platform
           </p>
 
-          <h2 className="mt-4 text-4xl font-extrabold text-violet-900">
-            Practical Business Transformation
+          <h2 className="mt-4 max-w-5xl text-4xl font-extrabold leading-tight text-slate-950">
+            Enterprise Readiness for the Fourth Industrial Revolution and AI
+            Evolution
           </h2>
 
-          <p className="mt-6 max-w-4xl text-lg font-medium leading-8 text-violet-800">
-            We help businesses improve operational efficiency,
-            productivity, workflow, reporting visibility, and business
-            performance through practical systems, analytics, and AI-guided
-            operational improvements.
-          </p>
+          <div className="mt-6 max-w-6xl space-y-5 text-lg leading-8 text-slate-700">
+            <p>
+              Modern organisations face increasing pressure from cost,
+              productivity, quality, speed, supply chain disruption, workforce
+              capability, sustainability, compliance and decision visibility.
+              Traditional reporting is often too slow, too fragmented and too
+              dependent on isolated departmental judgement.
+            </p>
 
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
-            <Link
-              href="/software/executive-dashboard"
-              className="rounded-2xl border border-red-300 bg-red-200 p-6 shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-2xl"
-            >
-              <h3 className="text-2xl font-bold text-red-950">
-                Manufacturing Excellence
-              </h3>
+            <p>
+              MBNCON Enterprise Intelligence Platform was built to connect
+              leadership, productivity improvement, operational excellence,
+              workforce development, manufacturing control, quality, logistics,
+              finance, governance and sustainability into one structured
+              intelligence ecosystem.
+            </p>
 
-              <p className="mt-4 leading-7 text-red-950">
-                Productivity improvement, bottleneck reduction, workflow
-                optimization, reporting systems, and operational efficiency.
+            <p>
+              The platform supports earlier decisions, clearer accountability,
+              stronger learning culture, better operational discipline and
+              continuous improvement through practical enterprise systems
+              designed for real business environments.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-slate-950 px-6 py-16 text-white">
+        <div className="mx-auto max-w-7xl">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-cyan-300">
+                Enterprise Module Gateway
               </p>
 
-              <p className="mt-5 text-sm font-bold text-red-900">
-                Open Manufacturing Dashboard →
-              </p>
-            </Link>
+              <h2 className="mt-4 text-4xl font-extrabold text-white">
+                Explore MBNCON by Business Outcome
+              </h2>
 
-            <Link
-              href="/software/executive-analytics-dashboard"
-              className="rounded-2xl border border-slate-300 bg-slate-200 p-6 shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-2xl"
-            >
-              <h3 className="text-2xl font-bold text-slate-950">
-                Business Analytics
-              </h3>
-
-              <p className="mt-4 leading-7 text-slate-900">
-                Data analysis using Excel, Tableau, operational dashboards,
-                KPI systems, and business reporting.
+              <p className="mt-5 max-w-4xl text-lg leading-8 text-slate-300">
+                The full platform contains 100+ grouped modules. The homepage
+                shows simple business outcome groups, while the full enterprise
+                control centre provides detailed access to nested modules.
               </p>
-
-              <p className="mt-5 text-sm font-bold text-slate-950">
-                Open Analytics Dashboard →
-              </p>
-            </Link>
+            </div>
 
             <Link
               href="/software"
-              className="rounded-2xl border border-purple-300 bg-purple-100 p-6 shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-2xl"
+              className="rounded-2xl bg-cyan-300 px-6 py-4 font-bold text-slate-950 shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-xl"
             >
-              <h3 className="text-2xl font-bold text-purple-950">
-                AI-Guided Systems
-              </h3>
-
-              <p className="mt-4 leading-7 text-purple-950">
-                Practical AI-assisted operational systems for SMEs,
-                logistics, hospitality, retail, and office environments.
-              </p>
-
-              <p className="mt-5 text-sm font-bold text-purple-900">
-                Open Enterprise Platform →
-              </p>
+              Open Full Control Centre →
             </Link>
           </div>
 
-          <p className="mt-12 max-w-5xl text-lg font-medium leading-8 text-violet-800">
-            We design practical productivity software and business systems
-            for international customers who want measurable improvement in
-            efficiency, teamwork, visibility, service quality, cost
-            control, revenue growth, stock control, kitchen operations,
-            cash point reporting, and value-added performance.
-          </p>
-
-          <div className="mt-10 grid gap-6 md:grid-cols-3">
-            {softwareCards.map((item) => (
+          <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {gatewayCards.map((card) => (
               <Link
-                key={item.title}
-                href={item.href}
-                className={`min-h-[240px] rounded-2xl border p-6 shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-xl ${item.style}`}
+                key={card.title}
+                href={card.href}
+                className={`min-h-[250px] rounded-3xl border p-6 shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-2xl ${card.style}`}
               >
-                <h3 className="text-xl font-extrabold leading-snug">
-                  {item.title}
+                <h3 className="text-2xl font-extrabold leading-snug">
+                  {card.title}
                 </h3>
 
                 <p className="mt-4 text-base leading-7">
-                  Click to explore our enterprise software environment and
-                  guided productivity systems.
+                  {card.description}
                 </p>
 
                 <p className="mt-6 text-sm font-bold opacity-80">
-                  Explore platform →
+                  Explore group →
                 </p>
               </Link>
             ))}
@@ -343,9 +285,78 @@ export default function HomePage() {
         </div>
       </section>
 
+      <section className="px-6 py-16">
+        <div className="mx-auto max-w-7xl rounded-3xl border border-slate-300 bg-slate-100 p-8 shadow-sm transition duration-300 hover:shadow-xl sm:p-10">
+          <p className="text-sm font-bold uppercase tracking-widest text-violet-700">
+            Practical Business Transformation
+          </p>
+
+          <h2 className="mt-4 max-w-5xl text-4xl font-black text-slate-950">
+            From Data Visibility to Management Discipline and Measurable
+            Improvement
+          </h2>
+
+          <div className="mt-8 grid gap-6 md:grid-cols-3">
+            <Link
+              href="/software#productivity-improvement-and-operational-excellence"
+              className="rounded-2xl border border-red-300 bg-red-100 p-6 shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-2xl"
+            >
+              <h3 className="text-2xl font-bold text-red-950">
+                Productivity Improvement
+              </h3>
+
+              <p className="mt-4 leading-7 text-red-950">
+                Value-added work, bottleneck control, root cause analysis, Lean,
+                Kaizen, OEE and operational flow improvement.
+              </p>
+
+              <p className="mt-5 text-sm font-bold text-red-900">
+                Explore productivity modules →
+              </p>
+            </Link>
+
+            <Link
+              href="/software#leadership-human-performance-and-skill-development"
+              className="rounded-2xl border border-emerald-300 bg-emerald-100 p-6 shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-2xl"
+            >
+              <h3 className="text-2xl font-bold text-emerald-950">
+                Leadership & Skills
+              </h3>
+
+              <p className="mt-4 leading-7 text-emerald-950">
+                Adaptive leadership, Inner Game thinking, skill matrix,
+                empowerment, coaching and management capability.
+              </p>
+
+              <p className="mt-5 text-sm font-bold text-emerald-900">
+                Explore leadership modules →
+              </p>
+            </Link>
+
+            <Link
+              href="/software#executive-intelligence-and-enterprise-control"
+              className="rounded-2xl border border-blue-300 bg-blue-100 p-6 shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-2xl"
+            >
+              <h3 className="text-2xl font-bold text-blue-950">
+                Executive Intelligence
+              </h3>
+
+              <p className="mt-4 leading-7 text-blue-950">
+                Dashboards, reports, control centres, factory health, risk
+                visibility and enterprise decision support.
+              </p>
+
+              <p className="mt-5 text-sm font-bold text-blue-900">
+                Explore executive modules →
+              </p>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       <section
-        id={slugify("Contact MBN Consulting")}
-        className="mx-auto mt-20 scroll-mt-28 max-w-7xl rounded-3xl border border-slate-300 bg-slate-100 p-10 shadow-sm transition duration-300 hover:shadow-xl"
+        id="contact"
+        className="mx-auto mb-16 mt-4 scroll-mt-28 max-w-7xl rounded-3xl border border-slate-300 bg-white p-8 shadow-sm transition duration-300 hover:shadow-xl sm:p-10"
       >
         <p className="text-sm font-bold uppercase tracking-widest text-cyan-700">
           Contact MBN Consulting
@@ -356,14 +367,14 @@ export default function HomePage() {
         </h2>
 
         <p className="mt-6 max-w-4xl text-lg leading-8 text-slate-700">
-          MBN Consulting supports manufacturing, logistics, hospitality,
-          retail, and operational businesses with productivity systems,
-          business analytics, workflow optimization, AI-guided operational
-          intelligence, and practical improvement consultancy.
+          MBN Consulting supports manufacturing, logistics, hospitality, retail,
+          corporate and operational businesses with productivity systems,
+          business analytics, workflow optimisation, enterprise intelligence and
+          practical improvement consultancy.
         </p>
 
         <div className="mt-10 grid gap-6 md:grid-cols-2">
-          <section className="rounded-2xl border border-slate-300 bg-white p-6 transition duration-300 hover:-translate-y-1 hover:shadow-lg">
+          <section className="rounded-2xl border border-slate-300 bg-slate-50 p-6 transition duration-300 hover:-translate-y-1 hover:shadow-lg">
             <h3 className="text-xl font-bold text-slate-950">
               United Kingdom
             </h3>
@@ -379,7 +390,7 @@ export default function HomePage() {
             </p>
           </section>
 
-          <section className="rounded-2xl border border-slate-300 bg-white p-6 transition duration-300 hover:-translate-y-1 hover:shadow-lg">
+          <section className="rounded-2xl border border-slate-300 bg-slate-50 p-6 transition duration-300 hover:-translate-y-1 hover:shadow-lg">
             <h3 className="text-xl font-bold text-slate-950">
               Contact Details
             </h3>
@@ -397,7 +408,7 @@ export default function HomePage() {
               <br />
               +44 7454 586658
               <br />
-              +880 1743 0055423 (Bangladesh)
+              +880 1743 0055423
             </p>
           </section>
         </div>
