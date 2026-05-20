@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Navbar from "@/components/software/Navbar";
 
 export const metadata: Metadata = {
   title:
@@ -132,6 +133,7 @@ const highlights = [
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-white text-neutral-900">
+      <Navbar />
       <div id="top" />
 
       <section className="bg-emerald-600 px-4 py-3 text-center text-sm font-semibold text-white sm:text-base">
@@ -266,7 +268,7 @@ export default function HomePage() {
               <Link
                 key={card.title}
                 href={card.href}
-                className={`min-h-[250px] rounded-3xl border p-6 shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-2xl ${card.style}`}
+                className={`min-h-63 rounded-3xl border p-6 shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-2xl ${card.style}`}
               >
                 <h3 className="text-2xl font-extrabold leading-snug">
                   {card.title}
