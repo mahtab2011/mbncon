@@ -620,6 +620,21 @@ export default function Sidebar() {
   ),
   href: "/software/ai-workforce-motivation-intelligence",
 },
+{
+  name: label(
+    "Growth Mindset Intelligent Centre",
+    "গ্রোথ মাইন্ডসেট ইন্টেলিজেন্ট সেন্টার"
+  ),
+  href: "/software/growth-mindset-intelligent-centre",
+},
+
+{
+  name: label(
+    "Emotional Resilience Intelligence Centre",
+    "ইমোশনাল রেজিলিয়েন্স ইন্টেলিজেন্স সেন্টার"
+  ),
+  href: "/software/emotional-resilience-intelligence-centre",
+},
 
                 {
           name: label("Leadership Coaching Form", "লিডারশিপ কোচিং ফর্ম"),

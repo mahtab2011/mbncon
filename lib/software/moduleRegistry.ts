@@ -160,7 +160,7 @@ export const moduleRegistry: ModuleItem[] = [
   },
   {
   name: "AI Workforce Motivation Intelligence",
-
+  
   href: "/software/ai-workforce-motivation-intelligence",
 
   category: "Workforce & Leadership Intelligence",
@@ -185,5 +185,34 @@ export const moduleRegistry: ModuleItem[] = [
   featured: true,
 
   recentlyAdded: true,
+},
+{
+  name: "Growth Mindset Intelligent Centre",
+  href: "/software/growth-mindset-intelligent-centre",
+  keywords: [
+    "growth mindset",
+    "learning culture",
+    "adaptive learning",
+    "coaching",
+    "improvement",
+    "mindset",
+    "continuous improvement",
+    "resilience",
+  ],
+},
+
+{
+  name: "Emotional Resilience Intelligence Centre",
+  href: "/software/emotional-resilience-intelligence-centre",
+  keywords: [
+    "emotional resilience",
+    "burnout",
+    "stress",
+    "fatigue",
+    "morale",
+    "leadership resilience",
+    "recovery",
+    "emotional intelligence",
+  ],
 },
 ];
