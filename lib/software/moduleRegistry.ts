@@ -158,4 +158,32 @@ export const moduleRegistry: ModuleItem[] = [
       "management",
     ],
   },
+  {
+  name: "AI Workforce Motivation Intelligence",
+
+  href: "/software/ai-workforce-motivation-intelligence",
+
+  category: "Workforce & Leadership Intelligence",
+
+  description:
+    "Enterprise workforce engagement, behavioural stability, recognition, morale, burnout, and leadership influence intelligence system.",
+
+  keywords: [
+    "motivation",
+    "engagement",
+    "leadership",
+    "burnout",
+    "morale",
+    "recognition",
+    "workforce",
+    "human intelligence",
+    "employee engagement",
+  ],
+
+  riskLevel: "high",
+
+  featured: true,
+
+  recentlyAdded: true,
+},
 ];

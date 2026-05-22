@@ -612,7 +612,15 @@ export default function Sidebar() {
     "ইমোশনাল ইন্টেলিজেন্স ও লিডারশিপ"
   ),
   href: "/software/emotional-intelligence-leadership",
+  },
+  {
+  name: label(
+    "AI Workforce Motivation Intelligence",
+    "এআই ওয়ার্কফোর্স মোটিভেশন ইন্টেলিজেন্স"
+  ),
+  href: "/software/ai-workforce-motivation-intelligence",
 },
+
                 {
           name: label("Leadership Coaching Form", "লিডারশিপ কোচিং ফর্ম"),
           href: "/software/manufacturing-productivity/leadership-coaching-form",
