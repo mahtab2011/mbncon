@@ -225,6 +225,13 @@ export default function Sidebar() {
           href: "/software/manufacturing-productivity/bottleneck-analysis",
         },
         {
+  name: label(
+    "Bottleneck & IE Intelligence",
+    "বটলনেক ও আইই ইন্টেলিজেন্স"
+  ),
+  href: "/software/bottleneck-industrial-engineering-intelligence",
+},
+        {
           name: label("Daily Management System", "ডেইলি ম্যানেজমেন্ট সিস্টেম"),
           href: "/software/manufacturing-productivity/daily-management-system",
         },
@@ -577,8 +584,36 @@ export default function Sidebar() {
         {
           name: label("Leadership Intelligence", "লিডারশিপ ইন্টেলিজেন্স"),
           href: "/software/leadership-intelligence",
-        },
+                },
         {
+  name: label(
+    "Organisational Resilience Intelligence",
+    "অর্গানাইজেশনাল রেজিলিয়েন্স ইন্টেলিজেন্স"
+  ),
+  href: "/software/organisational-resilience-intelligence",
+},
+{
+  name: label(
+    "Resilience Leadership Framework",
+    "রেজিলিয়েন্স লিডারশিপ ফ্রেমওয়ার্ক"
+  ),
+  href: "/software/resilience-leadership-framework",
+},
+{
+  name: label(
+    "Adaptive Recovery Intelligence",
+    "অ্যাডাপটিভ রিকভারি ইন্টেলিজেন্স"
+  ),
+  href: "/software/adaptive-recovery-intelligence",
+},
+{
+  name: label(
+    "Emotional Intelligence & Leadership",
+    "ইমোশনাল ইন্টেলিজেন্স ও লিডারশিপ"
+  ),
+  href: "/software/emotional-intelligence-leadership",
+},
+                {
           name: label("Leadership Coaching Form", "লিডারশিপ কোচিং ফর্ম"),
           href: "/software/manufacturing-productivity/leadership-coaching-form",
         },

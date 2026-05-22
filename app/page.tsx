@@ -334,7 +334,24 @@ export default function HomePage() {
                 Explore leadership modules →
               </p>
             </Link>
+<Link
+  href="/software/organisational-resilience-intelligence"
+  className="rounded-2xl border border-cyan-300 bg-cyan-100 p-6 shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-2xl"
+>
+  <h3 className="text-2xl font-bold text-cyan-950">
+    Organisational Resilience
+  </h3>
 
+  <p className="mt-4 leading-7 text-cyan-950">
+    Organisational resilience, adaptive leadership, crisis readiness,
+    workforce recovery capability, emotional intelligence, learning culture
+    and sustainable transformation readiness.
+  </p>
+
+  <p className="mt-5 text-sm font-bold text-cyan-900">
+    Explore resilience intelligence →
+  </p>
+</Link>
             <Link
               href="/software#executive-intelligence-and-enterprise-control"
               className="rounded-2xl border border-blue-300 bg-blue-100 p-6 shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-2xl"

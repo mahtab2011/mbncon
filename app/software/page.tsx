@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect } from "react";
+import InternalSearch from "@/components/software/InternalSearch";
 
 type ModuleLink = {
   name: string;
@@ -687,6 +688,7 @@ export default function SoftwareDashboardPage() {
 
   return (
     <main className="relative min-h-screen select-none overflow-hidden bg-slate-950 text-white">
+      <InternalSearch />
       <div className="pointer-events-none fixed inset-0 z-50 hidden items-center justify-center opacity-[0.05] md:flex">
         <div className="-rotate-45 text-4xl font-black uppercase tracking-widest text-white lg:text-6xl">
           MBNCON Confidential

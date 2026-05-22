@@ -20,6 +20,7 @@ import BangladeshApparelShowcase from "@/components/software/BangladeshApparelSh
 import KaizenActionList from "@/components/software/KaizenActionList";
 import GembaObservationList from "@/components/software/GembaObservationList";
 import CorrectiveActionList from "@/components/software/CorrectiveActionList";
+import InternalSearch from "@/components/software/InternalSearch";
 
 import {
   getProductionLogs,
@@ -347,7 +348,11 @@ export default function ExecutiveDashboardPage() {
           {error}
         </div>
       ) : null}
-
+<section className="mb-6">
+  <div className="max-w-2xl">
+    <InternalSearch />
+  </div>
+</section>
       <section id={slugify("Executive Intelligence")} className="scroll-mt-28">
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
           <div
@@ -356,6 +361,7 @@ export default function ExecutiveDashboardPage() {
             }}
             className="cursor-pointer transition hover:-translate-y-1 hover:scale-[1.01]"
           >
+            
             <KpiCard
               title="Live Records"
               value={String(dashboard.liveRecordCount)}
