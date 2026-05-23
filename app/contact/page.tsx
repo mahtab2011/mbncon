@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 type Language = "en" | "bn";
 
@@ -45,7 +47,8 @@ const content = {
     },
 
     submit: "Send Message",
-    home: "Back to Home",
+sending: "Sending...",
+home: "Back to Home",
   },
 
   bn: {
@@ -87,15 +90,71 @@ const content = {
     },
 
     submit: "মেসেজ পাঠান",
-    home: "হোমে ফিরে যান",
+sending: "পাঠানো হচ্ছে...",
+home: "হোমে ফিরে যান",
   },
 };
 
 export default function ContactPage() {
   const [language, setLanguage] = useState<Language>("en");
+const [loading, setLoading] = useState(false);
 
+const [successMessage, setSuccessMessage] = useState("");
+
+const [formData, setFormData] = useState({
+  name: "",
+  company: "",
+  email: "",
+  phone: "",
+  subject: "",
+  message: "",
+});
   const t = content[language];
+const handleChange = (
+  event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+) => {
+  setFormData((previous) => ({
+    ...previous,
+    [event.target.name]: event.target.value,
+  }));
+};
 
+const handleSubmit = async () => {
+  try {
+    setLoading(true);
+
+    await addDoc(collection(db, "contactInquiries"), {
+      ...formData,
+      language,
+      createdAt: serverTimestamp(),
+    });
+
+    setSuccessMessage(
+      language === "bn"
+        ? "আপনার মেসেজ সফলভাবে পাঠানো হয়েছে।"
+        : "Your message has been submitted successfully."
+    );
+
+    setFormData({
+      name: "",
+      company: "",
+      email: "",
+      phone: "",
+      subject: "",
+      message: "",
+    });
+  } catch (error) {
+    console.error(error);
+
+    alert(
+      language === "bn"
+        ? "সমস্যা হয়েছে। আবার চেষ্টা করুন।"
+        : "Something went wrong. Please try again."
+    );
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <main className="min-h-screen bg-slate-950 text-white">
       <section className="mx-auto max-w-7xl px-6 py-10">
@@ -188,8 +247,11 @@ export default function ContactPage() {
               </label>
 
               <input
-                type="text"
-                placeholder={t.placeholders.name}
+  type="text"
+  name="name"
+  value={formData.name}
+  onChange={handleChange}
+  placeholder={t.placeholders.name}
                 className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-white outline-none focus:border-cyan-400"
               />
             </div>
@@ -200,66 +262,91 @@ export default function ContactPage() {
               </label>
 
               <input
-                type="text"
-                placeholder={t.placeholders.company}
-                className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-white outline-none focus:border-cyan-400"
-              />
-            </div>
+  type="text"
+  name="company"
+  value={formData.company}
+  onChange={handleChange}
+  placeholder={t.placeholders.company}
+  className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-white outline-none focus:border-cyan-400"
+/>
+</div>
 
-            <div>
-              <label className="mb-2 block text-sm text-slate-300">
-                {t.email}
-              </label>
+<div>
+  <label className="mb-2 block text-sm text-slate-300">
+    {t.email}
+  </label>
 
-              <input
-                type="email"
-                placeholder={t.placeholders.email}
-                className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-white outline-none focus:border-cyan-400"
-              />
-            </div>
+  <input
+    type="email"
+    name="email"
+    value={formData.email}
+    onChange={handleChange}
+    placeholder={t.placeholders.email}
+    className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-white outline-none focus:border-cyan-400"
+  />
+</div>
 
-            <div>
-              <label className="mb-2 block text-sm text-slate-300">
-                {t.phone}
-              </label>
+<div>
+  <label className="mb-2 block text-sm text-slate-300">
+    {t.phone}
+  </label>
 
-              <input
-                type="text"
-                placeholder={t.placeholders.phone}
-                className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-white outline-none focus:border-cyan-400"
-              />
-            </div>
-          </div>
+  <input
+    type="text"
+    name="phone"
+    value={formData.phone}
+    onChange={handleChange}
+    placeholder={t.placeholders.phone}
+    className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-white outline-none focus:border-cyan-400"
+  />
+</div>
+</div>
 
-          <div className="mt-6">
-            <label className="mb-2 block text-sm text-slate-300">
-              {t.subject}
-            </label>
+<div className="mt-6">
+  <label className="mb-2 block text-sm text-slate-300">
+    {t.subject}
+  </label>
 
-            <input
-              type="text"
-              placeholder={t.placeholders.subject}
-              className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-white outline-none focus:border-cyan-400"
-            />
-          </div>
+  <input
+    type="text"
+    name="subject"
+    value={formData.subject}
+    onChange={handleChange}
+    placeholder={t.placeholders.subject}
+    className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-white outline-none focus:border-cyan-400"
+  />
+</div>
 
-          <div className="mt-6">
-            <label className="mb-2 block text-sm text-slate-300">
-              {t.message}
-            </label>
+<div className="mt-6">
+  <label className="mb-2 block text-sm text-slate-300">
+    {t.message}
+  </label>
 
-            <textarea
-              rows={8}
-              placeholder={t.placeholders.message}
-              className="w-full rounded-3xl border border-white/10 bg-slate-950 px-4 py-4 text-white outline-none focus:border-cyan-400"
-            />
-          </div>
+  <textarea
+    rows={8}
+    name="message"
+    value={formData.message}
+    onChange={handleChange}
+    placeholder={t.placeholders.message}
+    className="w-full rounded-3xl border border-white/10 bg-slate-950 px-4 py-4 text-white outline-none focus:border-cyan-400"
+  />
+</div>
 
-          <div className="mt-8">
-            <button className="rounded-full bg-cyan-400 px-8 py-3 font-semibold text-slate-950 hover:bg-cyan-300">
-              {t.submit}
-            </button>
-          </div>
+          <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
+  <button
+    onClick={handleSubmit}
+    disabled={loading}
+    className="rounded-full bg-cyan-400 px-8 py-3 font-semibold text-slate-950 transition hover:bg-cyan-300 disabled:opacity-50"
+  >
+    {loading ? t.sending : t.submit}
+  </button>
+
+  {successMessage && (
+    <p className="text-sm font-semibold text-emerald-400">
+      {successMessage}
+    </p>
+  )}
+</div>
         </section>
       </section>
     </main>

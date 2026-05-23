@@ -660,6 +660,45 @@ export default function Sidebar() {
       ),
       href: "/software/ai-smart-healthcare-intelligence",
     },
+        {
+      name: label(
+        "AI Banking & Insurance Intelligence",
+        "এআই ব্যাংকিং ও ইন্স্যুরেন্স ইন্টেলিজেন্স"
+      ),
+      href: "/software/ai-banking-insurance-intelligence",
+    },
+
+    {
+      name: label(
+        "AI Retail Intelligence",
+        "এআই রিটেইল ইন্টেলিজেন্স"
+      ),
+      href: "/software/ai-retail-intelligence",
+    },
+
+    {
+      name: label(
+        "AI Restaurant Intelligence",
+        "এআই রেস্টুরেন্ট ইন্টেলিজেন্স"
+      ),
+      href: "/software/ai-restaurant-intelligence",
+    },
+
+    {
+      name: label(
+        "AI Residential Hotel Intelligence",
+        "এআই রেসিডেন্সিয়াল হোটেল ইন্টেলিজেন্স"
+      ),
+      href: "/software/ai-residential-hotel-intelligence",
+    },
+
+    {
+      name: label(
+        "AI Catering Company Intelligence",
+        "এআই ক্যাটারিং কোম্পানি ইন্টেলিজেন্স"
+      ),
+      href: "/software/ai-catering-company-intelligence",
+    },
   ],
 },
     {

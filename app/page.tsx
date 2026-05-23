@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Navbar from "@/components/software/Navbar";
+import InternalSearch from "@/components/software/InternalSearch";
 
 export const metadata: Metadata = {
   title:
@@ -137,6 +138,11 @@ export default function HomePage() {
       <div id="top" />
 
       <section className="bg-emerald-600 px-4 py-3 text-center text-sm font-semibold text-white sm:text-base">
+        <section className="bg-slate-950 px-4 py-10">
+  <div className="mx-auto max-w-6xl">
+    <InternalSearch />
+  </div>
+</section>
         We aim to deliver a minimum{" "}
         <span className="text-lg font-extrabold text-yellow-300">20%</span>{" "}
         efficiency improvement within three to six months, subject to agreed
@@ -391,7 +397,55 @@ export default function HomePage() {
           business analytics, workflow optimisation, enterprise intelligence and
           practical improvement consultancy.
         </p>
+<div className="mt-8 grid gap-4 md:grid-cols-3">
+  <div className="rounded-2xl border border-cyan-200 bg-cyan-50 p-5">
+    <h3 className="text-lg font-bold text-slate-900">
+      Follow MBNCON
+    </h3>
 
+    <p className="mt-2 text-sm leading-6 text-slate-700">
+      Follow our AI transformation journey, enterprise intelligence
+      expansion, manufacturing innovation, leadership systems,
+      operational excellence insights, and future technology initiatives.
+    </p>
+
+    <button className="mt-5 rounded-full bg-cyan-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-cyan-600">
+      Follow Updates
+    </button>
+  </div>
+
+  <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
+    <h3 className="text-lg font-bold text-slate-900">
+      Enterprise Consultation
+    </h3>
+
+    <p className="mt-2 text-sm leading-6 text-slate-700">
+      Manufacturing groups, hospitality businesses, retailers,
+      logistics providers, restaurants, and operational enterprises
+      can contact MBNCON for AI transformation and productivity support.
+    </p>
+
+    <button className="mt-5 rounded-full bg-emerald-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-600">
+      Request Consultation
+    </button>
+  </div>
+
+  <div className="rounded-2xl border border-indigo-200 bg-indigo-50 p-5">
+    <h3 className="text-lg font-bold text-slate-900">
+      AI Transformation Network
+    </h3>
+
+    <p className="mt-2 text-sm leading-6 text-slate-700">
+      Join our growing AI transformation ecosystem covering
+      manufacturing, retail, agriculture, hospitality,
+      supply chain, and operational intelligence systems.
+    </p>
+
+    <button className="mt-5 rounded-full bg-indigo-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-600">
+      Join Network
+    </button>
+  </div>
+</div>
         <div className="mt-10 grid gap-6 md:grid-cols-2">
           <section className="rounded-2xl border border-slate-300 bg-slate-50 p-6 transition duration-300 hover:-translate-y-1 hover:shadow-lg">
             <h3 className="text-xl font-bold text-slate-950">

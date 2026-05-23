@@ -623,6 +623,73 @@ const moduleGroups: ModuleGroup[] = [
       },
     ],
   },
+    {
+    title: "AI Transformation Division",
+    description:
+      "AI transformation, industry intelligence, enterprise AI adoption, predictive systems, governance, analytics and sector-specific AI operational intelligence.",
+    modules: [
+      {
+        name: "AI Transformation Intelligence Centre",
+        href: "/software/ai-transformation-intelligence-centre",
+      },
+      {
+        name: "Why AI Intelligence",
+        href: "/software/why-ai-intelligence",
+      },
+      {
+        name: "Generative AI Intelligence",
+        href: "/software/generative-ai-intelligence",
+      },
+      {
+        name: "Predictive AI Intelligence",
+        href: "/software/predictive-ai-intelligence",
+      },
+      {
+        name: "AI Governance & Ethics",
+        href: "/software/ai-governance-ethics",
+      },
+      {
+        name: "AI Analytics & Decision Intelligence",
+        href: "/software/ai-analytics-decision-intelligence",
+      },
+      {
+        name: "AI Smart Agriculture Intelligence",
+        href: "/software/ai-smart-agriculture-intelligence",
+      },
+      {
+        name: "AI Agri Marketing Intelligence",
+        href: "/software/ai-agri-marketing-intelligence",
+      },
+      {
+        name: "AI Live Agri Product Price Intelligence",
+        href: "/software/ai-live-agri-product-price-intelligence",
+      },
+      {
+        name: "AI Smart Healthcare Intelligence",
+        href: "/software/ai-smart-healthcare-intelligence",
+      },
+      {
+        name: "AI Banking & Insurance Intelligence",
+        href: "/software/ai-banking-insurance-intelligence",
+      },
+      {
+        name: "AI Retail Intelligence",
+        href: "/software/ai-retail-intelligence",
+      },
+      {
+        name: "AI Restaurant Intelligence",
+        href: "/software/ai-restaurant-intelligence",
+      },
+      {
+        name: "AI Residential Hotel Intelligence",
+        href: "/software/ai-residential-hotel-intelligence",
+      },
+      {
+        name: "AI Catering Company Intelligence",
+        href: "/software/ai-catering-company-intelligence",
+      },
+    ],
+  },
 ];
 
 const overviewCards = [
