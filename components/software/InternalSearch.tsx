@@ -4,38 +4,55 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 
 import { moduleRegistry } from "@/lib/software/moduleRegistry";
+console.log(moduleRegistry);
 
 export default function InternalSearch() {
   const [query, setQuery] = useState("");
 
   const filteredModules = useMemo(() => {
-    if (!query.trim()) return [];
+    const search = query.toLowerCase().trim();
 
-    const lower = query.toLowerCase();
+    if (!search) return [];
 
     return moduleRegistry
       .map((module) => {
-        const nameScore = module.name.toLowerCase().includes(lower) ? 10 : 0;
+        const name = module.name.toLowerCase();
+        const href = module.href.toLowerCase();
+        const category = module.category?.toLowerCase() ?? "";
+        const description = module.description?.toLowerCase() ?? "";
+        const keywords = module.keywords.map((keyword) =>
+          keyword.toLowerCase()
+        );
 
-        const keywordScore = module.keywords.some((keyword) =>
-          keyword.toLowerCase().includes(lower)
+        const startsWithName = name.startsWith(search) ? 100 : 0;
+        const includesName = name.includes(search) ? 70 : 0;
+        const keywordMatch = keywords.some((keyword) =>
+          keyword.includes(search)
         )
-          ? 5
+          ? 50
           : 0;
-
-        const categoryScore = module.category?.toLowerCase().includes(lower)
-          ? 3
-          : 0;
-
+        const categoryMatch = category.includes(search) ? 30 : 0;
+        const hrefMatch = href.includes(search) ? 20 : 0;
+        const descriptionMatch = description.includes(search) ? 10 : 0;
         const featuredBonus = module.featured ? 2 : 0;
+        const recentBonus = module.recentlyAdded ? 2 : 0;
 
         return {
           ...module,
-          score: nameScore + keywordScore + categoryScore + featuredBonus,
+          score:
+            startsWithName +
+            includesName +
+            keywordMatch +
+            categoryMatch +
+            hrefMatch +
+            descriptionMatch +
+            featuredBonus +
+            recentBonus,
         };
       })
       .filter((module) => module.score > 0)
-      .sort((a, b) => b.score - a.score);
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 8);
   }, [query]);
 
   return (
@@ -53,9 +70,9 @@ export default function InternalSearch() {
 
         <input
           type="text"
-          placeholder="Search bottleneck, risk, leadership, productivity..."
+          placeholder="Search predictive, governance, analytics, agri price, bottleneck..."
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(event) => setQuery(event.target.value)}
           className="w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-white outline-none placeholder:text-slate-400 focus:border-cyan-400"
         />
 

@@ -575,6 +575,94 @@ export default function Sidebar() {
       ],
     },
     {
+  title: label(
+    "AI Transformation Division",
+    "এআই ট্রান্সফরমেশন ডিভিশন"
+  ),
+
+  links: [
+    {
+      name: label(
+        "AI Transformation Intelligence Centre",
+        "এআই ট্রান্সফরমেশন ইন্টেলিজেন্স সেন্টার"
+      ),
+      href: "/software/ai-transformation-intelligence-centre",
+    },
+
+    {
+      name: label(
+        "Why AI Intelligence",
+        "কেন এআই ইন্টেলিজেন্স"
+      ),
+      href: "/software/why-ai-intelligence",
+    },
+
+    {
+      name: label(
+        "Generative AI Intelligence",
+        "জেনারেটিভ এআই ইন্টেলিজেন্স"
+      ),
+      href: "/software/generative-ai-intelligence",
+    },
+
+    {
+      name: label(
+        "Predictive AI Intelligence",
+        "প্রেডিকটিভ এআই ইন্টেলিজেন্স"
+      ),
+      href: "/software/predictive-ai-intelligence",
+    },
+
+    {
+      name: label(
+        "AI Governance & Ethics",
+        "এআই গভর্ন্যান্স ও এথিক্স"
+      ),
+      href: "/software/ai-governance-ethics",
+    },
+
+    {
+      name: label(
+        "AI Analytics & Decision Intelligence",
+        "এআই অ্যানালিটিক্স ও ডিসিশন ইন্টেলিজেন্স"
+      ),
+      href: "/software/ai-analytics-decision-intelligence",
+    },
+
+    {
+      name: label(
+        "AI Smart Agriculture Intelligence",
+        "এআই স্মার্ট এগ্রিকালচার ইন্টেলিজেন্স"
+      ),
+      href: "/software/ai-smart-agriculture-intelligence",
+    },
+
+    {
+      name: label(
+        "AI Agri Marketing Intelligence",
+        "এআই এগ্রি মার্কেটিং ইন্টেলিজেন্স"
+      ),
+      href: "/software/ai-agri-marketing-intelligence",
+    },
+
+    {
+      name: label(
+        "AI Live Agri Product Price Intelligence",
+        "এআই লাইভ এগ্রি প্রোডাক্ট প্রাইস ইন্টেলিজেন্স"
+      ),
+      href: "/software/ai-live-agri-product-price-intelligence",
+    },
+
+    {
+      name: label(
+        "AI Smart Healthcare Intelligence",
+        "এআই স্মার্ট হেলথকেয়ার ইন্টেলিজেন্স"
+      ),
+      href: "/software/ai-smart-healthcare-intelligence",
+    },
+  ],
+},
+    {
       title: label("Leadership & Human Performance", "লিডারশিপ ও মানব পারফরম্যান্স"),
       links: [
         {
@@ -635,8 +723,56 @@ export default function Sidebar() {
   ),
   href: "/software/emotional-resilience-intelligence-centre",
 },
-
-                {
+{
+  name: label(
+    "Self Regulated Performance Intelligence",
+    "সেলফ রেগুলেটেড পারফরম্যান্স ইন্টেলিজেন্স"
+  ),
+  href: "/software/self-regulated-performance-intelligence",
+},
+{
+  name: label(
+    "AI Psychological Safety Intelligence",
+    "সাইকোলজিক্যাল সেফটি ইন্টেলিজেন্স"
+  ),
+  href: "/software/psychological-safety-intelligence",
+},
+{
+  name: label(
+    "AI Leadership Coaching Intelligence",
+    "লিডারশিপ কোচিং ইন্টেলিজেন্স"
+  ),
+  href: "/software/leadership-coaching-intelligence",
+},
+{
+  name: label(
+    "AI Accountability Culture Intelligence",
+    "অ্যাকাউন্টেবিলিটি কালচার ইন্টেলিজেন্স"
+  ),
+  href: "/software/accountability-culture-intelligence",
+},
+{
+  name: label(
+    "AI Decision Making Intelligence",
+    "ডিসিশন মেকিং ইন্টেলিজেন্স"
+  ),
+  href: "/software/decision-making-intelligence",
+}, 
+{
+  name: label(
+    "AI Conflict Resolution Intelligence",
+    "কনফ্লিক্ট রেজুলেশন ইন্টেলিজেন্স"
+  ),
+  href: "/software/conflict-resolution-intelligence",
+},
+{
+  name: label(
+    "AI Strategic Thinking Intelligence",
+    "স্ট্র্যাটেজিক থিংকিং ইন্টেলিজেন্স"
+  ),
+  href: "/software/strategic-thinking-intelligence",
+},    
+{
           name: label("Leadership Coaching Form", "লিডারশিপ কোচিং ফর্ম"),
           href: "/software/manufacturing-productivity/leadership-coaching-form",
         },
