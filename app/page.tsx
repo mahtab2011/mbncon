@@ -409,9 +409,12 @@ export default function HomePage() {
       operational excellence insights, and future technology initiatives.
     </p>
 
-    <button className="mt-5 rounded-full bg-cyan-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-cyan-600">
-      Follow Updates
-    </button>
+    <Link
+  href="/updates"
+  className="mt-5 inline-flex rounded-full bg-cyan-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-cyan-600"
+>
+  Follow Updates
+</Link>
   </div>
 
   <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
@@ -425,9 +428,12 @@ export default function HomePage() {
       can contact MBNCON for AI transformation and productivity support.
     </p>
 
-    <button className="mt-5 rounded-full bg-emerald-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-600">
-      Request Consultation
-    </button>
+    <Link
+  href="/contact"
+  className="mt-5 inline-flex rounded-full bg-emerald-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-600"
+>
+  Request Consultation
+</Link>
   </div>
 
   <div className="rounded-2xl border border-indigo-200 bg-indigo-50 p-5">
@@ -441,9 +447,12 @@ export default function HomePage() {
       supply chain, and operational intelligence systems.
     </p>
 
-    <button className="mt-5 rounded-full bg-indigo-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-600">
-      Join Network
-    </button>
+    <Link
+  href="/network"
+  className="mt-5 inline-flex rounded-full bg-indigo-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-600"
+>
+  Join Network
+</Link>
   </div>
 </div>
         <div className="mt-10 grid gap-6 md:grid-cols-2">
