@@ -28,8 +28,10 @@ const sections = [
   },
   {
     title: "Sewing & Production",
-    description: "Production control, line planning, machine allocation and live output.",
+    description: "Production control, operation bulletin, line planning, machine allocation and live output.",
     items: [
+      { title: "Operation Bulletin", href: "/manufacturing/operation-bulletin", description: "Sewing operation library, SMV, machine type, operation sequence and bottleneck basis." },
+      { title: "Sewing Task Library", href: "/manufacturing/operation-bulletin", description: "Detailed sewing task library for line balancing, bottleneck analysis and production planning." },
       { title: "Live Production Dashboard", href: "/manufacturing/live-production-dashboard", description: "Live production visibility and output monitoring." },
       { title: "Line Master", href: "/manufacturing/line-master", description: "Line setup and master data." },
       { title: "Line Optimization", href: "/manufacturing/line-optimization", description: "Improve line balance and remove bottlenecks." },
@@ -99,15 +101,15 @@ export default function GpaLandingPage() {
             <Link href="/manufacturing/enterprise-command-hub" className="rounded-xl bg-white px-6 py-3 font-bold text-blue-700 shadow hover:bg-blue-50">
               Enterprise Command Hub
             </Link>
-
+            <Link href="/manufacturing/operation-bulletin" className="rounded-xl bg-blue-900 px-6 py-3 font-bold text-white shadow hover:bg-blue-950">
+              Operation Bulletin
+            </Link>
             <Link href="/manufacturing/cutting-command-centre" className="rounded-xl bg-blue-900 px-6 py-3 font-bold text-white shadow hover:bg-blue-950">
               Cutting Tools
             </Link>
-
             <Link href="/manufacturing/live-production-dashboard" className="rounded-xl bg-blue-900 px-6 py-3 font-bold text-white shadow hover:bg-blue-950">
               Sewing / Production
             </Link>
-
             <Link href="/manufacturing/fabric-consumption" className="rounded-xl bg-blue-900 px-6 py-3 font-bold text-white shadow hover:bg-blue-950">
               Fabric Consumption
             </Link>
@@ -121,7 +123,6 @@ export default function GpaLandingPage() {
                 <h2 className="text-3xl font-bold text-slate-900">
                   {section.title}
                 </h2>
-
                 <p className="mt-2 text-slate-600">
                   {section.description}
                 </p>
@@ -137,7 +138,6 @@ export default function GpaLandingPage() {
                     <h3 className="text-xl font-bold text-blue-700">
                       {item.title}
                     </h3>
-
                     <p className="mt-3 text-sm text-slate-600">
                       {item.description}
                     </p>
@@ -152,7 +152,6 @@ export default function GpaLandingPage() {
           <h2 className="text-3xl font-bold">
             BGMEA Pilot Release Candidate 1
           </h2>
-
           <p className="mt-4 text-lg text-slate-200">
             GPA now connects the executive layer with operational factory
             tools, including cutting, fabric, sewing, IE, productivity,
