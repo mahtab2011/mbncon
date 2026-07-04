@@ -5,124 +5,71 @@ const sections = [
     title: "Enterprise Command",
     description: "Executive dashboards, CEO cockpit and enterprise intelligence.",
     items: [
-      {
-        title: "Enterprise Command Hub",
-        href: "/manufacturing/enterprise-command-hub",
-        description: "Main GPA executive command centre.",
-      },
-      {
-        title: "Global Executive Dashboard",
-        href: "/manufacturing/global-executive-dashboard",
-        description: "Board-level enterprise KPI dashboard.",
-      },
-      {
-        title: "Executive Command Centre",
-        href: "/manufacturing/executive-command-centre",
-        description: "Production, quality, maintenance and shipment intelligence.",
-      },
-      {
-        title: "Executive Decision Centre",
-        href: "/manufacturing/executive-decision-centre",
-        description: "AI-supported executive decisions.",
-      },
+      { title: "Enterprise Command Hub", href: "/manufacturing/enterprise-command-hub", description: "Main GPA executive command centre." },
+      { title: "Global Executive Dashboard", href: "/manufacturing/global-executive-dashboard", description: "Board-level enterprise KPI dashboard." },
+      { title: "Executive Command Centre", href: "/manufacturing/executive-command-centre", description: "Production, quality, maintenance and shipment intelligence." },
+      { title: "Executive Decision Centre", href: "/manufacturing/executive-decision-centre", description: "AI-supported executive decisions." },
+      { title: "Executive Command Wall", href: "/manufacturing/executive-command-wall", description: "Enterprise-wide command wall." },
+      { title: "Enterprise Risk Centre", href: "/manufacturing/enterprise-risk-centre", description: "Enterprise risk monitoring and escalation." },
     ],
   },
   {
-    title: "Productivity Tools",
-    description: "IE, bottleneck, line balancing and productivity improvement tools.",
+    title: "Cutting & Fabric",
+    description: "Cutting room, fabric consumption, marker, shade and layout tools.",
     items: [
-      {
-        title: "Bottleneck Prediction",
-        href: "/manufacturing/bottleneck-prediction",
-        description: "Detect and predict factory bottlenecks.",
-      },
-      {
-        title: "Line Balancing",
-        href: "/manufacturing/line-balancing",
-        description: "Balance sewing lines and improve output.",
-      },
-      {
-        title: "Operator Productivity",
-        href: "/manufacturing/operator-productivity",
-        description: "Track operator performance and productivity.",
-      },
-      {
-        title: "Skill Gap Engine",
-        href: "/manufacturing/skill-gap-engine",
-        description: "Identify skill gaps and training needs.",
-      },
+      { title: "Cutting Command Centre", href: "/manufacturing/cutting-command-centre", description: "Cutting KPIs, bundles, fabric usage and AI alerts." },
+      { title: "Fabric Consumption", href: "/manufacturing/fabric-consumption", description: "Fabric dimension, pattern dimension and consumption analysis." },
+      { title: "Fabric Optimizer", href: "/manufacturing/fabric-optimizer", description: "Optimize marker efficiency and cutting cost." },
+      { title: "Fabric Inspection", href: "/manufacturing/fabric-inspection", description: "4-point inspection, defects, GSM and width control." },
+      { title: "Fabric Shade Management", href: "/manufacturing/fabric-shade-management", description: "Shade grouping, lay allocation and shade control." },
+      { title: "Fabric Cutting Knowledge", href: "/manufacturing/fabric-cutting-knowledge", description: "Cutting procedures, fabric behaviour and layout guidance." },
+      { title: "Marker Intelligence", href: "/manufacturing/marker-intelligence", description: "Marker efficiency, layout and utilization intelligence." },
     ],
   },
   {
-    title: "Cutting & Fabric Intelligence",
-    description: "Fabric consumption, marker efficiency, cutting and fabric control.",
+    title: "Sewing & Production",
+    description: "Production control, line planning, machine allocation and live output.",
     items: [
-      {
-        title: "Cutting Command Centre",
-        href: "/manufacturing/cutting-command-centre",
-        description: "Cutting room intelligence and control.",
-      },
-      {
-        title: "Fabric Consumption",
-        href: "/manufacturing/fabric-consumption",
-        description: "Fabric dimension, pattern dimension and consumption analysis.",
-      },
-      {
-        title: "Fabric Optimizer",
-        href: "/manufacturing/fabric-optimizer",
-        description: "Optimize fabric usage, marker efficiency and cutting cost.",
-      },
-      {
-        title: "Fabric Inspection",
-        href: "/manufacturing/fabric-inspection",
-        description: "4-point fabric inspection and defect intelligence.",
-      },
-      {
-        title: "Fabric Shade Management",
-        href: "/manufacturing/fabric-shade-management",
-        description: "Shade grouping, lay control and bundle integrity.",
-      },
-      {
-        title: "Fabric Cutting Knowledge",
-        href: "/manufacturing/fabric-cutting-knowledge",
-        description: "Cutting knowledge, fabric behavior and layout guidance.",
-      },
+      { title: "Live Production Dashboard", href: "/manufacturing/live-production-dashboard", description: "Live production visibility and output monitoring." },
+      { title: "Line Master", href: "/manufacturing/line-master", description: "Line setup and master data." },
+      { title: "Line Optimization", href: "/manufacturing/line-optimization", description: "Improve line balance and remove bottlenecks." },
+      { title: "Machine Master", href: "/manufacturing/machine-master", description: "Machine master data and machine profile." },
+      { title: "Machine Allocation", href: "/manufacturing/machine-allocation", description: "Allocate machines to operations and lines." },
+      { title: "Maintenance Entry", href: "/manufacturing/maintenance-entry", description: "Machine maintenance and downtime entries." },
+      { title: "Learning Curve", href: "/manufacturing/learning-curve", description: "Track operator and line learning performance." },
+    ],
+  },
+  {
+    title: "Productivity & IE",
+    description: "IE, bottleneck, skill, productivity and improvement tools.",
+    items: [
+      { title: "Bottleneck Prediction", href: "/manufacturing/bottleneck-prediction", description: "Detect and predict factory bottlenecks." },
+      { title: "Factory Health Predictor", href: "/manufacturing/factory-health-predictor", description: "Predict factory health from operational KPIs." },
+      { title: "Skill Gap Engine", href: "/manufacturing/skill-gap-engine", description: "Identify operator skill gaps and training needs." },
+      { title: "Attendance Centre", href: "/manufacturing/attendance-centre", description: "Workforce attendance and presence tracking." },
+      { title: "Department Master", href: "/manufacturing/department-master", description: "Department structure and accountability." },
     ],
   },
   {
     title: "Factory Operations",
-    description: "Factory master data, live factory twin and operational control.",
+    description: "Factory master, digital twin, operational control and command visibility.",
     items: [
-      {
-        title: "Factory Master",
-        href: "/manufacturing/factory-master",
-        description: "Factory profile and master data.",
-      },
-      {
-        title: "Department Master",
-        href: "/manufacturing/department-master",
-        description: "Department structure and operational ownership.",
-      },
-      {
-        title: "Digital Factory Twin",
-        href: "/manufacturing/digital-factory-twin",
-        description: "Digital representation of factory operations.",
-      },
-      {
-        title: "Digital Factory Twin Live",
-        href: "/manufacturing/digital-factory-twin-live",
-        description: "Live monitoring of factory operations.",
-      },
-      {
-        title: "Command Wall",
-        href: "/manufacturing/command-wall",
-        description: "Operational command wall for factory visibility.",
-      },
-      {
-        title: "Attendance Centre",
-        href: "/manufacturing/attendance-centre",
-        description: "Workforce attendance and presence tracking.",
-      },
+      { title: "Factory Master", href: "/manufacturing/factory-master", description: "Factory profile and master data." },
+      { title: "Digital Factory Twin", href: "/manufacturing/digital-factory-twin", description: "Digital representation of factory operations." },
+      { title: "Digital Factory Twin Live", href: "/manufacturing/digital-factory-twin-live", description: "Live digital twin monitoring." },
+      { title: "Command Wall", href: "/manufacturing/command-wall", description: "Operational command wall for factory visibility." },
+      { title: "BGMEA Demo", href: "/manufacturing/bgmea-demo", description: "BGMEA pilot demonstration page." },
+      { title: "BGMEA Release Checklist", href: "/manufacturing/bgmea-release-checklist", description: "Pilot release readiness checklist." },
+    ],
+  },
+  {
+    title: "AI & Support",
+    description: "AI assistant, live assistant and pilot navigation.",
+    items: [
+      { title: "AI Assistant", href: "/manufacturing/ai-assistant", description: "Ask operational questions using manufacturing intelligence." },
+      { title: "AI Assistant Live", href: "/manufacturing/ai-assistant-live", description: "Live AI assistant for factory operations." },
+      { title: "Pilot Navigation Hub", href: "/manufacturing/pilot-navigation-hub", description: "BGMEA pilot demonstration navigation." },
+      { title: "Global Search", href: "/manufacturing/global-search", description: "Search across manufacturing intelligence modules." },
     ],
   },
 ];
@@ -136,9 +83,7 @@ export default function GpaLandingPage() {
             MBNCON Flagship Manufacturing Platform
           </p>
 
-          <h1 className="mt-4 text-5xl font-extrabold">
-            GPA
-          </h1>
+          <h1 className="mt-4 text-5xl font-extrabold">GPA</h1>
 
           <p className="mt-4 text-2xl font-semibold">
             Garments Performance Analytics
@@ -146,29 +91,24 @@ export default function GpaLandingPage() {
 
           <p className="mt-6 max-w-5xl text-lg text-blue-50">
             AI-powered Manufacturing Operating System for garment factories,
-            covering enterprise command, productivity improvement, cutting,
-            fabric, IE, factory operations and executive intelligence.
+            covering enterprise command, cutting, fabric, sewing, IE,
+            productivity, factory operations and executive intelligence.
           </p>
 
           <div className="mt-8 flex flex-wrap gap-4">
-            <Link
-              href="/manufacturing/enterprise-command-hub"
-              className="rounded-xl bg-white px-6 py-3 font-bold text-blue-700 shadow hover:bg-blue-50"
-            >
-              Open Enterprise Command Hub
+            <Link href="/manufacturing/enterprise-command-hub" className="rounded-xl bg-white px-6 py-3 font-bold text-blue-700 shadow hover:bg-blue-50">
+              Enterprise Command Hub
             </Link>
 
-            <Link
-              href="/manufacturing/cutting-command-centre"
-              className="rounded-xl bg-blue-900 px-6 py-3 font-bold text-white shadow hover:bg-blue-950"
-            >
-              Open Cutting Tools
+            <Link href="/manufacturing/cutting-command-centre" className="rounded-xl bg-blue-900 px-6 py-3 font-bold text-white shadow hover:bg-blue-950">
+              Cutting Tools
             </Link>
 
-            <Link
-              href="/manufacturing/fabric-consumption"
-              className="rounded-xl bg-blue-900 px-6 py-3 font-bold text-white shadow hover:bg-blue-950"
-            >
+            <Link href="/manufacturing/live-production-dashboard" className="rounded-xl bg-blue-900 px-6 py-3 font-bold text-white shadow hover:bg-blue-950">
+              Sewing / Production
+            </Link>
+
+            <Link href="/manufacturing/fabric-consumption" className="rounded-xl bg-blue-900 px-6 py-3 font-bold text-white shadow hover:bg-blue-950">
               Fabric Consumption
             </Link>
           </div>
@@ -214,10 +154,9 @@ export default function GpaLandingPage() {
           </h2>
 
           <p className="mt-4 text-lg text-slate-200">
-            Multi-factory enterprise intelligence platform including Executive
-            Score, Factory Ranking, Heat Map, Predictive Analytics, CEO Morning
-            Brief, AI Decision Centre, cutting intelligence, fabric intelligence
-            and live enterprise monitoring.
+            GPA now connects the executive layer with operational factory
+            tools, including cutting, fabric, sewing, IE, productivity,
+            AI decision support and live enterprise monitoring.
           </p>
         </div>
       </section>
