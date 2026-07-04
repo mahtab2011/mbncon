@@ -30,8 +30,8 @@ const sections = [
     title: "Sewing & Production",
     description: "Production control, operation bulletin, line planning, machine allocation and live output.",
     items: [
-      { title: "Operation Bulletin", href: "/manufacturing/operation-bulletin", description: "Sewing operation library, SMV, machine type, operation sequence and bottleneck basis." },
-      { title: "Sewing Task Library", href: "/manufacturing/operation-bulletin", description: "Detailed sewing task library for line balancing, bottleneck analysis and production planning." },
+      { title: "Operation Bulletin", href: "/manufacturing/operation-bulletin-master", description: "Sewing operation library, SMV, machine type, operation sequence and bottleneck basis." },
+      { title: "Sewing Task Library", href: "/manufacturing/operation-bulletin-master", description: "Detailed sewing task library for line balancing, bottleneck analysis and production planning." },
       { title: "Live Production Dashboard", href: "/manufacturing/live-production-dashboard", description: "Live production visibility and output monitoring." },
       { title: "Line Master", href: "/manufacturing/line-master", description: "Line setup and master data." },
       { title: "Line Optimization", href: "/manufacturing/line-optimization", description: "Improve line balance and remove bottlenecks." },
