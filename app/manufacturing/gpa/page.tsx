@@ -14,16 +14,17 @@ const sections = [
     ],
   },
   {
-    title: "Cutting & Fabric",
-    description: "Cutting room, fabric consumption, marker, shade and layout tools.",
+    title: "Cutting & Fabric Workflow",
+    description: "Factory cutting procedure from fabric data to marker, lay, cutting and bundle control.",
     items: [
       { title: "Cutting Command Centre", href: "/manufacturing/cutting-command-centre", description: "Cutting KPIs, bundles, fabric usage and AI alerts." },
-      { title: "Fabric Consumption", href: "/manufacturing/fabric-consumption", description: "Fabric dimension, pattern dimension and consumption analysis." },
-      { title: "Fabric Optimizer", href: "/manufacturing/fabric-optimizer", description: "Optimize marker efficiency and cutting cost." },
-      { title: "Fabric Inspection", href: "/manufacturing/fabric-inspection", description: "4-point inspection, defects, GSM and width control." },
-      { title: "Fabric Shade Management", href: "/manufacturing/fabric-shade-management", description: "Shade grouping, lay allocation and shade control." },
-      { title: "Fabric Cutting Knowledge", href: "/manufacturing/fabric-cutting-knowledge", description: "Cutting procedures, fabric behaviour and layout guidance." },
-      { title: "Marker Intelligence", href: "/manufacturing/marker-intelligence", description: "Marker efficiency, layout and utilization intelligence." },
+      { title: "Fabric Consumption", href: "/manufacturing/fabric-consumption", description: "Fabric width, order quantity, marker efficiency, shrinkage, wastage and required fabric." },
+      { title: "Fabric Optimizer", href: "/manufacturing/fabric-optimizer", description: "Recommended marker, roll selection, lay plan and saving opportunity." },
+      { title: "Marker Intelligence", href: "/manufacturing/marker-intelligence", description: "Marker efficiency, pattern layout, fabric utilization and cutting loss control." },
+      { title: "Fabric Inspection", href: "/manufacturing/fabric-inspection", description: "4-point inspection, defects, GSM, width and roll suitability." },
+      { title: "Fabric Shade Management", href: "/manufacturing/fabric-shade-management", description: "Shade grouping, lay allocation and shade mixing prevention." },
+      { title: "Fabric Cutting Knowledge", href: "/manufacturing/fabric-cutting-knowledge", description: "Cutting SOP, fabric behaviour, lay control and cutting procedures." },
+      { title: "Material Issue", href: "/manufacturing/material-issue", description: "Issue fabric and materials to cutting floor." },
     ],
   },
   {
@@ -37,6 +38,7 @@ const sections = [
       { title: "Line Optimization", href: "/manufacturing/line-optimization", description: "Improve line balance and remove bottlenecks." },
       { title: "Machine Master", href: "/manufacturing/machine-master", description: "Machine master data and machine profile." },
       { title: "Machine Allocation", href: "/manufacturing/machine-allocation", description: "Allocate machines to operations and lines." },
+      { title: "Operator Allocation", href: "/manufacturing/operator-allocation", description: "Allocate operators by skill, machine and operation." },
       { title: "Maintenance Entry", href: "/manufacturing/maintenance-entry", description: "Machine maintenance and downtime entries." },
       { title: "Learning Curve", href: "/manufacturing/learning-curve", description: "Track operator and line learning performance." },
     ],
@@ -101,17 +103,17 @@ export default function GpaLandingPage() {
             <Link href="/manufacturing/enterprise-command-hub" className="rounded-xl bg-white px-6 py-3 font-bold text-blue-700 shadow hover:bg-blue-50">
               Enterprise Command Hub
             </Link>
-            <Link href="/manufacturing/operation-bulletin" className="rounded-xl bg-blue-900 px-6 py-3 font-bold text-white shadow hover:bg-blue-950">
+            <Link href="/manufacturing/operation-bulletin-master" className="rounded-xl bg-blue-900 px-6 py-3 font-bold text-white shadow hover:bg-blue-950">
               Operation Bulletin
             </Link>
             <Link href="/manufacturing/cutting-command-centre" className="rounded-xl bg-blue-900 px-6 py-3 font-bold text-white shadow hover:bg-blue-950">
               Cutting Tools
             </Link>
-            <Link href="/manufacturing/live-production-dashboard" className="rounded-xl bg-blue-900 px-6 py-3 font-bold text-white shadow hover:bg-blue-950">
-              Sewing / Production
-            </Link>
             <Link href="/manufacturing/fabric-consumption" className="rounded-xl bg-blue-900 px-6 py-3 font-bold text-white shadow hover:bg-blue-950">
               Fabric Consumption
+            </Link>
+            <Link href="/manufacturing/fabric-optimizer" className="rounded-xl bg-blue-900 px-6 py-3 font-bold text-white shadow hover:bg-blue-950">
+              Fabric Optimizer
             </Link>
           </div>
         </div>
