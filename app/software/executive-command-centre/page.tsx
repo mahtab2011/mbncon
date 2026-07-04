@@ -16,6 +16,9 @@ import {
   generateExecutiveSummary,
 } from "@/lib/software/aiObservations";
 
+import { buildExecutiveDashboardUiModel } from "@/lib/manufacturing/executive/executiveDashboardUiModel";
+import { executiveCommandCentreLayout } from "@/lib/manufacturing/executive/executiveCommandCentreLayout";
+
 function slugify(value: string) {
   return value
     .toLowerCase()
@@ -26,6 +29,9 @@ function slugify(value: string) {
 }
 
 export default function ExecutiveCommandCentrePage() {
+  const model = buildExecutiveDashboardUiModel();
+  const dashboard = model.dashboard;
+
   const productionForecast = exponentialSmoothing([
     { period: "Jan", actual: 82 },
     { period: "Feb", actual: 85 },
@@ -59,25 +65,25 @@ export default function ExecutiveCommandCentrePage() {
 
   const kpiCards = [
     {
+      title: "Factory Health",
+      value: `${dashboard.health.overallScore}/100`,
+      change: dashboard.health.overallStatus,
+      risk: dashboard.risk === "LOW" ? ("Low" as const) : ("Medium" as const),
+      href: "#ai-factory-command-centre",
+    },
+    {
       title: "Production Efficiency",
-      value: "88%",
+      value: `${dashboard.health.production}%`,
       change: "+4.2% this month",
       risk: "Low" as const,
       href: "#executive-summary",
     },
     {
-      title: "Shipment Stability",
-      value: "92%",
-      change: "Strong delivery trend",
+      title: "Buyer Readiness",
+      value: `${dashboard.kpis.buyerReadiness}%`,
+      change: "Strong buyer confidence",
       risk: "Low" as const,
-      href: "#forecast-intelligence",
-    },
-    {
-      title: "Operational Risk",
-      value: String(operationalRisk.score),
-      change: operationalRisk.level,
-      risk: operationalRisk.level,
-      href: "#operational-alerts",
+      href: "#ai-recommendations",
     },
     {
       title: "Forecast Accuracy",
@@ -90,26 +96,41 @@ export default function ExecutiveCommandCentrePage() {
 
   const scoreCards = [
     {
-      label: "Operational Score",
-      score: Math.round(performance.score),
-      href: "#executive-summary",
+      label: "Production",
+      score: dashboard.health.production,
+      href: "#ai-factory-command-centre",
     },
     {
-      label: "Forecast Accuracy",
-      score: Math.round(productionForecast.averageAccuracy),
-      href: "#forecast-intelligence",
+      label: "Quality",
+      score: dashboard.health.quality,
+      href: "#ai-factory-command-centre",
     },
     {
-      label: "Risk Stability",
-      score: operationalRisk.score,
-      href: "#operational-alerts",
+      label: "Maintenance",
+      score: dashboard.health.maintenance,
+      href: "#ai-factory-command-centre",
+    },
+    {
+      label: "Compliance",
+      score: dashboard.health.compliance,
+      href: "#ai-factory-command-centre",
+    },
+    {
+      label: "Sustainability",
+      score: dashboard.health.sustainability,
+      href: "#ai-factory-command-centre",
+    },
+    {
+      label: "Commercial",
+      score: dashboard.health.commercial,
+      href: "#ai-factory-command-centre",
     },
   ];
 
   return (
     <DashboardShell
       title="Executive Command Centre"
-      subtitle="AI-assisted manufacturing intelligence, operational forecasting, executive scoring, and consultancy decision-support system."
+      subtitle="MBNCON AI Factory OS executive briefing, factory health, KPI intelligence, risks, opportunities, and AI recommendations."
     >
       <section
         id="command-centre-kpis"
@@ -136,7 +157,7 @@ export default function ExecutiveCommandCentrePage() {
 
       <section
         id="score-intelligence"
-        className="mt-10 grid scroll-mt-28 gap-6 lg:grid-cols-3"
+        className="mt-10 grid scroll-mt-28 gap-6 md:grid-cols-2 lg:grid-cols-3"
       >
         {scoreCards.map((card) => (
           <div
@@ -150,6 +171,85 @@ export default function ExecutiveCommandCentrePage() {
             <ScoreRing label={card.label} score={card.score} />
           </div>
         ))}
+      </section>
+
+      <section
+        id="ai-factory-command-centre"
+        className="mt-10 scroll-mt-28 rounded-3xl border border-neutral-200 bg-white p-8 shadow-sm"
+      >
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-widest text-cyan-700">
+              MBNCON AI Factory OS
+            </p>
+
+            <h2 className="mt-2 text-3xl font-bold text-neutral-950">
+              {model.pageTitle}
+            </h2>
+
+            <p className="mt-3 max-w-3xl text-sm leading-7 text-neutral-600">
+              {dashboard.morningBriefing.executiveMessage}
+            </p>
+
+            <p className="mt-3 text-xs text-neutral-400">
+              Generated at: Executive session   
+            </p>
+          </div>
+
+          <div className="rounded-3xl bg-neutral-950 p-6 text-white">
+            <p className="text-sm uppercase tracking-widest text-emerald-300">
+              Factory Health
+            </p>
+
+            <p className="mt-3 text-6xl font-bold">
+              {dashboard.health.overallScore}
+            </p>
+
+            <p className="mt-2 text-sm text-neutral-300">
+              Status: {dashboard.health.overallStatus}
+            </p>
+
+            <p className="mt-1 text-sm text-neutral-300">
+              Enterprise Risk: {dashboard.risk}
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {dashboard.morningBriefing.todaysFocus.map((focus) => (
+            <div
+              key={focus}
+              className="rounded-2xl bg-neutral-50 p-5 text-sm leading-7 text-neutral-700"
+            >
+              {focus}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section
+        id="executive-live-kpis"
+        className="mt-10 grid scroll-mt-28 gap-6 md:grid-cols-2 xl:grid-cols-4"
+      >
+        <MiniKpi
+          title="First Pass Yield"
+          value={`${dashboard.kpis.firstPassYield}%`}
+        />
+
+        <MiniKpi
+          title="On-Time Delivery"
+          value={`${dashboard.kpis.onTimeDelivery}%`}
+        />
+
+        <MiniKpi
+          title="Machine Availability"
+          value={`${dashboard.kpis.machineAvailability}%`}
+        />
+
+        <MiniKpi
+          title="Sustainability Score"
+          value={`${dashboard.kpis.sustainabilityScore}%`}
+        />
       </section>
 
       <section
@@ -169,31 +269,100 @@ export default function ExecutiveCommandCentrePage() {
         id="operational-alerts"
         className="mt-10 grid scroll-mt-28 gap-6 lg:grid-cols-2"
       >
-        <div className="transition hover:-translate-y-1 hover:scale-[1.01]">
-          <AlertPanel
-            title={operationalObservation.title}
-            message={operationalObservation.summary}
-            severity={
-              operationalObservation.priority === "Critical"
-                ? "danger"
-                : operationalObservation.priority === "High"
-                ? "warning"
-                : "info"
-            }
-          />
-        </div>
+        {dashboard.alerts.map((alert) => (
+          <div
+            key={alert.alertId}
+            className="transition hover:-translate-y-1 hover:scale-[1.01]"
+          >
+            <AlertPanel
+              title={alert.title}
+              message={alert.message}
+              severity={
+                alert.level === "CRITICAL"
+                  ? "danger"
+                  : alert.level === "WARNING"
+                  ? "warning"
+                  : "info"
+              }
+            />
+          </div>
+        ))}
+      </section>
 
-        <div className="transition hover:-translate-y-1 hover:scale-[1.01]">
-          <AlertPanel
-            title={forecastObservation.title}
-            message={forecastObservation.summary}
-            severity={
-              forecastObservation.priority === "High"
-                ? "warning"
-                : "info"
-            }
-          />
-        </div>
+      <section
+        id="ai-recommendations"
+        className="mt-10 grid scroll-mt-28 gap-6 lg:grid-cols-2"
+      >
+        <ExecutivePanel title="Today&apos;s Priorities">
+          {dashboard.priorities.map((priority) => (
+            <div
+              key={priority.priority}
+              className="rounded-2xl bg-neutral-50 p-5"
+            >
+              <p className="text-sm font-bold text-neutral-900">
+                {priority.priority}. {priority.action}
+              </p>
+
+              <p className="mt-2 text-xs text-neutral-500">
+                Area: {priority.responsibleArea} | Urgency:{" "}
+                {priority.urgency}
+              </p>
+            </div>
+          ))}
+        </ExecutivePanel>
+
+        <ExecutivePanel title="Improvement Opportunities">
+          {dashboard.opportunities.map((opportunity) => (
+            <div
+              key={opportunity.title}
+              className="rounded-2xl bg-neutral-50 p-5"
+            >
+              <p className="text-sm font-bold text-neutral-900">
+                {opportunity.title}
+              </p>
+
+              <p className="mt-2 text-sm leading-7 text-neutral-600">
+                {opportunity.estimatedBenefit}
+              </p>
+
+              <p className="mt-2 text-xs font-semibold text-emerald-700">
+                Priority: {opportunity.priority}
+              </p>
+            </div>
+          ))}
+        </ExecutivePanel>
+
+        <ExecutivePanel title="AI Recommendations">
+          {dashboard.recommendations.map((recommendation) => (
+            <div
+              key={recommendation.recommendationId}
+              className="rounded-2xl bg-neutral-50 p-5"
+            >
+              <p className="text-sm font-bold text-neutral-900">
+                {recommendation.title}
+              </p>
+
+              <p className="mt-2 text-sm leading-7 text-neutral-600">
+                {recommendation.recommendation}
+              </p>
+
+              <p className="mt-2 text-xs font-semibold text-cyan-700">
+                Impact: {recommendation.expectedImpact}
+              </p>
+            </div>
+          ))}
+        </ExecutivePanel>
+
+        <ExecutivePanel title="Command Centre Layout Registry">
+          {executiveCommandCentreLayout.map((card) => (
+            <div
+              key={card.id}
+              className="rounded-2xl bg-neutral-50 p-4 text-sm text-neutral-700"
+            >
+              {card.displayOrder}. {card.title} — {card.width}
+            </div>
+          ))}
+        </ExecutivePanel>
       </section>
 
       <section
@@ -239,19 +408,47 @@ export default function ExecutiveCommandCentrePage() {
             </p>
           </div>
         </div>
-
-        <div className="mt-8 rounded-2xl border border-cyan-100 bg-cyan-50 p-6">
-          <p className="text-sm font-semibold uppercase tracking-widest text-cyan-700">
-            AI Recommendation
-          </p>
-
-          <p className="mt-4 text-sm leading-8 text-neutral-700">
-            Management should review operational score, forecast accuracy, risk
-            stability, and production forecast together before making
-            production, shipment, manpower, or corrective action decisions.
-          </p>
-        </div>
       </section>
     </DashboardShell>
+  );
+}
+
+function MiniKpi({
+  title,
+  value,
+}: {
+  title: string;
+  value: string;
+}) {
+  return (
+    <div className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:bg-neutral-50">
+      <p className="text-sm font-semibold uppercase tracking-widest text-neutral-500">
+        {title}
+      </p>
+
+      <p className="mt-4 text-4xl font-bold text-neutral-950">
+        {value}
+      </p>
+    </div>
+  );
+}
+
+function ExecutivePanel({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm">
+      <h2 className="text-xl font-bold text-neutral-950">
+        {title}
+      </h2>
+
+      <div className="mt-5 space-y-4">
+        {children}
+      </div>
+    </section>
   );
 }

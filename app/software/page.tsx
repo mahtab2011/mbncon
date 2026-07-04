@@ -26,6 +26,49 @@ function slugify(value: string) {
 
 const moduleGroups: ModuleGroup[] = [
   {
+    title: "AI Garment Factory Operating System",
+    description:
+      "Complete operating system for garment factories, textile mills, washing plants, accessories manufacturers, buying houses and export-oriented industrial groups.",
+    modules: [
+      {
+        name: "Garment Factory Command Centre",
+        href: "/software/garment-factory-command-centre",
+      },
+      {
+        name: "Production Intelligence Dashboard",
+        href: "/software/production-entry",
+      },
+      {
+        name: "Line Efficiency Dashboard",
+        href: "/software/line-balancing-intelligence",
+      },
+      {
+        name: "DHU & Quality Intelligence",
+        href: "/software/quality-entry",
+      },
+      {
+        name: "WIP Control Centre",
+        href: "/software/garment-wip-control-centre",
+      },
+      {
+        name: "Shipment Control Tower",
+        href: "/software/shipment-delay-prediction",
+      },
+      {
+        name: "Buyer & Style Profitability",
+        href: "/software/ai-order-profitability-intelligence",
+      },
+      {
+        name: "Factory Health Score",
+        href: "/software/ai-factory-health-engine",
+      },
+      {
+        name: "AI Factory Advisor",
+        href: "/software/ai-factory-war-room-command-centre",
+      },
+    ],
+  },
+  {
     title: "Leadership, Human Performance & Skill Development",
     description:
       "Leadership capability, mindset, skill development, empowerment, coaching, resilience, management discipline and human performance improvement.",
@@ -771,16 +814,17 @@ export default function SoftwareDashboardPage() {
           </p>
 
           <h1 className="text-3xl font-bold leading-tight sm:text-4xl md:text-5xl">
-            Enterprise Control Centre for Manufacturing Intelligence,
-            Productivity, Leadership and Operational Excellence
-          </h1>
+  AI-Powered Garment Factory Operating System for Production,
+  IE, Quality, Shipment, Profitability and Executive Control
+</h1>
 
           <p className="mt-5 max-w-5xl text-base leading-relaxed text-slate-300 sm:text-lg">
-            A grouped navigation system for executive intelligence, production
-            control, productivity improvement, leadership development, workforce
-            capability, quality, compliance, supply chain, profitability, ESG,
-            risk recovery and enterprise transformation.
-          </p>
+  A complete garment manufacturing intelligence platform for factory owners,
+  directors, production heads, IE teams, quality managers, merchandisers,
+  compliance teams and BGMEA-level enterprise benchmarking. It connects
+  production, line efficiency, DHU, WIP, shipment, buyer profitability,
+  factory health, ESG and AI-powered executive decision support.
+</p>
 
           <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {overviewCards.map((card) => (

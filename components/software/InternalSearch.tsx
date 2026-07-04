@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 
 import { moduleRegistry } from "@/lib/software/moduleRegistry";
-console.log(moduleRegistry);
+
 
 export default function InternalSearch() {
   const [query, setQuery] = useState("");

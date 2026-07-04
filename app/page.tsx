@@ -123,12 +123,12 @@ const gatewayCards: GatewayCard[] = [
 ];
 
 const highlights = [
-  "Industry 4.0 readiness",
-  "AI-assisted enterprise intelligence",
-  "Leadership and skill development",
-  "Operational excellence systems",
-  "Productivity and cost control",
-  "Risk, quality and supply chain visibility",
+  "Production Intelligence Dashboard",
+  "Industrial Engineering & Line Balancing",
+  "DHU & Quality Intelligence",
+  "Shipment Control Tower",
+  "Buyer & Style Profitability",
+  "AI Factory Health Score",
 ];
 
 export default function HomePage() {
@@ -156,17 +156,18 @@ export default function HomePage() {
           </p>
 
           <h1 className="mt-5 max-w-6xl text-4xl font-extrabold leading-tight text-blue-100 sm:text-5xl lg:text-6xl">
-            Enterprise Intelligence for Productivity, Leadership, Operational
-            Excellence and AI-Era Transformation
-          </h1>
-
+  AI-Powered Garment Factory Operating System
+</h1>
+<p className="mt-4 text-xl font-semibold text-cyan-300">
+  Built for Garment Manufacturers, Textile Mills, Washing Plants,
+  Accessories Manufacturers, Buying Houses and Exporters
+</p>
           <p className="mt-6 max-w-5xl text-lg leading-9 text-white/90 sm:text-xl">
-            MBNCON helps organisations improve visibility, productivity,
-            leadership capability, operational control, quality, profitability,
-            supply chain coordination, risk recovery and enterprise
-            transformation in the Fourth Industrial Revolution and AI evolution
-            era.
-          </p>
+  MBNCON connects production, industrial engineering, quality, shipment,
+  merchandising, buyer profitability, compliance, utilities, workforce
+  capability and executive control into one AI-powered garment factory
+  intelligence platform.
+</p>
 
           <div className="mt-10 flex flex-wrap gap-4">
             <Link

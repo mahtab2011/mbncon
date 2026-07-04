@@ -1,249 +1,329 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import DashboardShell from "@/components/software/DashboardShell";
 
-function slugify(value: string) {
-  return value
-    .toLowerCase()
-    .trim()
-    .replace(/&/g, "and")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
+type Lang = "en" | "bn";
 
-const supplierAreas = [
-  "Material quality performance",
-  "On-time delivery reliability",
-  "Price stability",
-  "Lead time consistency",
-  "Rejection and return rate",
-  "Shortage risk",
-  "Communication responsiveness",
-  "Dependency risk",
-  "Corrective action response",
-  "Overall supplier scorecard",
-];
+type SupplierRow = {
+  name: string;
+  category: string;
+  qualityScore: number;
+  deliveryScore: number;
+  priceScore: number;
+  leadTimeScore: number;
+  dependencyRisk: number;
+  lateDeliveryCost: number;
+  rejectionCost: number;
+  shortageCost: number;
+};
 
-const kpiCards = [
+const initialSuppliers: SupplierRow[] = [
   {
-    title: "Supplier Risk",
-    value: "Medium",
-    description:
-      "Supplier risk visibility prepared for sourcing, quality, and production control.",
-    target: "Supplier Scorecard Areas",
-    className: "border-fuchsia-400/30 bg-fuchsia-400/10 text-fuchsia-200",
+    name: "ABC Fabric Mills",
+    category: "Fabric",
+    qualityScore: 86,
+    deliveryScore: 78,
+    priceScore: 74,
+    leadTimeScore: 80,
+    dependencyRisk: 35,
+    lateDeliveryCost: 12000,
+    rejectionCost: 4500,
+    shortageCost: 3000,
   },
   {
-    title: "Quality Concern",
-    value: "Monitor",
-    description:
-      "Material quality performance, rejection, return rate, and corrective action are tracked.",
-    target: "Supplier Scorecard Areas",
-    className: "border-red-400/30 bg-red-400/10 text-red-200",
+    name: "Prime Accessories Ltd",
+    category: "Accessories",
+    qualityScore: 72,
+    deliveryScore: 64,
+    priceScore: 68,
+    leadTimeScore: 61,
+    dependencyRisk: 55,
+    lateDeliveryCost: 18500,
+    rejectionCost: 7200,
+    shortageCost: 6400,
   },
   {
-    title: "Delivery Reliability",
-    value: "Developing",
-    description:
-      "On-time delivery, lead time consistency, shortage risk, and dependency risk are visible.",
-    target: "Supplier Performance Layer",
-    className: "border-orange-400/30 bg-orange-400/10 text-orange-200",
-  },
-  {
-    title: "Scorecard Status",
-    value: "Ready",
-    description:
-      "Supplier scorecard structure is ready for executive review and improvement action.",
-    target: "Consultancy Application",
-    className: "border-emerald-400/30 bg-emerald-400/10 text-emerald-200",
+    name: "Global Label House",
+    category: "Label & Packaging",
+    qualityScore: 91,
+    deliveryScore: 88,
+    priceScore: 82,
+    leadTimeScore: 86,
+    dependencyRisk: 22,
+    lateDeliveryCost: 2500,
+    rejectionCost: 900,
+    shortageCost: 700,
   },
 ];
 
 export default function SupplierPerformanceIntelligencePage() {
+  const [lang, setLang] = useState<Lang>("en");
+  const [suppliers, setSuppliers] = useState(initialSuppliers);
+
+  const t = {
+    en: {
+      title: "Supplier Performance Intelligence",
+      subtitle:
+        "Supplier scorecard, hidden cost, sourcing risk and corrective action intelligence",
+      supplier: "Supplier",
+      category: "Category",
+      quality: "Quality",
+      delivery: "Delivery",
+      price: "Price",
+      leadTime: "Lead Time",
+      dependency: "Dependency Risk",
+      score: "Final Score",
+      rating: "Rating",
+      hiddenCost: "Hidden Cost",
+      totalHiddenCost: "Total Supplier Hidden Cost",
+      highestRisk: "Highest Risk Supplier",
+      preferred: "Preferred Supplier",
+      approved: "Approved Supplier",
+      watchlist: "Watchlist",
+      highRisk: "High Risk",
+      ai: "AI Supplier Recommendation",
+    },
+    bn: {
+      title: "সরবরাহকারী পারফরম্যান্স ইন্টেলিজেন্স",
+      subtitle:
+        "সরবরাহকারী স্কোরকার্ড, লুকানো খরচ, সোর্সিং ঝুঁকি ও সংশোধনমূলক ব্যবস্থা বিশ্লেষণ",
+      supplier: "সরবরাহকারী",
+      category: "ক্যাটাগরি",
+      quality: "মান",
+      delivery: "ডেলিভারি",
+      price: "দাম",
+      leadTime: "লিড টাইম",
+      dependency: "নির্ভরতা ঝুঁকি",
+      score: "চূড়ান্ত স্কোর",
+      rating: "রেটিং",
+      hiddenCost: "লুকানো খরচ",
+      totalHiddenCost: "মোট সরবরাহকারী লুকানো খরচ",
+      highestRisk: "সর্বোচ্চ ঝুঁকিপূর্ণ সরবরাহকারী",
+      preferred: "পছন্দনীয় সরবরাহকারী",
+      approved: "অনুমোদিত সরবরাহকারী",
+      watchlist: "ওয়াচলিস্ট",
+      highRisk: "উচ্চ ঝুঁকি",
+      ai: "AI সরবরাহকারী সুপারিশ",
+    },
+  }[lang];
+
+  function finalScore(row: SupplierRow) {
+    const positive =
+      row.qualityScore * 0.3 +
+      row.deliveryScore * 0.3 +
+      row.priceScore * 0.2 +
+      row.leadTimeScore * 0.2;
+
+    const penalty = row.dependencyRisk * 0.25;
+
+    return Math.max(0, Math.min(100, positive - penalty));
+  }
+
+  function hiddenCost(row: SupplierRow) {
+    return row.lateDeliveryCost + row.rejectionCost + row.shortageCost;
+  }
+
+  function rating(score: number) {
+    if (score >= 85) return t.preferred;
+    if (score >= 70) return t.approved;
+    if (score >= 50) return t.watchlist;
+    return t.highRisk;
+  }
+
+  function updateSupplier(
+    index: number,
+    field: keyof SupplierRow,
+    value: string | number
+  ) {
+    setSuppliers((current) =>
+      current.map((row, rowIndex) =>
+        rowIndex === index ? { ...row, [field]: value } : row
+      )
+    );
+  }
+
+  const totalHiddenCost = useMemo(
+    () => suppliers.reduce((sum, row) => sum + hiddenCost(row), 0),
+    [suppliers]
+  );
+
+  const highestRiskSupplier = useMemo(() => {
+    return [...suppliers].sort((a, b) => finalScore(a) - finalScore(b))[0];
+  }, [suppliers]);
+
   return (
     <DashboardShell title="Supplier Performance Intelligence">
       <main className="min-h-screen bg-slate-950 text-white">
         <section className="mx-auto max-w-7xl px-6 py-12">
-          <div id="top" />
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <Link
+                href="/software"
+                className="rounded-full border border-white/20 px-4 py-2 text-sm text-slate-200 transition duration-300 hover:bg-white/10"
+              >
+                ← Back to Dashboard
+              </Link>
 
-          <Link
-            href="/software"
-            className="rounded-full border border-white/20 px-4 py-2 text-sm text-slate-200 transition duration-300 hover:bg-white/10"
-          >
-            ← Back to Dashboard
-          </Link>
+              <p className="mt-8 text-sm font-semibold uppercase tracking-widest text-fuchsia-300">
+                MBNCON Supplier Intelligence
+              </p>
 
-          <section className="mt-8 rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl">
-            <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-fuchsia-300">
-              MBNCON Supplier Intelligence
-            </p>
+              <h1 className="mt-3 text-4xl font-bold md:text-5xl">
+                {t.title}
+              </h1>
 
-            <h1 className="text-4xl font-bold md:text-5xl">
-              Supplier Performance Intelligence
-            </h1>
-
-            <p className="mt-4 max-w-4xl text-lg leading-8 text-slate-300">
-              Analyse supplier quality, delivery reliability, price stability,
-              lead time, rejection rate, shortage risk, dependency risk, and
-              corrective action performance.
-            </p>
-          </section>
-
-          <section className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-            {kpiCards.map((card) => {
-              const targetId = slugify(card.target);
-
-              return (
-                <a
-                  key={card.title}
-                  href={`#${targetId}`}
-                  className={`rounded-3xl border p-6 shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-xl ${card.className}`}
-                >
-                  <p className="text-sm font-semibold uppercase tracking-wide opacity-80">
-                    {card.title}
-                  </p>
-
-                  <p className="mt-3 text-3xl font-extrabold">
-                    {card.value}
-                  </p>
-
-                  <p className="mt-4 text-sm leading-7 opacity-90">
-                    {card.description}
-                  </p>
-
-                  <p className="mt-5 text-sm font-semibold opacity-80">
-                    View section →
-                  </p>
-                </a>
-              );
-            })}
-          </section>
-
-          <section
-            id={slugify("Supplier Scorecard Areas")}
-            className="mt-10 scroll-mt-28 rounded-3xl border border-white/10 bg-slate-900 p-8 shadow-md transition duration-300 hover:shadow-xl"
-          >
-            <h2 className="text-2xl font-bold text-fuchsia-200">
-              Supplier Scorecard Areas
-            </h2>
-
-            <div className="mt-6 grid gap-4 md:grid-cols-2">
-              {supplierAreas.map((item, index) => {
-                const itemId = slugify(item);
-
-                return (
-                  <a
-                    key={item}
-                    href={`#${itemId}`}
-                    className="flex gap-4 rounded-2xl border border-white/10 bg-white/5 p-4 transition duration-300 hover:border-fuchsia-400 hover:bg-fuchsia-400/10 hover:shadow-lg"
-                  >
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-fuchsia-400 font-bold text-slate-950">
-                      {index + 1}
-                    </span>
-
-                    <div>
-                      <p className="font-semibold text-white">{item}</p>
-
-                      <p className="mt-1 text-sm leading-6 text-slate-400">
-                        Track score, trend, risk level, supplier response, and
-                        improvement action.
-                      </p>
-                    </div>
-                  </a>
-                );
-              })}
+              <p className="mt-4 max-w-4xl text-lg leading-8 text-slate-300">
+                {t.subtitle}
+              </p>
             </div>
-          </section>
 
-          <section
-            id={slugify("Supplier Performance Layer")}
-            className="mt-10 scroll-mt-28 rounded-3xl border border-fuchsia-400/30 bg-slate-900 p-8 shadow-md transition duration-300 hover:shadow-xl"
-          >
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-fuchsia-300">
-              Supplier Performance Layer
-            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setLang("en")}
+                className={`rounded-xl px-4 py-2 font-bold ${
+                  lang === "en"
+                    ? "bg-fuchsia-400 text-slate-950"
+                    : "bg-slate-800"
+                }`}
+              >
+                EN
+              </button>
 
-            <h2 className="mt-3 text-3xl font-extrabold text-white">
-              Quality, Delivery, Price & Dependency Intelligence
-            </h2>
-
-            <p className="mt-5 max-w-5xl text-lg leading-8 text-slate-300">
-              This module helps factory leadership compare supplier quality,
-              delivery reliability, price stability, lead time consistency,
-              rejection and return rate, shortage risk, communication
-              responsiveness, dependency exposure, corrective action response,
-              and overall supplier scorecard performance.
-            </p>
-
-            <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-              {supplierAreas.map((item) => {
-                const itemId = slugify(item);
-
-                return (
-                  <section
-                    key={item}
-                    id={itemId}
-                    className="scroll-mt-28 rounded-2xl border border-white/10 bg-white/5 p-5 transition duration-300 hover:-translate-y-1 hover:border-fuchsia-400 hover:bg-fuchsia-400/10 hover:shadow-lg"
-                  >
-                    <h3 className="font-semibold text-white">{item}</h3>
-
-                    <p className="mt-3 text-sm leading-6 text-slate-300">
-                      Intelligence focus prepared for supplier scorecard review,
-                      risk visibility, sourcing decision support, and corrective
-                      action follow-up.
-                    </p>
-                  </section>
-                );
-              })}
+              <button
+                onClick={() => setLang("bn")}
+                className={`rounded-xl px-4 py-2 font-bold ${
+                  lang === "bn"
+                    ? "bg-fuchsia-400 text-slate-950"
+                    : "bg-slate-800"
+                }`}
+              >
+                বাংলা
+              </button>
             </div>
+          </div>
+
+          <section className="mt-10 grid gap-4 md:grid-cols-3">
+            <KPI
+              title={t.totalHiddenCost}
+              value={`$${totalHiddenCost.toFixed(0)}`}
+            />
+            <KPI title={t.highestRisk} value={highestRiskSupplier.name} />
+            <KPI
+              title={t.rating}
+              value={rating(finalScore(highestRiskSupplier))}
+            />
           </section>
 
-          <section
-            id={slugify("Consultancy Application")}
-            className="mt-10 scroll-mt-28 rounded-3xl border border-fuchsia-400/30 bg-fuchsia-400/10 p-8 shadow-md transition duration-300 hover:shadow-xl"
-          >
-            <h2 className="text-2xl font-bold text-fuchsia-200">
-              Consultancy Application
-            </h2>
+          <section className="mt-10 overflow-x-auto rounded-3xl border border-white/10 bg-slate-900 p-6">
+            <table className="min-w-[1200px] w-full text-left">
+              <thead>
+                <tr className="border-b border-white/10 text-sm text-slate-300">
+                  <th className="p-3">{t.supplier}</th>
+                  <th className="p-3">{t.category}</th>
+                  <th className="p-3">{t.quality}</th>
+                  <th className="p-3">{t.delivery}</th>
+                  <th className="p-3">{t.price}</th>
+                  <th className="p-3">{t.leadTime}</th>
+                  <th className="p-3">{t.dependency}</th>
+                  <th className="p-3">{t.hiddenCost}</th>
+                  <th className="p-3">{t.score}</th>
+                  <th className="p-3">{t.rating}</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {suppliers.map((row, index) => {
+                  const score = finalScore(row);
+
+                  return (
+                    <tr key={index} className="border-b border-white/5">
+                      <td className="p-3">
+                        <input
+                          value={row.name}
+                          onChange={(event) =>
+                            updateSupplier(index, "name", event.target.value)
+                          }
+                          className="w-44 rounded-lg bg-slate-950 p-2"
+                        />
+                      </td>
+
+                      <td className="p-3">
+                        <input
+                          value={row.category}
+                          onChange={(event) =>
+                            updateSupplier(
+                              index,
+                              "category",
+                              event.target.value
+                            )
+                          }
+                          className="w-36 rounded-lg bg-slate-950 p-2"
+                        />
+                      </td>
+
+                      {(
+                        [
+                          "qualityScore",
+                          "deliveryScore",
+                          "priceScore",
+                          "leadTimeScore",
+                          "dependencyRisk",
+                        ] as (keyof SupplierRow)[]
+                      ).map((field) => (
+                        <td key={field} className="p-3">
+                          <input
+                            type="number"
+                            value={row[field]}
+                            onChange={(event) =>
+                              updateSupplier(
+                                index,
+                                field,
+                                Number(event.target.value)
+                              )
+                            }
+                            className="w-24 rounded-lg bg-slate-950 p-2"
+                          />
+                        </td>
+                      ))}
+
+                      <td className="p-3 font-bold text-yellow-300">
+                        ${hiddenCost(row).toFixed(0)}
+                      </td>
+
+                      <td className="p-3 font-bold text-fuchsia-300">
+                        {score.toFixed(1)}
+                      </td>
+
+                      <td className="p-3 font-bold">{rating(score)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </section>
+
+          <section className="mt-10 rounded-3xl border border-fuchsia-400/30 bg-fuchsia-400/10 p-8">
+            <h2 className="text-2xl font-bold text-fuchsia-200">{t.ai}</h2>
 
             <p className="mt-4 max-w-5xl leading-8 text-slate-200">
-              This module helps factories evaluate which suppliers support
-              performance and which suppliers create hidden cost, production
-              delay, quality failure, shortage, and delivery risk.
+              {lang === "en"
+                ? `${highestRiskSupplier.name} currently has the weakest supplier score. Management should review delivery reliability, dependency exposure, rejection cost and shortage cost before placing further critical orders.`
+                : `${highestRiskSupplier.name} বর্তমানে সবচেয়ে দুর্বল সরবরাহকারী স্কোর দেখাচ্ছে। গুরুত্বপূর্ণ অর্ডার দেওয়ার আগে ডেলিভারি নির্ভরযোগ্যতা, নির্ভরতা ঝুঁকি, রিজেকশন খরচ এবং শর্টেজ খরচ পর্যালোচনা করা উচিত।`}
             </p>
-
-            <div className="mt-8 grid gap-5 md:grid-cols-3">
-              {[
-                "Supplier scorecard visibility",
-                "Corrective action follow-up",
-                "Sourcing risk reduction",
-              ].map((item) => (
-                <div
-                  key={item}
-                  className="rounded-2xl border border-white/10 bg-white/5 p-5 transition duration-300 hover:-translate-y-1 hover:bg-white/10 hover:shadow-lg"
-                >
-                  <p className="font-semibold text-white">{item}</p>
-
-                  <p className="mt-3 text-sm leading-6 text-slate-300">
-                    Consultancy-demo executive UX prepared for supplier
-                    performance review and sourcing decision support.
-                  </p>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-6">
-              <a
-                href="#top"
-                className="text-sm font-semibold text-fuchsia-300 transition duration-300 hover:text-fuchsia-100"
-              >
-                Back to top ↑
-              </a>
-            </div>
           </section>
         </section>
       </main>
     </DashboardShell>
+  );
+}
+
+function KPI({ title, value }: { title: string; value: string }) {
+  return (
+    <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
+      <p className="text-sm text-slate-400">{title}</p>
+      <p className="mt-3 text-3xl font-black">{value}</p>
+    </div>
   );
 }
