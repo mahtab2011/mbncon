@@ -125,7 +125,12 @@ export default function DemoResultsPage() {
             >
               Upload My Pattern
             </Link>
-
+<Link
+  href="/optifabric/demo/roi"
+  className="rounded-xl bg-green-500 px-8 py-4 text-lg font-black text-slate-950"
+>
+  Calculate My Saving
+</Link>
             <Link
               href="/optifabric/demo"
               className="rounded-xl border border-slate-500 px-8 py-4 text-lg font-bold text-white"
@@ -133,6 +138,7 @@ export default function DemoResultsPage() {
               Replay Demo
             </Link>
           </div>
+          
         </section>
       </div>
     </main>
