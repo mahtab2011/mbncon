@@ -75,7 +75,7 @@ export default function DemoLayoutPage() {
 
         <div className="mt-8 flex justify-end">
           <Link
-            href="/optifabric/demo/ai"
+            href="/optifabric/demo/theatre"
             className="rounded-xl bg-cyan-400 px-8 py-4 text-lg font-black text-slate-950"
           >
             Run AI Optimization →
