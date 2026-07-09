@@ -4,6 +4,8 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { fabricPatternTypes } from "@/lib/optifabric/fabricPatternTypes";
 import { loadImage } from "@/lib/optifabric/imageLoader";
+import { inspectPatternImage, VisionAiResult } from "@/lib/optifabric/visionAiEngine";
+import { inspectTracedPattern } from "@/lib/optifabric/patternInspectionEngine";
 import {
   calculatePolygonPixelArea,
   convertPixelAreaToSqInches,
@@ -15,6 +17,8 @@ export default function LiveTracingPage() {
   const [points, setPoints] = useState<PolygonPoint[]>([]);
   const [scalePixels, setScalePixels] = useState(600);
   const [imageSrc, setImageSrc] = useState<string>("");
+  const [fileName, setFileName] = useState<string>("");
+  const [visionResult, setVisionResult] = useState<VisionAiResult | null>(null);
 
   const selectedFabric = fabricPatternTypes.find(
     (item) => item.id === fabricType
@@ -28,6 +32,15 @@ export default function LiveTracingPage() {
     return convertPixelAreaToSqInches(pixelArea, 12, scalePixels);
   }, [pixelArea, scalePixels]);
 
+  const inspection = useMemo(() => {
+    return inspectTracedPattern({
+      boundaryPoints: points.length,
+      pixelArea,
+      areaSqInches,
+      scalePixels,
+    });
+  }, [points.length, pixelArea, areaSqInches, scalePixels]);
+
   async function handleFileUpload(
     event: React.ChangeEvent<HTMLInputElement>
   ) {
@@ -38,7 +51,20 @@ export default function LiveTracingPage() {
     const image = await loadImage(file);
 
     setImageSrc(image);
+    setFileName(file.name);
     setPoints([]);
+    setVisionResult(null);
+  }
+
+  function runAiInspection() {
+    const result = inspectPatternImage({
+      fileName: fileName || "uploaded-pattern",
+      fabricType,
+      hasScaleVisible: scalePixels > 0,
+      hasClearBoundary: Boolean(imageSrc),
+    });
+
+    setVisionResult(result);
   }
 
   function handleCanvasClick(event: React.MouseEvent<HTMLDivElement>) {
@@ -76,7 +102,7 @@ export default function LiveTracingPage() {
 
         <section className="mt-8 rounded-3xl bg-slate-900 border border-slate-700 p-8">
           <p className="text-cyan-300 font-semibold mb-3">
-            Mini Pilot · Live Pattern Tracing
+            Mini Pilot · Vision AI + Live Pattern Tracing
           </p>
 
           <h1 className="text-4xl font-bold mb-4">
@@ -84,9 +110,9 @@ export default function LiveTracingPage() {
           </h1>
 
           <p className="text-slate-300 max-w-3xl">
-            Upload a pattern image, click around the boundary, and OptiFabric AI
-            converts the traced outline into area for nesting, consumption, and
-            savings calculation.
+            Upload a pattern image, inspect it with Vision AI, then click around
+            the boundary to convert the traced outline into area for nesting,
+            consumption, and savings calculation.
           </p>
         </section>
 
@@ -100,6 +126,13 @@ export default function LiveTracingPage() {
               onChange={handleFileUpload}
               className="w-full rounded-xl bg-slate-800 border border-slate-600 p-4 text-slate-300"
             />
+
+            <button
+              onClick={runAiInspection}
+              className="mt-4 rounded-xl bg-cyan-500 px-5 py-3 text-slate-950 font-bold hover:bg-cyan-400"
+            >
+              🔍 AI Inspect Pattern
+            </button>
 
             <label className="block mt-6 mb-2 text-sm font-semibold text-slate-300">
               Fabric Pattern Type
@@ -148,7 +181,7 @@ export default function LiveTracingPage() {
           </div>
 
           <div className="rounded-2xl bg-slate-900 border border-slate-700 p-6">
-            <h2 className="text-2xl font-bold mb-4">Tracing Controls</h2>
+            <h2 className="text-2xl font-bold mb-4">AI Inspection & Tracing</h2>
 
             <button
               onClick={undoLastPoint}
@@ -170,14 +203,39 @@ export default function LiveTracingPage() {
               <p className="mt-2 font-bold text-cyan-300">
                 Area: {areaSqInches.toFixed(2)} sq inches
               </p>
-            </div>
-
-            <div className="mt-5 rounded-xl bg-amber-950/40 border border-amber-700 p-4">
-              <p className="text-sm text-amber-200">
-                Pilot instruction: upload one pattern image, then click around
-                the outer boundary. Use Undo if a point is wrong.
+              <p className="mt-2">
+                Tracing Status: {inspection.tracingStatus}
               </p>
             </div>
+
+            {visionResult && (
+              <div className="mt-5 rounded-xl bg-green-950/40 border border-green-700 p-4">
+                <p className="font-bold text-green-300 mb-2">
+                  Vision AI Result
+                </p>
+                <p>Image Accepted: {visionResult.imageAccepted ? "YES" : "NO"}</p>
+                <p>Boundary: {visionResult.boundaryStatus}</p>
+                <p>Scale: {visionResult.scaleStatus}</p>
+                <p>Fabric Risk: {visionResult.fabricRisk}</p>
+                <p className="mt-3 text-sm text-green-100">
+                  {visionResult.tracingRecommendation}
+                </p>
+              </div>
+            )}
+
+            {inspection.warnings.length > 0 && (
+              <div className="mt-5 rounded-xl bg-amber-950/40 border border-amber-700 p-4">
+                <p className="font-bold text-amber-200 mb-2">
+                  Inspection Warnings
+                </p>
+
+                <ul className="space-y-1 text-sm text-amber-100">
+                  {inspection.warnings.map((warning) => (
+                    <li key={warning}>• {warning}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         </section>
 
