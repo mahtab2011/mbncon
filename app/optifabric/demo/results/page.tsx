@@ -120,7 +120,7 @@ export default function DemoResultsPage() {
 
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Link
-              href="/optifabric/mini-pilot/live-tracing"
+              href="/optifabric/demo/upload"
               className="rounded-xl bg-cyan-400 px-8 py-4 text-lg font-black text-slate-950"
             >
               Upload My Pattern
