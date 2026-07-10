@@ -651,7 +651,7 @@ useEffect(() => {
           <div className="mt-7">
             {points.length >= 3 ? (
               <Link
-                href="/optifabric/mini-pilot/polygon-nesting"
+                href="/optifabric/demo/polygon"
                 className="inline-block rounded-2xl bg-cyan-400 px-9 py-4 text-lg font-black text-slate-950 hover:bg-cyan-300"
               >
                 Continue to Polygon Nesting →
