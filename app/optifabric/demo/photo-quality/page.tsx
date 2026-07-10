@@ -321,7 +321,7 @@ export default function PhotoQualityDemoPage() {
             <div className="mt-6 flex flex-wrap gap-4">
               {result.canContinue ? (
                 <Link
-                  href="/optifabric/mini-pilot/live-tracing"
+                  href="/optifabric/demo/boundary-tracing"
                   className="rounded-xl bg-green-500 px-6 py-4 font-black text-slate-950"
                 >
                   Continue to AI Analysis / AI বিশ্লেষণে যান
@@ -338,7 +338,7 @@ export default function PhotoQualityDemoPage() {
 
               {result.level === "ACCEPTABLE" && (
                 <Link
-                  href="/optifabric/mini-pilot/live-tracing"
+                  href="/optifabric/demo/boundary-tracing"
                   className="rounded-xl border border-amber-500 px-6 py-4 font-bold text-amber-200"
                 >
                   Continue Anyway / তবুও এগিয়ে যান
