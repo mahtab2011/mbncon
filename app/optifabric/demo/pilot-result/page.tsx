@@ -672,14 +672,14 @@ export default function PilotResultPage() {
       number: "03",
       title: t.stepTrace,
       description: t.stepTraceDescription,
-      href: "/optifabric/demo/live-tracing",
+      href: "/optifabric/demo/boundary-tracing",
       status: "completed",
     },
     {
       number: "04",
       title: t.stepPolygon,
       description: t.stepPolygonDescription,
-      href: "/optifabric/demo/ai-polygon",
+      href: "/optifabric/demo/polygon",
       status: "completed",
     },
     {

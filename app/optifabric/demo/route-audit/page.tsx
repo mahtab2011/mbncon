@@ -65,7 +65,7 @@ const pilotRoutes: PilotRoute[] = [
       "The user identifies the pattern boundary without CAD experience.",
     descriptionBn:
       "CAD অভিজ্ঞতা ছাড়াই ব্যবহারকারী প্যাটার্নের সীমানা চিহ্নিত করেন।",
-    href: "/optifabric/demo/live-tracing",
+    href: "/optifabric/demo/boundary-tracing",
   },
   {
     id: "ai-polygon",
@@ -76,7 +76,7 @@ const pilotRoutes: PilotRoute[] = [
       "Boundary points are converted into a digital engineering shape.",
     descriptionBn:
       "সীমানার পয়েন্টগুলোকে ডিজিটাল ইঞ্জিনিয়ারিং আকারে রূপান্তর করা হয়।",
-    href: "/optifabric/demo/ai-polygon",
+    href: "/optifabric/demo/polygon",
   },
   {
     id: "ai-nesting",

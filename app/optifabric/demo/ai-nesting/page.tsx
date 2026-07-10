@@ -295,7 +295,7 @@ export default function AiNestingDemoPage() {
 
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
-              href="/optifabric/demo/ai-polygon"
+              href="/optifabric/demo/polygon"
               className="rounded-xl border border-slate-600 bg-slate-900 px-5 py-3 font-semibold text-slate-200 transition hover:border-cyan-400 hover:text-white"
             >
               ← {t.back}
