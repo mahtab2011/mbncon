@@ -244,7 +244,7 @@ export default function UploadYourPatternPage() {
 
           <div className="mt-10">
             <Link
-              href="/optifabric/mini-pilot/live-tracing"
+              href="/optifabric/demo/photo-quality"
               className="inline-block rounded-2xl bg-cyan-400 px-10 py-5 text-xl font-black text-slate-950 hover:bg-cyan-300"
             >
               🚀 Upload My Pattern / প্যাটার্ন আপলোড করুন
