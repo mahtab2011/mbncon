@@ -1,5 +1,5 @@
 import Link from "next/link";
-
+import PresentationProgress from "@/app/components/optifabric/PresentationProgress";
 const uploadSteps = [
   "Upload pattern photo or PDF",
   "Confirm 12-inch scale is visible",
@@ -12,6 +12,7 @@ export default function OptiFabricPatternUploadPage() {
   return (
     <main className="min-h-screen bg-slate-950 text-white p-6">
       <div className="max-w-5xl mx-auto">
+        <PresentationProgress currentStep={0} />
         <Link
           href="/optifabric/cutting-assistant"
           className="text-sm text-cyan-300 hover:text-cyan-200"

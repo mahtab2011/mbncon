@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import PresentationProgress from "@/app/components/optifabric/PresentationProgress";
 import {
   ChangeEvent,
   MouseEvent,
@@ -341,6 +342,7 @@ useEffect(() => {
   return (
     <main className="min-h-screen bg-slate-950 p-6 text-white">
       <div className="mx-auto max-w-7xl">
+        <PresentationProgress currentStep={2} />
         <Link
           href="/optifabric/demo/photo-quality"
           className="text-cyan-300"

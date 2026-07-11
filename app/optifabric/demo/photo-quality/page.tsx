@@ -5,6 +5,7 @@ import Image from "next/image";
 import { ChangeEvent, useMemo, useState } from "react";
 
 import { evaluatePhotoQuality } from "@/lib/optifabric/photoQualityEngine";
+import PresentationProgress from "@/app/components/optifabric/PresentationProgress";
 
 type PreviewFile = {
   name: string;
@@ -80,6 +81,7 @@ export default function PhotoQualityDemoPage() {
   return (
     <main className="min-h-screen bg-slate-950 p-6 text-white">
       <div className="mx-auto max-w-7xl">
+        <PresentationProgress currentStep={1} />
         <Link href="/optifabric/demo/upload" className="text-cyan-300">
           ← Back to Upload Guidance
         </Link>

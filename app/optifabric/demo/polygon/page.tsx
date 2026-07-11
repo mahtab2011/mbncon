@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import PresentationProgress from "@/app/components/optifabric/PresentationProgress";
 
 const boundaryPoints = [
   { id: 1, x: 120, y: 80 },
@@ -31,6 +32,7 @@ export default function PolygonDemoPage() {
   return (
     <main className="min-h-screen bg-slate-950 p-6 text-white">
       <div className="mx-auto max-w-7xl">
+        <PresentationProgress currentStep={3} />
         <Link
           href="/optifabric/demo/boundary-tracing"
           className="text-cyan-300 hover:text-cyan-200"
