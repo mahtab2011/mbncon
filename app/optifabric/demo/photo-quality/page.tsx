@@ -6,6 +6,7 @@ import { ChangeEvent, useMemo, useState } from "react";
 
 import { evaluatePhotoQuality } from "@/lib/optifabric/photoQualityEngine";
 import PresentationProgress from "@/app/components/optifabric/PresentationProgress";
+import AIExplanationCard from "@/app/components/optifabric/AIExplanationCard";
 
 type PreviewFile = {
   name: string;
@@ -349,6 +350,28 @@ export default function PhotoQualityDemoPage() {
             </div>
           </div>
         </section>
+        <div className="mt-8">
+  <AIExplanationCard
+    title="Photo Quality Check"
+    titleBn="ছবির গুণগত মান পরীক্ষা"
+
+    purpose="Check whether the uploaded photo is suitable for accurate AI analysis."
+
+    purposeBn="আপলোড করা ছবিটি AI-এর সঠিক বিশ্লেষণের জন্য উপযুক্ত কিনা তা যাচাই করা।"
+
+    why="AI needs a clear image to accurately detect the pattern boundary and avoid measurement errors."
+
+    whyBn="AI সঠিকভাবে প্যাটার্নের সীমা শনাক্ত করতে এবং পরিমাপের ভুল এড়াতে পরিষ্কার ছবি প্রয়োজন।"
+
+    bestPractice="Take the photo under good lighting with the full pattern and scale visible."
+
+    bestPracticeBn="ভালো আলোতে পুরো প্যাটার্ন ও স্কেল দৃশ্যমান রেখে ছবি তুলুন।"
+
+    commonMistake="Using blurred, dark, tilted or partially hidden images."
+
+    commonMistakeBn="ঝাপসা, অন্ধকার, কাত করা বা আংশিক ঢাকা ছবি ব্যবহার করা।"
+  />
+</div>
       </div>
     </main>
   );

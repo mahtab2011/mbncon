@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import PresentationProgress from "@/app/components/optifabric/PresentationProgress";
+import AIExplanationCard from "@/app/components/optifabric/AIExplanationCard";
 
 type Language = "en" | "bn";
 
@@ -943,6 +944,28 @@ export default function FabricSavingPage() {
             </section>
           </div>
         </section>
+        <div className="mt-8">
+  <AIExplanationCard
+    title="Fabric Saving Intelligence"
+    titleBn="কাপড় সাশ্রয় বিশ্লেষণ"
+
+    purpose="Estimate how much fabric can be saved by improving marker efficiency and reducing avoidable waste."
+
+    purposeBn="মার্কার দক্ষতা বৃদ্ধি এবং অনাকাঙ্ক্ষিত অপচয় কমিয়ে কত কাপড় সাশ্রয় করা সম্ভব তা নির্ণয় করা।"
+
+    why="AI compares the current marker result with the improved nesting result to calculate potential fabric savings."
+
+    whyBn="AI বর্তমান মার্কার ফলাফল এবং উন্নত নেস্টিং ফলাফল তুলনা করে সম্ভাব্য কাপড় সাশ্রয় নির্ণয় করে।"
+
+    bestPractice="Use verified fabric width, pattern area and marker efficiency data before reviewing the savings result."
+
+    bestPracticeBn="সাশ্রয়ের ফলাফল দেখার আগে সঠিক কাপড়ের প্রস্থ, প্যাটার্ন ক্ষেত্রফল এবং মার্কার দক্ষতার তথ্য নিশ্চিত করুন।"
+
+    commonMistake="Using estimated or incorrect production data, which may produce unrealistic savings figures."
+
+    commonMistakeBn="অনুমানভিত্তিক বা ভুল উৎপাদন তথ্য ব্যবহার করা, যার ফলে অবাস্তব সাশ্রয়ের হিসাব হতে পারে।"
+  />
+</div>
       </div>
     </main>
   );

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import PresentationProgress from "@/app/components/optifabric/PresentationProgress";
+import AIExplanationCard from "@/app/components/optifabric/AIExplanationCard";
 
 const boundaryPoints = [
   { id: 1, x: 120, y: 80 },
@@ -305,6 +306,28 @@ export default function PolygonDemoPage() {
             </Link>
           </div>
         </section>
+        <div className="mt-8">
+  <AIExplanationCard
+    title="Polygon Construction"
+    titleBn="পলিগন নির্মাণ"
+
+    purpose="Convert the traced boundary into an engineering-grade polygon suitable for accurate area calculation and AI nesting."
+
+    purposeBn="ট্রেস করা সীমানাকে প্রকৌশলগত মানের পলিগনে রূপান্তর করা যাতে সঠিক ক্ষেত্রফল গণনা এবং AI নেস্টিং করা যায়।"
+
+    why="AI requires a mathematically accurate polygon because every area, marker and fabric calculation depends on its precision."
+
+    whyBn="AI-এর জন্য গাণিতিকভাবে সঠিক পলিগন প্রয়োজন, কারণ ক্ষেত্রফল, মার্কার এবং কাপড়ের সকল হিসাব এর উপর নির্ভর করে।"
+
+    bestPractice="Ensure the traced boundary is complete before generating the polygon."
+
+    bestPracticeBn="পলিগন তৈরির আগে নিশ্চিত করুন যে পুরো সীমানা সঠিকভাবে ট্রেস করা হয়েছে।"
+
+    commonMistake="Generating the polygon before completing the full boundary tracing."
+
+    commonMistakeBn="সম্পূর্ণ সীমানা ট্রেস করার আগে পলিগন তৈরি করা।"
+  />
+</div>
       </div>
     </main>
   );

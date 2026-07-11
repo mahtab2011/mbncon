@@ -3,6 +3,9 @@
 import Link from "next/link";
 import AIGuidancePanel from "@/app/components/optifabric/AIGuidancePanel";
 import AICoach from "@/app/components/optifabric/AICoach";
+import AIExplanationCard from "@/app/components/optifabric/AIExplanationCard";
+import CommercialBanner from "@/app/components/optifabric/CommercialBanner";
+import PresentationProgress from "@/app/components/optifabric/PresentationProgress";
 
 const workflow = [
   "Upload one pattern file",
@@ -19,8 +22,18 @@ const workflow = [
 export default function UploadYourPatternPage() {
   return (
     <main className="min-h-screen bg-slate-950 p-6 text-white">
-      <div className="mx-auto max-w-7xl">
-        <Link href="/optifabric/demo/results" className="text-cyan-300">
+  <div className="mx-auto max-w-7xl">
+
+    <PresentationProgress currentStep={0} />
+
+    <div className="mt-6">
+      <CommercialBanner />
+    </div>
+
+    <Link
+      href="/optifabric/demo/results"
+      className="text-cyan-300"
+    >
           ← Back to Results
         </Link>
 
@@ -174,6 +187,28 @@ export default function UploadYourPatternPage() {
           </div>
         </section>
 
+<div className="mt-8">
+  <AIExplanationCard
+  title="Upload Pattern"
+  titleBn="প্যাটার্ন আপলোড"
+
+  purpose="Upload a clear garment pattern image or PDF for AI analysis."
+
+  purposeBn="AI বিশ্লেষণের জন্য পরিষ্কার গার্মেন্টস প্যাটার্ন ছবি বা PDF আপলোড করুন।"
+
+  why="AI requires a high-quality image to identify the exact cutting boundary and calculate an accurate pattern area."
+
+  whyBn="AI সঠিক কাটিং সীমা নির্ধারণ এবং সঠিক ক্ষেত্রফল গণনার জন্য পরিষ্কার ছবি প্রয়োজন।"
+
+  bestPractice="Use a flat pattern with a visible 12-inch reference scale under good lighting."
+
+  bestPracticeBn="ভালো আলোতে সমতল প্যাটার্ন ব্যবহার করুন এবং ১২ ইঞ্চি স্কেল অবশ্যই দৃশ্যমান রাখুন।"
+
+  commonMistake="Uploading folded, blurred or partially hidden patterns."
+
+  commonMistakeBn="ভাঁজ করা, ঝাপসা অথবা আংশিক ঢাকা প্যাটার্ন আপলোড করা।"
+/>
+</div>
         <section className="mt-8 rounded-3xl bg-green-950 p-8">
           <h2 className="text-3xl font-black">Expected AI Output</h2>
           <p className="mt-2 text-lg text-green-200">

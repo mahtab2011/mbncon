@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import PresentationProgress from "@/app/components/optifabric/PresentationProgress";
+import AIExplanationCard from "@/app/components/optifabric/AIExplanationCard";
 import {
   ChangeEvent,
   MouseEvent,
@@ -669,6 +670,28 @@ useEffect(() => {
             )}
           </div>
         </section>
+        <div className="mt-8">
+  <AIExplanationCard
+    title="Boundary Tracing"
+    titleBn="বাউন্ডারি ট্রেসিং"
+
+    purpose="Trace the exact garment pattern boundary for accurate engineering calculations."
+
+    purposeBn="সঠিক প্রকৌশলগত গণনার জন্য প্যাটার্নের সঠিক সীমানা নির্ধারণ করুন।"
+
+    why="AI uses the traced boundary to calculate the true pattern area and generate reliable nesting results."
+
+    whyBn="AI ট্রেস করা সীমানা ব্যবহার করে সঠিক ক্ষেত্রফল নির্ণয় করে এবং নির্ভরযোগ্য নেস্টিং ফলাফল তৈরি করে।"
+
+    bestPractice="Zoom in when tracing corners and curved edges to improve accuracy."
+
+    bestPracticeBn="কোণা ও বাঁকা অংশ ট্রেস করার সময় জুম ব্যবহার করুন যাতে নির্ভুলতা বৃদ্ধি পায়।"
+
+    commonMistake="Skipping corners, cutting across curves or leaving gaps in the traced boundary."
+
+    commonMistakeBn="কোণা বাদ দেওয়া, বাঁকা অংশ সোজা করে ট্রেস করা অথবা সীমানায় ফাঁক রেখে দেওয়া।"
+  />
+</div>
       </div>
     </main>
   );

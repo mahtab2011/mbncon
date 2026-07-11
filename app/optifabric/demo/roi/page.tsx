@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import PresentationProgress from "@/app/components/optifabric/PresentationProgress";
+import AIExplanationCard from "@/app/components/optifabric/AIExplanationCard";
 
 type Language = "en" | "bn";
 type RoiStatus = "excellent" | "strong" | "positive" | "review";
@@ -947,6 +948,28 @@ export default function CommercialRoiPage() {
             </section>
           </div>
         </section>
+        <div className="mt-8">
+  <AIExplanationCard
+    title="Commercial ROI Intelligence"
+    titleBn="বাণিজ্যিক ROI বিশ্লেষণ"
+
+    purpose="Calculate the commercial return created by fabric savings, waste reduction and improved cutting efficiency."
+
+    purposeBn="কাপড় সাশ্রয়, অপচয় হ্রাস এবং উন্নত কাটিং দক্ষতা থেকে সৃষ্ট বাণিজ্যিক লাভ নির্ণয় করা।"
+
+    why="AI combines fabric cost, production volume and estimated savings to show the financial value of using OptiFabric AI."
+
+    whyBn="AI কাপড়ের মূল্য, উৎপাদনের পরিমাণ এবং সম্ভাব্য সাশ্রয়ের তথ্য একত্র করে OptiFabric AI ব্যবহারের আর্থিক মূল্য দেখায়।"
+
+    bestPractice="Use realistic annual production volume, verified fabric cost and confirmed saving percentages."
+
+    bestPracticeBn="বাস্তবসম্মত বার্ষিক উৎপাদন পরিমাণ, যাচাইকৃত কাপড়ের মূল্য এবং নিশ্চিত সাশ্রয়ের হার ব্যবহার করুন।"
+
+    commonMistake="Entering exaggerated production figures or unverified fabric prices, which may overstate the expected ROI."
+
+    commonMistakeBn="অতিরঞ্জিত উৎপাদন পরিমাণ বা যাচাই না করা কাপড়ের মূল্য ব্যবহার করা, যার ফলে প্রত্যাশিত ROI অতিরিক্ত দেখাতে পারে।"
+  />
+</div>
       </div>
     </main>
   );

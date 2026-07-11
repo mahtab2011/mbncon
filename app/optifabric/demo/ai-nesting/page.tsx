@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import PresentationProgress from "@/app/components/optifabric/PresentationProgress";
+import AIExplanationCard from "@/app/components/optifabric/AIExplanationCard";
 
 type Language = "en" | "bn";
 
@@ -601,6 +602,28 @@ export default function AiNestingDemoPage() {
             </div>
           </div>
         </section>
+        <div className="mt-8">
+  <AIExplanationCard
+    title="AI Nesting"
+    titleBn="AI নেস্টিং"
+
+    purpose="Arrange pattern pieces to maximise fabric utilisation while maintaining correct engineering rules."
+
+    purposeBn="প্রকৌশলগত নিয়ম বজায় রেখে প্যাটার্নগুলো এমনভাবে সাজানো যাতে কাপড়ের সর্বোচ্চ ব্যবহার নিশ্চিত হয়।"
+
+    why="AI analyses the shape and orientation of every pattern piece to reduce fabric waste and improve marker efficiency."
+
+    whyBn="AI প্রতিটি প্যাটার্নের আকৃতি ও অবস্থান বিশ্লেষণ করে কাপড়ের অপচয় কমায় এবং মার্কারের দক্ষতা বৃদ্ধি করে।"
+
+    bestPractice="Use accurate pattern boundaries and the correct fabric width before generating the nesting layout."
+
+    bestPracticeBn="নেস্টিং করার আগে সঠিক প্যাটার্ন সীমা এবং সঠিক কাপড়ের প্রস্থ নিশ্চিত করুন।"
+
+    commonMistake="Using incomplete pattern boundaries or incorrect fabric width."
+
+    commonMistakeBn="অসম্পূর্ণ প্যাটার্ন সীমা অথবা ভুল কাপড়ের প্রস্থ ব্যবহার করা।"
+  />
+</div>
       </div>
     </main>
   );
