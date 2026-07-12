@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import PresentationProgress from "@/app/components/optifabric/PresentationProgress";
 import AIExplanationCard from "@/app/components/optifabric/AIExplanationCard";
+import CommercialFooter from "@/app/components/optifabric/CommercialFooter";
 
 type Language = "en" | "bn";
 
@@ -623,6 +624,9 @@ export default function AiNestingDemoPage() {
 
     commonMistakeBn="অসম্পূর্ণ প্যাটার্ন সীমা অথবা ভুল কাপড়ের প্রস্থ ব্যবহার করা।"
   />
+</div>
+<div className="mt-8">
+  <CommercialFooter />
 </div>
       </div>
     </main>

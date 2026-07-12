@@ -7,6 +7,7 @@ import { ChangeEvent, useMemo, useState } from "react";
 import { evaluatePhotoQuality } from "@/lib/optifabric/photoQualityEngine";
 import PresentationProgress from "@/app/components/optifabric/PresentationProgress";
 import AIExplanationCard from "@/app/components/optifabric/AIExplanationCard";
+import CommercialFooter from "@/app/components/optifabric/CommercialFooter";
 
 type PreviewFile = {
   name: string;
@@ -350,6 +351,7 @@ export default function PhotoQualityDemoPage() {
             </div>
           </div>
         </section>
+        
         <div className="mt-8">
   <AIExplanationCard
     title="Photo Quality Check"
@@ -371,6 +373,9 @@ export default function PhotoQualityDemoPage() {
 
     commonMistakeBn="ঝাপসা, অন্ধকার, কাত করা বা আংশিক ঢাকা ছবি ব্যবহার করা।"
   />
+</div>
+<div className="mt-8">
+  <CommercialFooter />
 </div>
       </div>
     </main>

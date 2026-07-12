@@ -3,6 +3,7 @@
 import Link from "next/link";
 import PresentationProgress from "@/app/components/optifabric/PresentationProgress";
 import AIExplanationCard from "@/app/components/optifabric/AIExplanationCard";
+import CommercialFooter from "@/app/components/optifabric/CommercialFooter";
 import {
   ChangeEvent,
   MouseEvent,
@@ -691,6 +692,9 @@ useEffect(() => {
 
     commonMistakeBn="কোণা বাদ দেওয়া, বাঁকা অংশ সোজা করে ট্রেস করা অথবা সীমানায় ফাঁক রেখে দেওয়া।"
   />
+</div>
+<div className="mt-8">
+  <CommercialFooter />
 </div>
       </div>
     </main>

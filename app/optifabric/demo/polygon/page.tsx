@@ -3,6 +3,7 @@
 import Link from "next/link";
 import PresentationProgress from "@/app/components/optifabric/PresentationProgress";
 import AIExplanationCard from "@/app/components/optifabric/AIExplanationCard";
+import CommercialFooter from "@/app/components/optifabric/CommercialFooter";
 
 const boundaryPoints = [
   { id: 1, x: 120, y: 80 },
@@ -327,6 +328,9 @@ export default function PolygonDemoPage() {
 
     commonMistakeBn="সম্পূর্ণ সীমানা ট্রেস করার আগে পলিগন তৈরি করা।"
   />
+</div>
+<div className="mt-8">
+  <CommercialFooter />
 </div>
       </div>
     </main>

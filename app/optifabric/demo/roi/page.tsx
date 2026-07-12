@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import PresentationProgress from "@/app/components/optifabric/PresentationProgress";
 import AIExplanationCard from "@/app/components/optifabric/AIExplanationCard";
+import CommercialFooter from "@/app/components/optifabric/CommercialFooter";
 
 type Language = "en" | "bn";
 type RoiStatus = "excellent" | "strong" | "positive" | "review";
@@ -969,6 +970,9 @@ export default function CommercialRoiPage() {
 
     commonMistakeBn="অতিরঞ্জিত উৎপাদন পরিমাণ বা যাচাই না করা কাপড়ের মূল্য ব্যবহার করা, যার ফলে প্রত্যাশিত ROI অতিরিক্ত দেখাতে পারে।"
   />
+</div>
+<div className="mt-8">
+  <CommercialFooter />
 </div>
       </div>
     </main>

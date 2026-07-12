@@ -6,6 +6,7 @@ import AICoach from "@/app/components/optifabric/AICoach";
 import AIExplanationCard from "@/app/components/optifabric/AIExplanationCard";
 import CommercialBanner from "@/app/components/optifabric/CommercialBanner";
 import PresentationProgress from "@/app/components/optifabric/PresentationProgress";
+import CommercialFooter from "@/app/components/optifabric/CommercialFooter";
 
 const workflow = [
   "Upload one pattern file",
@@ -286,6 +287,9 @@ export default function UploadYourPatternPage() {
             </Link>
           </div>
         </section>
+        <div className="mt-8">
+          <CommercialFooter />
+        </div>
       </div>
     </main>
   );

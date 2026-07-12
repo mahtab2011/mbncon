@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import PresentationProgress from "@/app/components/optifabric/PresentationProgress";
 import AIExplanationCard from "@/app/components/optifabric/AIExplanationCard";
+import CommercialFooter from "@/app/components/optifabric/CommercialFooter";
 
 type Language = "en" | "bn";
 
@@ -965,6 +966,9 @@ export default function FabricSavingPage() {
 
     commonMistakeBn="অনুমানভিত্তিক বা ভুল উৎপাদন তথ্য ব্যবহার করা, যার ফলে অবাস্তব সাশ্রয়ের হিসাব হতে পারে।"
   />
+</div>
+<div className="mt-8">
+  <CommercialFooter />
 </div>
       </div>
     </main>
