@@ -1,0 +1,126 @@
+// Central entitlement foundation — Phase 1.
+//
+// This is a NEW, isolated schema/database, separate from
+// server/optifabric-api/prisma/schema.prisma and from OptiSewing's
+// apps/api/prisma/schema.prisma. Neither of those is read, modified, or
+// migrated by this schema. See CENTRAL-ENTITLEMENT-PHASE-1.md at the repo
+// root for the full design rationale, cutover plan, and rollback notes.
+//
+// Requires its own DATABASE_URL at deploy time, pointed at a database
+// dedicated to this service — do not point it at the OptiFabric or
+// OptiSewing databases.
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// One central identity per factory/organisation, independent of how any
+// individual product (Bangladesh Apparel, OptiFabric, OptiSewing) chooses
+// to identify that same real-world organisation internally. Deliberately
+// does NOT attempt to reuse or force-align existing product-specific
+// factory UUIDs — those stay exactly as they are in their own systems.
+model Organisation {
+  id          String   @id @default(uuid())
+  name        String
+  countryCode String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  externalRefs OrganisationExternalRef[]
+  entitlements ProductEntitlement[]
+}
+
+// Which outside system("BANGLADESH_APPAREL" being the marketplace this
+// whole engagement has been working on) a given external id belongs to.
+// Deliberately open to more systems later without a schema change beyond
+// adding an enum value.
+enum ExternalSystem {
+  BANGLADESH_APPAREL
+  OPTIFABRIC
+  OPTISEWING
+}
+
+// Maps one central Organisation to that same organisation's id in each
+// external system it's known to. A single Organisation can have zero, one,
+// or several of these — e.g. a factory known to both OptiFabric and
+// OptiSewing has two rows here, one per system, but ONE Organisation.
+model OrganisationExternalRef {
+  id                String         @id @default(uuid())
+  organisationId    String
+  system            ExternalSystem
+  externalFactoryId String
+  createdAt         DateTime       @default(now())
+
+  organisation Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+
+  // A given external id can only ever map to one Organisation within a
+  // given system — this is what makes the mapping trustworthy in both
+  // directions (external id -> org, and org -> external id per system).
+  @@unique([system, externalFactoryId])
+  @@index([organisationId])
+}
+
+enum Product {
+  OPTIFABRIC
+  OPTISEWING
+}
+
+// Why this Organisation currently has (or had) access to this Product.
+// BANGLADESH_FREE and INTERNATIONAL_TRIAL are both "free" in the sense of
+// no charge, but are handled by different access rules (see
+// EntitlementService.getEffectiveEntitlement): BANGLADESH_FREE never
+// expires; INTERNATIONAL_TRIAL expires at trialEndsAt.
+enum EntitlementSource {
+  BANGLADESH_FREE
+  INTERNATIONAL_TRIAL
+  PAID
+}
+
+// Only meaningful when source = PAID. Left null for BANGLADESH_FREE and
+// INTERNATIONAL_TRIAL rows.
+enum PlanCode {
+  OPTIFABRIC_MONTHLY
+  OPTISEWING_MONTHLY
+  BUNDLE_MONTHLY
+}
+
+// The authoritative entitlement fact: does this Organisation have access to
+// this Product, and why. Deliberately holds NO separate "status" enum —
+// access is always computed from (source, trialEndsAt, currentPeriodEnd) at
+// read time by EntitlementService.getEffectiveEntitlement(), so there is no
+// stale/stored boolean that could ever disagree with the timestamps. See
+// that method for the exact decision logic.
+//
+// At most one row exists per (organisationId, product) at any time — state
+// transitions (e.g. trial -> paid) UPDATE the existing row rather than
+// inserting a new one, mirroring the pattern already used by both
+// legacy per-product Subscription tables this schema is intentionally NOT
+// touching.
+model ProductEntitlement {
+  id             String            @id @default(uuid())
+  organisationId String
+  product        Product
+  source         EntitlementSource
+  planCode       PlanCode?
+
+  // Only meaningful when source = INTERNATIONAL_TRIAL.
+  trialStartedAt DateTime?
+  trialEndsAt    DateTime?
+
+  // Only meaningful when source = PAID.
+  currentPeriodStart DateTime?
+  currentPeriodEnd   DateTime?
+  cancelAtPeriodEnd  Boolean   @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  organisation Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+
+  @@unique([organisationId, product])
+  @@index([organisationId])
+}
