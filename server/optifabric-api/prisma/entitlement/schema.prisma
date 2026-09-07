@@ -1,0 +1,113 @@
+// ============================================================================
+// LOCAL READ/WRITE COPY of the central entitlement schema — Phase 2 adapter.
+// ============================================================================
+//
+// This file MUST be kept model-for-model identical to
+// server/entitlement-api/prisma/schema.prisma. It exists ONLY because a
+// direct cross-package TypeScript import of entitlement-api's own generated
+// Prisma client hit a real, confirmed `tsc` module-resolution collision: two
+// differently-generated `@prisma/client` packages (this backend's own, and
+// entitlement-api's) sharing the same package name caused TypeScript's
+// module-resolution cache to serve entitlement-api's generated types from
+// THIS package's `@prisma/client` output when both were pulled into one
+// compilation via relative imports (reproduced with `tsc --traceResolution`
+// during Phase 2 implementation — see docs/PHASE-2-ENTITLEMENT-CUTOVER.md,
+// "Integration architecture chosen", for the full writeup).
+//
+// The FIX for that collision is this file's custom `generator` `output`
+// path below — it generates into this package's OWN node_modules under a
+// name that can never collide with any other package's "@prisma/client",
+// so there is nothing left to confuse TypeScript's resolver.
+//
+// This is NOT a second entitlement DATABASE — `datasource.url` reads
+// ENTITLEMENT_DATABASE_URL, which must be set to the EXACT SAME connection
+// string as entitlement-api's own DATABASE_URL at deploy time. One
+// database, two independently-generated TypeScript bindings to it — the
+// same pattern documented in entitlement-providers.ts.
+//
+// KNOWN RISK, explicitly flagged rather than hidden: because this is a
+// second COPY of the schema text (not a shared import), a future schema
+// change in entitlement-api will NOT automatically propagate here. This is
+// the accepted cost of avoiding the tsc collision without touching
+// entitlement-api itself, and it is exactly the kind of coupling a proper
+// npm-workspace or published-internal-package setup would remove — flagged
+// as a Phase 3+ follow-up in the Phase 2 report, not solved here.
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../node_modules/.prisma-entitlement-client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("ENTITLEMENT_DATABASE_URL")
+}
+
+model Organisation {
+  id          String   @id @default(uuid())
+  name        String
+  countryCode String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  externalRefs OrganisationExternalRef[]
+  entitlements ProductEntitlement[]
+}
+
+enum ExternalSystem {
+  BANGLADESH_APPAREL
+  OPTIFABRIC
+  OPTISEWING
+}
+
+model OrganisationExternalRef {
+  id                String         @id @default(uuid())
+  organisationId    String
+  system            ExternalSystem
+  externalFactoryId String
+  createdAt         DateTime       @default(now())
+
+  organisation Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+
+  @@unique([system, externalFactoryId])
+  @@index([organisationId])
+}
+
+enum Product {
+  OPTIFABRIC
+  OPTISEWING
+}
+
+enum EntitlementSource {
+  BANGLADESH_FREE
+  INTERNATIONAL_TRIAL
+  PAID
+}
+
+enum PlanCode {
+  OPTIFABRIC_MONTHLY
+  OPTISEWING_MONTHLY
+  BUNDLE_MONTHLY
+}
+
+model ProductEntitlement {
+  id             String            @id @default(uuid())
+  organisationId String
+  product        Product
+  source         EntitlementSource
+  planCode       PlanCode?
+
+  trialStartedAt DateTime?
+  trialEndsAt    DateTime?
+
+  currentPeriodStart DateTime?
+  currentPeriodEnd   DateTime?
+  cancelAtPeriodEnd  Boolean   @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  organisation Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+
+  @@unique([organisationId, product])
+  @@index([organisationId])
+}

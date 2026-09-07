@@ -5,6 +5,7 @@ import { AuthModule } from "./modules/auth/auth.module";
 import { SubscriptionModule } from "./modules/subscription/subscription.module";
 import { HealthModule } from "./modules/health/health.module";
 import { SubscriptionGuard } from "./common/guards/subscription.guard";
+import { EntitlementIntegrationModule } from "./entitlement/entitlement.module";
 
 @Module({
   imports: [
@@ -18,6 +19,11 @@ import { SubscriptionGuard } from "./common/guards/subscription.guard";
     HealthModule,
     AuthModule,
     SubscriptionModule,
+    // Phase 2: central entitlement — provides the SubscriptionGuard's new
+    // decision dependencies (OrganisationResolverService,
+    // EntitlementOnboardingService, the entitlement Prisma/service tokens).
+    // See docs/PHASE-2-ENTITLEMENT-CUTOVER.md.
+    EntitlementIntegrationModule,
   ],
   controllers: [],
   providers: [

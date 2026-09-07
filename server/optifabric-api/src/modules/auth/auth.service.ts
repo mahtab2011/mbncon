@@ -10,6 +10,7 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  Logger,
   NotFoundException,
   UnauthorizedException,
 } from "@nestjs/common";
@@ -26,6 +27,8 @@ import {
   SEATS_ALLOWED_BEFORE_APPROVAL,
   TRIAL_PERIOD_DAYS,
 } from "../subscription/subscription.types";
+import { OrganisationResolverService } from "../../entitlement/organisation-resolver.service";
+import { EntitlementOnboardingService } from "../../entitlement/entitlement-onboarding.service";
 
 const BCRYPT_WORK_FACTOR = 12;
 
@@ -45,9 +48,13 @@ export interface SignUpInput {
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger("AuthService");
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
+    private readonly organisationResolver: OrganisationResolverService,
+    private readonly entitlementOnboarding: EntitlementOnboardingService,
   ) {}
 
   async hashPassword(plainPassword: string): Promise<string> {
@@ -59,7 +66,17 @@ export class AuthService {
       throw new BadRequestException("Password must be at least 8 characters.");
     }
 
-    return this.prisma.$transaction(async (tx) => {
+    // Populated only when this signup creates a brand-new factory — read
+    // after the (optifabric-database-only) transaction below commits, to
+    // drive central-entitlement onboarding. See onboardNewFactoryEntitlement.
+    let newFactoryContext: {
+      factoryId: string;
+      factoryName: string;
+      country: string;
+      isBangladesh: boolean;
+    } | null = null;
+
+    const result = await this.prisma.$transaction(async (tx) => {
       let factory = await tx.factory.findUnique({ where: { factoryCode: input.factoryCode } });
       let isFoundingAdmin = false;
 
@@ -140,6 +157,13 @@ export class AuthService {
               cancelAtPeriodEnd: false,
             };
         await tx.subscription.create({ data: { ...fields, signature: signSubscriptionFields(fields) } });
+
+        newFactoryContext = {
+          factoryId: factory.id,
+          factoryName: factory.factoryName,
+          country: factory.country,
+          isBangladesh,
+        };
       }
 
       await tx.auditEvent.create({
@@ -181,6 +205,52 @@ export class AuthService {
         isFoundingAdmin,
       };
     });
+
+    if (newFactoryContext) {
+      await this.onboardNewFactoryEntitlement(newFactoryContext);
+    }
+
+    return result;
+  }
+
+  // Central-entitlement side effect of a brand-new factory's founding-admin
+  // signup. Deliberately runs AFTER the optifabric-database transaction
+  // above has already committed, not inside it: the entitlement database is
+  // a physically separate Postgres database (server/entitlement-api's own),
+  // so no single Prisma/Postgres transaction can span both — there is no
+  // two-phase-commit here. This is an accepted eventual-consistency
+  // tradeoff (see docs/PHASE-2-ENTITLEMENT-CUTOVER.md): if this call fails,
+  // the OptiFabric account still exists (the signup itself already
+  // succeeded), but SubscriptionGuard will fail closed for that factory
+  // until the mapping/trial is retried or backfilled — never the other way
+  // around (never "account exists, guard wrongly allows access").
+  //
+  // Bangladesh factories: mapping only, per the Phase 2 Bangladesh rule —
+  // never auto-grants BANGLADESH_FREE from a self-declared country field.
+  private async onboardNewFactoryEntitlement(ctx: {
+    factoryId: string;
+    factoryName: string;
+    country: string;
+    isBangladesh: boolean;
+  }): Promise<void> {
+    try {
+      const organisationId = await this.organisationResolver.resolveOrCreateOrganisationForOptiFabricFactory(
+        ctx.factoryId,
+        ctx.factoryName,
+        ctx.country,
+      );
+
+      if (ctx.isBangladesh) {
+        this.entitlementOnboarding.onboardNewBangladeshFactory();
+      } else {
+        await this.entitlementOnboarding.onboardNewInternationalFactory(organisationId);
+      }
+    } catch (err) {
+      this.logger.error(
+        `Central entitlement onboarding failed for factory ${ctx.factoryId}: ${(err as Error).message}. ` +
+          "The OptiFabric account was created successfully; entitlement mapping/trial needs to be retried or backfilled.",
+      );
+    }
   }
 
   // An OptiFabric representative approves a signup that was held past the
@@ -279,7 +349,54 @@ export class AuthService {
     if (!passwordMatches) {
       throw new UnauthorizedException("Invalid credentials.");
     }
+
+    // PHASE 2A hardening (Issue 3): every successful login is also an
+    // idempotent entitlement-reconciliation opportunity. If this factory's
+    // signup-time onboarding failed or never ran (mapping missing, or an
+    // international trial never started), this repairs it here — never by
+    // extending an already-existing trial/mapping. See
+    // reconcileEntitlementOnboarding's own doc comment and
+    // docs/PHASE-2A-MAPPING-BACKFILL-HARDENING.md, "Issue 3", for why this
+    // was chosen over a fake cross-database transaction.
+    await this.reconcileEntitlementOnboarding(factoryId);
+
     return user;
+  }
+
+  // IDEMPOTENT RECOVERY/RECONCILIATION — Phase 2A. Safe to call on every
+  // login, not just once: resolveOrCreateOrganisationForOptiFabricFactory
+  // is idempotent (never creates a duplicate mapping), and
+  // onboardNewInternationalFactory -> startInternationalTrial is idempotent
+  // (a no-op once an entitlement row already exists for either product) —
+  // so this can NEVER restart a trial or re-grant something that already
+  // exists. It only ever completes work that a prior signup's best-effort
+  // onboarding step failed to finish. Never throws: a reconciliation
+  // failure must never block a legitimate login (the account already
+  // exists); SubscriptionGuard's fail-closed behavior remains the actual
+  // safety net for a factory whose reconciliation keeps failing.
+  async reconcileEntitlementOnboarding(factoryId: string): Promise<void> {
+    try {
+      const factory = await this.prisma.factory.findUnique({ where: { id: factoryId } });
+      if (!factory) return;
+
+      const isBangladesh = isBangladeshFactory(factory.country);
+      const organisationId = await this.organisationResolver.resolveOrCreateOrganisationForOptiFabricFactory(
+        factory.id,
+        factory.factoryName,
+        factory.country,
+      );
+
+      if (isBangladesh) {
+        this.entitlementOnboarding.onboardNewBangladeshFactory();
+      } else {
+        await this.entitlementOnboarding.onboardNewInternationalFactory(organisationId);
+      }
+    } catch (err) {
+      this.logger.error(
+        `Entitlement reconciliation failed for factory ${factoryId}: ${(err as Error).message}. ` +
+          "Access remains fail-closed via SubscriptionGuard until this is retried.",
+      );
+    }
   }
 
   async issueToken(user: { id: string; factoryId: string; role: string }) {

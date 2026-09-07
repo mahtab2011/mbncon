@@ -6,7 +6,9 @@
     "build": "nest build",
     "lint": "tsc --noEmit",
     "test": "jest",
-    "start:dev": "nest start --watch"
+    "start:dev": "nest start --watch",
+    "check:entitlement-schema-parity": "ts-node scripts/entitlement-schema-parity.ts",
+    "backfill:optifabric-entitlements": "ts-node scripts/backfill-optifabric-entitlements.ts"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",

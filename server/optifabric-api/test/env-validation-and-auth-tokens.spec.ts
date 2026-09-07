@@ -10,6 +10,9 @@ const VALID_PLATFORM_REP_API_KEY = "e".repeat(64);
 function baseEnv(overrides: Record<string, string | undefined> = {}) {
   return {
     DATABASE_URL: "postgresql://user:pass@localhost:5432/optifabric",
+    // Phase 2: required alongside DATABASE_URL now that SubscriptionGuard
+    // depends on central entitlement — see env-validation.config.ts.
+    ENTITLEMENT_DATABASE_URL: "postgresql://user:pass@localhost:5432/entitlement",
     JWT_SECRET: VALID_JWT_SECRET,
     CORS_ALLOWED_ORIGINS: "https://optifabric.mbncon.com",
     LICENSE_SIGNING_SECRET: VALID_LICENSE_SIGNING_SECRET,
@@ -17,6 +20,20 @@ function baseEnv(overrides: Record<string, string | undefined> = {}) {
     ...overrides,
   };
 }
+
+// Phase 2: AuthService now also takes an OrganisationResolverService and an
+// EntitlementOnboardingService — see the equivalent comment in
+// test/auth-signup.spec.ts. Not exercised by this file's tests.
+const noopOrganisationResolver = {
+  resolveOrganisationForOptiFabricFactory: jest.fn().mockResolvedValue(null),
+  resolveOrCreateOrganisationForOptiFabricFactory: jest.fn().mockResolvedValue("org-stub"),
+};
+const noopEntitlementOnboarding = {
+  onboardNewInternationalFactory: jest.fn().mockResolvedValue(undefined),
+  onboardNewBangladeshFactory: jest.fn(),
+  isEligibleForBangladeshTransitionalAccess: jest.fn().mockResolvedValue(false),
+  identifyLegacyBangladeshFreeFactories: jest.fn().mockResolvedValue([]),
+};
 
 describe("validateEnv (fail-closed startup checks)", () => {
   it("throws when required env vars are missing", () => {
@@ -75,7 +92,12 @@ describe("AuthService token revocation", () => {
     const prisma = buildPrismaMock();
     prisma.revokedTokenRecord.findUnique.mockResolvedValue(null);
     const jwtService = { signAsync: jest.fn() };
-    const service = new AuthService(prisma as never, jwtService as never);
+    const service = new AuthService(
+      prisma as never,
+      jwtService as never,
+      noopOrganisationResolver as never,
+      noopEntitlementOnboarding as never,
+    );
 
     await expect(service.isRevoked("jti-1")).resolves.toBe(false);
   });
@@ -85,7 +107,12 @@ describe("AuthService token revocation", () => {
     prisma.revokedTokenRecord.upsert.mockResolvedValue({ tokenJti: "jti-1" });
     prisma.revokedTokenRecord.findUnique.mockResolvedValue({ tokenJti: "jti-1" });
     const jwtService = { signAsync: jest.fn() };
-    const service = new AuthService(prisma as never, jwtService as never);
+    const service = new AuthService(
+      prisma as never,
+      jwtService as never,
+      noopOrganisationResolver as never,
+      noopEntitlementOnboarding as never,
+    );
 
     await service.revokeToken("jti-1", new Date(Date.now() + 60_000));
     await expect(service.isRevoked("jti-1")).resolves.toBe(true);
@@ -94,7 +121,12 @@ describe("AuthService token revocation", () => {
   it("issueToken signs a payload carrying factoryId, role, and a fresh jti", async () => {
     const prisma = buildPrismaMock();
     const jwtService = { signAsync: jest.fn().mockResolvedValue("signed.jwt.token") };
-    const service = new AuthService(prisma as never, jwtService as never);
+    const service = new AuthService(
+      prisma as never,
+      jwtService as never,
+      noopOrganisationResolver as never,
+      noopEntitlementOnboarding as never,
+    );
 
     const result = await service.issueToken({ id: "user-1", factoryId: "f-1", role: "ROLE_OPERATOR" });
 

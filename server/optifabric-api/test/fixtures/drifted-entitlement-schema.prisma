@@ -1,0 +1,85 @@
+// Deliberately-drifted fixture for test/entitlement-schema-parity.spec.ts —
+// proves the parity comparator actually detects a real mismatch and isn't
+// a no-op. The drift here: PlanCode is missing BUNDLE_MONTHLY, and
+// ProductEntitlement has an extra `notes` field that doesn't exist in the
+// authoritative schema. Never generated against, never used by any client
+// — text only.
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../node_modules/.prisma-entitlement-client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("ENTITLEMENT_DATABASE_URL")
+}
+
+model Organisation {
+  id          String   @id @default(uuid())
+  name        String
+  countryCode String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  externalRefs OrganisationExternalRef[]
+  entitlements ProductEntitlement[]
+}
+
+enum ExternalSystem {
+  BANGLADESH_APPAREL
+  OPTIFABRIC
+  OPTISEWING
+}
+
+model OrganisationExternalRef {
+  id                String         @id @default(uuid())
+  organisationId    String
+  system            ExternalSystem
+  externalFactoryId String
+  createdAt         DateTime       @default(now())
+
+  organisation Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+
+  @@unique([system, externalFactoryId])
+  @@index([organisationId])
+}
+
+enum Product {
+  OPTIFABRIC
+  OPTISEWING
+}
+
+enum EntitlementSource {
+  BANGLADESH_FREE
+  INTERNATIONAL_TRIAL
+  PAID
+}
+
+enum PlanCode {
+  OPTIFABRIC_MONTHLY
+  OPTISEWING_MONTHLY
+}
+
+model ProductEntitlement {
+  id             String            @id @default(uuid())
+  organisationId String
+  product        Product
+  source         EntitlementSource
+  planCode       PlanCode?
+  notes          String?
+
+  trialStartedAt DateTime?
+  trialEndsAt    DateTime?
+
+  currentPeriodStart DateTime?
+  currentPeriodEnd   DateTime?
+  cancelAtPeriodEnd  Boolean   @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  organisation Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+
+  @@unique([organisationId, product])
+  @@index([organisationId])
+}

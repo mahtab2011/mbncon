@@ -5,6 +5,24 @@ import { AuthService } from "../src/modules/auth/auth.service";
 
 const TEST_SECRET = "d".repeat(64);
 
+// Phase 2: AuthService now also takes an OrganisationResolverService and an
+// EntitlementOnboardingService (see auth.service.ts). None of these
+// pre-existing signup tests exercise central-entitlement onboarding — that
+// has its own dedicated coverage in test/entitlement-cutover.spec.ts — so a
+// no-op stub is enough here; onboardNewFactoryEntitlement() also swallows
+// any error from these (logged, not thrown), so signUp() itself is
+// unaffected either way.
+const noopOrganisationResolver = {
+  resolveOrganisationForOptiFabricFactory: jest.fn().mockResolvedValue(null),
+  resolveOrCreateOrganisationForOptiFabricFactory: jest.fn().mockResolvedValue("org-stub"),
+};
+const noopEntitlementOnboarding = {
+  onboardNewInternationalFactory: jest.fn().mockResolvedValue(undefined),
+  onboardNewBangladeshFactory: jest.fn(),
+  isEligibleForBangladeshTransitionalAccess: jest.fn().mockResolvedValue(false),
+  identifyLegacyBangladeshFreeFactories: jest.fn().mockResolvedValue([]),
+};
+
 async function withLicenseSecret<T>(fn: () => Promise<T>): Promise<T> {
   const original = process.env.LICENSE_SIGNING_SECRET;
   process.env.LICENSE_SIGNING_SECRET = TEST_SECRET;
@@ -40,7 +58,12 @@ describe("AuthService.signUp", () => {
   it("rejects a password shorter than 8 characters", async () => {
     const { prisma } = buildPrismaMock();
     const jwtService = { signAsync: jest.fn() };
-    const service = new AuthService(prisma as never, jwtService as never);
+    const service = new AuthService(
+        prisma as never,
+        jwtService as never,
+        noopOrganisationResolver as never,
+        noopEntitlementOnboarding as never,
+      );
 
     await expect(
       service.signUp({
@@ -64,7 +87,12 @@ describe("AuthService.signUp", () => {
         Promise.resolve({ id: "user-1", ...data }),
       );
       const jwtService = { signAsync: jest.fn().mockResolvedValue("signed.jwt") };
-      const service = new AuthService(prisma as never, jwtService as never);
+      const service = new AuthService(
+        prisma as never,
+        jwtService as never,
+        noopOrganisationResolver as never,
+        noopEntitlementOnboarding as never,
+      );
 
       const result = await service.signUp({
         factoryCode: "F-1",
@@ -94,7 +122,12 @@ describe("AuthService.signUp", () => {
         Promise.resolve({ id: "user-2", ...data }),
       );
       const jwtService = { signAsync: jest.fn().mockResolvedValue("signed.jwt") };
-      const service = new AuthService(prisma as never, jwtService as never);
+      const service = new AuthService(
+        prisma as never,
+        jwtService as never,
+        noopOrganisationResolver as never,
+        noopEntitlementOnboarding as never,
+      );
 
       const result = await service.signUp({
         factoryCode: "F-1",
@@ -124,7 +157,12 @@ describe("AuthService.signUp", () => {
         Promise.resolve({ id: "user-1", ...data }),
       );
       const jwtService = { signAsync: jest.fn().mockResolvedValue("signed.jwt") };
-      const service = new AuthService(prisma as never, jwtService as never);
+      const service = new AuthService(
+        prisma as never,
+        jwtService as never,
+        noopOrganisationResolver as never,
+        noopEntitlementOnboarding as never,
+      );
 
       await service.signUp({
         factoryCode: "BD-1",
@@ -159,7 +197,12 @@ describe("AuthService.signUp", () => {
         Promise.resolve({ id: "user-4", ...data }),
       );
       const jwtService = { signAsync: jest.fn() };
-      const service = new AuthService(prisma as never, jwtService as never);
+      const service = new AuthService(
+        prisma as never,
+        jwtService as never,
+        noopOrganisationResolver as never,
+        noopEntitlementOnboarding as never,
+      );
 
       const result = await service.signUp({
         factoryCode: "BD-1",
@@ -188,7 +231,12 @@ describe("AuthService.signUp", () => {
         Promise.resolve({ id: "user-4", ...data }),
       );
       const jwtService = { signAsync: jest.fn() };
-      const service = new AuthService(prisma as never, jwtService as never);
+      const service = new AuthService(
+        prisma as never,
+        jwtService as never,
+        noopOrganisationResolver as never,
+        noopEntitlementOnboarding as never,
+      );
 
       const result = await service.signUp({
         factoryCode: "VN-1",
@@ -214,7 +262,12 @@ describe("AuthService.signUp", () => {
         Promise.resolve({ id: "user-5", ...data }),
       );
       const jwtService = { signAsync: jest.fn().mockResolvedValue("signed.jwt") };
-      const service = new AuthService(prisma as never, jwtService as never);
+      const service = new AuthService(
+        prisma as never,
+        jwtService as never,
+        noopOrganisationResolver as never,
+        noopEntitlementOnboarding as never,
+      );
 
       const result = await service.signUp({
         factoryCode: "BD-1",
@@ -235,7 +288,12 @@ describe("AuthService.signUp", () => {
     tx.factory.findUnique.mockResolvedValue({ id: "factory-1", factoryCode: "F-1" });
     tx.user.findUnique.mockResolvedValue({ id: "existing-user" });
     const jwtService = { signAsync: jest.fn() };
-    const service = new AuthService(prisma as never, jwtService as never);
+    const service = new AuthService(
+        prisma as never,
+        jwtService as never,
+        noopOrganisationResolver as never,
+        noopEntitlementOnboarding as never,
+      );
 
     await expect(
       service.signUp({
@@ -261,7 +319,12 @@ describe("AuthService.approvePendingUser", () => {
         Promise.resolve({ id: "sub-bd", ...create }),
       );
       const jwtService = { signAsync: jest.fn() };
-      const service = new AuthService(prisma as never, jwtService as never);
+      const service = new AuthService(
+        prisma as never,
+        jwtService as never,
+        noopOrganisationResolver as never,
+        noopEntitlementOnboarding as never,
+      );
 
       const result = await service.approvePendingUser("user-4", "confirmed via bKash");
 
@@ -274,7 +337,12 @@ describe("AuthService.approvePendingUser", () => {
     const { prisma, tx } = buildPrismaMock();
     tx.user.findUnique.mockResolvedValue(null);
     const jwtService = { signAsync: jest.fn() };
-    const service = new AuthService(prisma as never, jwtService as never);
+    const service = new AuthService(
+        prisma as never,
+        jwtService as never,
+        noopOrganisationResolver as never,
+        noopEntitlementOnboarding as never,
+      );
 
     await expect(service.approvePendingUser("missing-user")).rejects.toBeInstanceOf(NotFoundException);
   });
@@ -283,7 +351,12 @@ describe("AuthService.approvePendingUser", () => {
     const { prisma, tx } = buildPrismaMock();
     tx.user.findUnique.mockResolvedValue({ id: "user-1", factoryId: "factory-1", isActive: true });
     const jwtService = { signAsync: jest.fn() };
-    const service = new AuthService(prisma as never, jwtService as never);
+    const service = new AuthService(
+        prisma as never,
+        jwtService as never,
+        noopOrganisationResolver as never,
+        noopEntitlementOnboarding as never,
+      );
 
     await expect(service.approvePendingUser("user-1")).rejects.toBeInstanceOf(BadRequestException);
   });

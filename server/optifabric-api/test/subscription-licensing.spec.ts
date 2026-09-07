@@ -368,6 +368,15 @@ describe("SubscriptionService.computeEffectiveState", () => {
   });
 });
 
+// PHASE 2: SubscriptionGuard's decision dependencies changed from a single
+// legacy SubscriptionService to (FactoryOrganisationMappingService,
+// EntitlementOnboardingService, EntitlementDecisionService) — see
+// src/common/guards/subscription.guard.ts. PHASE 2A renamed the first
+// dependency from a plain read-only OrganisationResolverService to a
+// mapping service that also lazily creates a mapping when none exists yet
+// (see docs/PHASE-2A-MAPPING-BACKFILL-HARDENING.md) — these three smoke
+// tests are updated to the new shape; the full case matrix (including the
+// lazy-mapping/lockout-fix scenarios) lives in test/entitlement-cutover.spec.ts.
 describe("SubscriptionGuard", () => {
   function buildContext(user: unknown, handlerMeta: boolean | undefined) {
     return {
@@ -378,33 +387,75 @@ describe("SubscriptionGuard", () => {
     } as never;
   }
 
+  function buildDeps() {
+    const mapping = {
+      resolveOrLazilyMapOrganisation: jest.fn().mockResolvedValue("org-1"),
+    };
+    const onboarding = {
+      isEligibleForBangladeshTransitionalAccess: jest.fn().mockResolvedValue(false),
+    };
+    const entitlementDecision = { canAccess: jest.fn() };
+    return { mapping, onboarding, entitlementDecision };
+  }
+
   it("allows the request through when @SkipSubscriptionCheck() metadata is present", async () => {
     const reflector = { getAllAndOverride: jest.fn().mockReturnValue(true) };
-    const subscriptionService = { getEffectiveState: jest.fn() };
-    const guard = new SubscriptionGuard(reflector as never, subscriptionService as never);
+    const { mapping, onboarding, entitlementDecision } = buildDeps();
+    const guard = new SubscriptionGuard(
+      reflector as never,
+      mapping as never,
+      onboarding as never,
+      entitlementDecision as never,
+    );
 
     await expect(guard.canActivate(buildContext({ factoryId: "f-1" }, true))).resolves.toBe(true);
-    expect(subscriptionService.getEffectiveState).not.toHaveBeenCalled();
+    expect(mapping.resolveOrLazilyMapOrganisation).not.toHaveBeenCalled();
+    expect(entitlementDecision.canAccess).not.toHaveBeenCalled();
   });
 
-  it("throws 402 Payment Required when the factory's subscription has expired", async () => {
+  it("throws 402 Payment Required when central entitlement denies access and no Bangladesh fallback applies", async () => {
     const reflector = { getAllAndOverride: jest.fn().mockReturnValue(false) };
-    const subscriptionService = {
-      getEffectiveState: jest.fn().mockResolvedValue({ status: "EXPIRED", isAccessAllowed: false, tampered: false }),
-    };
-    const guard = new SubscriptionGuard(reflector as never, subscriptionService as never);
+    const { mapping, onboarding, entitlementDecision } = buildDeps();
+    entitlementDecision.canAccess.mockResolvedValue(false);
+    const guard = new SubscriptionGuard(
+      reflector as never,
+      mapping as never,
+      onboarding as never,
+      entitlementDecision as never,
+    );
 
     await expect(guard.canActivate(buildContext({ factoryId: "f-1" }, false))).rejects.toBeInstanceOf(HttpException);
   });
 
-  it("allows the request through when the subscription is active", async () => {
+  it("allows the request through when central entitlement grants access", async () => {
     const reflector = { getAllAndOverride: jest.fn().mockReturnValue(false) };
-    const subscriptionService = {
-      getEffectiveState: jest.fn().mockResolvedValue({ status: "ACTIVE", isAccessAllowed: true, tampered: false }),
-    };
-    const guard = new SubscriptionGuard(reflector as never, subscriptionService as never);
+    const { mapping, onboarding, entitlementDecision } = buildDeps();
+    entitlementDecision.canAccess.mockResolvedValue(true);
+    const guard = new SubscriptionGuard(
+      reflector as never,
+      mapping as never,
+      onboarding as never,
+      entitlementDecision as never,
+    );
 
     await expect(guard.canActivate(buildContext({ factoryId: "f-1" }, false))).resolves.toBe(true);
+  });
+
+  it("PHASE 2A: denies fail-closed when the factory itself does not exist (lazy mapping returns null)", async () => {
+    const reflector = { getAllAndOverride: jest.fn().mockReturnValue(false) };
+    const { mapping, onboarding, entitlementDecision } = buildDeps();
+    mapping.resolveOrLazilyMapOrganisation.mockResolvedValue(null);
+    const guard = new SubscriptionGuard(
+      reflector as never,
+      mapping as never,
+      onboarding as never,
+      entitlementDecision as never,
+    );
+
+    await expect(guard.canActivate(buildContext({ factoryId: "ghost-factory" }, false))).rejects.toBeInstanceOf(
+      HttpException,
+    );
+    expect(entitlementDecision.canAccess).not.toHaveBeenCalled();
   });
 
   it("SkipSubscriptionCheck() decorator is defined and callable", () => {
