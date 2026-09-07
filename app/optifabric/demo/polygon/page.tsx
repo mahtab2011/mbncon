@@ -300,7 +300,7 @@ export default function PolygonDemoPage() {
 
           <div className="mt-8 text-center">
             <Link
-              href="/optifabric/demo/nesting"
+              href="/optifabric/demo/ai-nesting"
               className="inline-block rounded-2xl bg-cyan-400 px-10 py-5 text-xl font-black text-slate-950 hover:bg-cyan-300"
             >
               Continue to AI Nesting →

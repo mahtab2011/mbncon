@@ -1,0 +1,268 @@
+export const thermalLeggingPatternMaster = [
+  {
+    id: "thermal-legging-left-front",
+    name: "Left Front Leg",
+    required: true,
+    cutQuantity: 1,
+    cutOnFold: false,
+    custom: false,
+    sequence: 1,
+    description:
+      "Left front leg panel extending from waist to ankle for thermal legging construction.",
+  },
+  {
+    id: "thermal-legging-right-front",
+    name: "Right Front Leg",
+    required: true,
+    cutQuantity: 1,
+    cutOnFold: false,
+    custom: false,
+    sequence: 2,
+    description:
+      "Right front leg panel extending from waist to ankle for thermal legging construction.",
+  },
+  {
+    id: "thermal-legging-left-back",
+    name: "Left Back Leg",
+    required: true,
+    cutQuantity: 1,
+    cutOnFold: false,
+    custom: false,
+    sequence: 3,
+    description:
+      "Left back leg panel shaped for seat and calf comfort.",
+  },
+  {
+    id: "thermal-legging-right-back",
+    name: "Right Back Leg",
+    required: true,
+    cutQuantity: 1,
+    cutOnFold: false,
+    custom: false,
+    sequence: 4,
+    description:
+      "Right back leg panel shaped for seat and calf comfort.",
+  },
+  {
+    id: "thermal-legging-waistband",
+    name: "Waistband",
+    required: true,
+    cutQuantity: 1,
+    cutOnFold: false,
+    custom: false,
+    sequence: 5,
+    description:
+      "Main waistband providing stretch, support and waist stability.",
+  },
+  {
+    id: "thermal-legging-waist-elastic",
+    name: "Waist Elastic Channel",
+    required: false,
+    cutQuantity: 1,
+    cutOnFold: false,
+    custom: false,
+    sequence: 6,
+    description:
+      "Optional casing or channel used to insert waistband elastic.",
+  },
+  {
+    id: "thermal-legging-front-gusset",
+    name: "Front Gusset",
+    required: false,
+    cutQuantity: 1,
+    cutOnFold: false,
+    custom: false,
+    sequence: 7,
+    description:
+      "Optional front crotch gusset improving flexibility and comfort.",
+  },
+  {
+    id: "thermal-legging-back-gusset",
+    name: "Back Gusset",
+    required: false,
+    cutQuantity: 1,
+    cutOnFold: false,
+    custom: false,
+    sequence: 8,
+    description:
+      "Optional rear gusset reducing seam stress during movement.",
+  },
+  {
+    id: "thermal-legging-crotch-gusset",
+    name: "Diamond Gusset",
+    required: false,
+    cutQuantity: 1,
+    cutOnFold: false,
+    custom: false,
+    sequence: 9,
+    description:
+      "Diamond-shaped gusset improving mobility for sports and thermal garments.",
+  },
+  {
+    id: "thermal-legging-left-knee-panel",
+    name: "Left Knee Panel",
+    required: false,
+    cutQuantity: 1,
+    cutOnFold: false,
+    custom: false,
+    sequence: 10,
+    description:
+      "Optional articulated left knee reinforcement panel.",
+  },
+  {
+    id: "thermal-legging-right-knee-panel",
+    name: "Right Knee Panel",
+    required: false,
+    cutQuantity: 1,
+    cutOnFold: false,
+    custom: false,
+    sequence: 11,
+    description:
+      "Optional articulated right knee reinforcement panel.",
+  },
+  {
+    id: "thermal-legging-left-calf-panel",
+    name: "Left Calf Panel",
+    required: false,
+    cutQuantity: 1,
+    cutOnFold: false,
+    custom: false,
+    sequence: 12,
+    description:
+      "Optional compression or ergonomic left calf panel.",
+  },
+  {
+    id: "thermal-legging-right-calf-panel",
+    name: "Right Calf Panel",
+    required: false,
+    cutQuantity: 1,
+    cutOnFold: false,
+    custom: false,
+    sequence: 13,
+    description:
+      "Optional compression or ergonomic right calf panel.",
+  },
+  {
+    id: "thermal-legging-left-ankle-cuff",
+    name: "Left Ankle Cuff",
+    required: false,
+    cutQuantity: 1,
+    cutOnFold: false,
+    custom: false,
+    sequence: 14,
+    description:
+      "Optional rib or self-fabric cuff at the left ankle.",
+  },
+  {
+    id: "thermal-legging-right-ankle-cuff",
+    name: "Right Ankle Cuff",
+    required: false,
+    cutQuantity: 1,
+    cutOnFold: false,
+    custom: false,
+    sequence: 15,
+    description:
+      "Optional rib or self-fabric cuff at the right ankle.",
+  },
+  {
+    id: "thermal-legging-inner-waist-lining",
+    name: "Inner Waist Lining",
+    required: false,
+    cutQuantity: 1,
+    cutOnFold: false,
+    custom: false,
+    sequence: 16,
+    description:
+      "Optional internal waistband lining improving comfort.",
+  },
+  {
+    id: "thermal-legging-phone-pocket-left",
+    name: "Left Phone Pocket",
+    required: false,
+    cutQuantity: 1,
+    cutOnFold: false,
+    custom: false,
+    sequence: 17,
+    description:
+      "Optional stretch pocket positioned on the left thigh.",
+  },
+  {
+    id: "thermal-legging-phone-pocket-right",
+    name: "Right Phone Pocket",
+    required: false,
+    cutQuantity: 1,
+    cutOnFold: false,
+    custom: false,
+    sequence: 18,
+    description:
+      "Optional stretch pocket positioned on the right thigh.",
+  },
+  {
+    id: "thermal-legging-pocket-facing-left",
+    name: "Left Pocket Facing",
+    required: false,
+    cutQuantity: 1,
+    cutOnFold: false,
+    custom: false,
+    sequence: 19,
+    description:
+      "Optional facing reinforcing the left thigh pocket opening.",
+  },
+  {
+    id: "thermal-legging-pocket-facing-right",
+    name: "Right Pocket Facing",
+    required: false,
+    cutQuantity: 1,
+    cutOnFold: false,
+    custom: false,
+    sequence: 20,
+    description:
+      "Optional facing reinforcing the right thigh pocket opening.",
+  },
+  {
+    id: "thermal-legging-reflective-strip-left",
+    name: "Left Reflective Strip",
+    required: false,
+    cutQuantity: 1,
+    cutOnFold: false,
+    custom: false,
+    sequence: 21,
+    description:
+      "Optional reflective strip for improved visibility.",
+  },
+  {
+    id: "thermal-legging-reflective-strip-right",
+    name: "Right Reflective Strip",
+    required: false,
+    cutQuantity: 1,
+    cutOnFold: false,
+    custom: false,
+    sequence: 22,
+    description:
+      "Optional reflective strip for improved visibility.",
+  },
+  {
+    id: "thermal-legging-flatlock-reinforcement",
+    name: "Flatlock Reinforcement Strip",
+    required: false,
+    cutQuantity: 2,
+    cutOnFold: false,
+    custom: false,
+    sequence: 23,
+    description:
+      "Optional reinforcement strips supporting flatlock seam construction.",
+  },
+  {
+    id: "thermal-legging-decoration-backing",
+    name: "Decoration Backing Patch",
+    required: false,
+    cutQuantity: 1,
+    cutOnFold: false,
+    custom: false,
+    sequence: 24,
+    description:
+      "Optional reinforcement backing behind embroidery, logo or heat-transfer graphics.",
+  },
+];
+
+export default thermalLeggingPatternMaster;

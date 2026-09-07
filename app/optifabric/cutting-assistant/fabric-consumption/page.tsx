@@ -15,105 +15,228 @@ export default function FabricConsumptionPage() {
   });
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white p-6">
-      <div className="max-w-6xl mx-auto">
+    <main className="min-h-screen bg-slate-950 p-6 text-white">
+      <div className="mx-auto max-w-6xl">
         <Link
           href="/optifabric/cutting-assistant/marker-layout"
-          className="text-cyan-300 hover:text-cyan-200"
+          className="inline-block text-cyan-300 transition hover:text-cyan-200"
         >
-          ← Back to Marker Layout
+          <span className="block">← Back to Marker Layout</span>
+          <span className="mt-1 block text-sm text-slate-400">
+            ← Marker Layout-এ ফিরে যান
+          </span>
         </Link>
 
-        <section className="mt-8 rounded-3xl bg-slate-900 border border-slate-700 p-8">
-          <p className="text-cyan-300 font-semibold mb-3">
+        <section className="mt-8 rounded-3xl border border-slate-700 bg-slate-900 p-8">
+          <p className="font-semibold text-cyan-300">
             Block 007A · Engineering Fabric Intelligence
           </p>
 
-          <h1 className="text-4xl font-bold mb-4">
+          <p className="mt-2 font-bold text-cyan-200">
+            ব্লক ০০৭A · Engineering Fabric Intelligence
+          </p>
+
+          <h1 className="mt-5 text-4xl font-bold">
             AI Fabric Consumption Intelligence
           </h1>
 
-          <p className="text-slate-300 max-w-3xl">
-            OptiFabric AI calculates consumption from square inches, marker
-            area, utilization, air area, fabric width, order quantity and fabric
-            cost.
+          <h2 className="mt-3 text-2xl font-black text-cyan-300">
+            AI কাপড় ব্যবহার বিশ্লেষণ
+          </h2>
+
+          <p className="mt-5 max-w-3xl leading-8 text-slate-300">
+            OptiFabric AI calculates consumption from garment area, marker
+            area, utilisation, unused space, fabric width, order quantity and
+            fabric cost.
+          </p>
+
+          <p className="mt-4 max-w-3xl leading-8 text-slate-400">
+            OptiFabric AI garment area, marker area, utilisation, unused
+            space, fabric width, order quantity এবং fabric cost ব্যবহার করে
+            কাপড়ের consumption হিসাব করে।
           </p>
         </section>
 
-        <section className="grid md:grid-cols-2 gap-6 mt-8">
-          <div className="rounded-2xl bg-slate-900 border border-slate-700 p-6">
-            <h2 className="text-2xl font-bold mb-4">Area-Based Result</h2>
+        <section className="mt-8 grid gap-6 md:grid-cols-2">
+          <div className="rounded-2xl border border-slate-700 bg-slate-900 p-6">
+            <h2 className="text-2xl font-bold">
+              Area-Based Result
+            </h2>
 
-            <p>Garment Area: {result.garmentAreaSqInches} sq inches</p>
+            <h3 className="mt-2 text-xl font-black text-cyan-300">
+              Area-ভিত্তিক ফলাফল
+            </h3>
 
-            <p className="mt-3">
-              Marker Area: {result.markerAreaSqInches} sq inches
-            </p>
+            <div className="mt-6 space-y-4">
+              <ResultRow
+                labelEnglish="Garment Area"
+                labelBangla="Garment area"
+                value={`${result.garmentAreaSqInches} sq inches`}
+              />
 
-            <p className="mt-3">
-              Air Area / Unused Space: {result.airAreaSqInches} sq inches
-            </p>
+              <ResultRow
+                labelEnglish="Marker Area"
+                labelBangla="Marker area"
+                value={`${result.markerAreaSqInches} sq inches`}
+              />
 
-            <p className="mt-3">
-              Marker Efficiency: {result.markerEfficiency}%
-            </p>
+              <ResultRow
+                labelEnglish="Air Area / Unused Space"
+                labelBangla="খালি area / অব্যবহৃত জায়গা"
+                value={`${result.airAreaSqInches} sq inches`}
+              />
 
-            <p className="mt-3">
-              Fabric Utilization: {result.utilizationPercent}%
-            </p>
+              <ResultRow
+                labelEnglish="Marker Efficiency"
+                labelBangla="Marker efficiency"
+                value={`${result.markerEfficiency}%`}
+              />
 
-            <p className="mt-3">
-              Linear Length Per Marker:{" "}
-              {result.linearLengthPerMarkerInches} inches
-            </p>
+              <ResultRow
+                labelEnglish="Fabric Utilisation"
+                labelBangla="Fabric utilisation"
+                value={`${result.utilizationPercent}%`}
+              />
 
-            <p className="mt-3">
-              Consumption Per Garment:{" "}
-              {result.consumptionPerGarmentYards} yards
-            </p>
+              <ResultRow
+                labelEnglish="Linear Length Per Marker"
+                labelBangla="প্রতি marker-এর linear length"
+                value={`${result.linearLengthPerMarkerInches} inches`}
+              />
 
-            <p className="mt-3 font-bold text-cyan-300">
-              Total Order Fabric: {result.totalOrderYards} yards
-            </p>
+              <ResultRow
+                labelEnglish="Consumption Per Garment"
+                labelBangla="প্রতি garment-এর consumption"
+                value={`${result.consumptionPerGarmentYards} yards`}
+              />
 
-            <p className="mt-3 font-bold text-cyan-300">
-              Estimated Fabric Cost: ${result.estimatedFabricCost}
-            </p>
+              <ResultRow
+                labelEnglish="Total Order Fabric"
+                labelBangla="মোট order fabric"
+                value={`${result.totalOrderYards} yards`}
+                highlighted
+              />
+
+              <ResultRow
+                labelEnglish="Estimated Fabric Cost"
+                labelBangla="আনুমানিক fabric cost"
+                value={`$${result.estimatedFabricCost}`}
+                highlighted
+              />
+            </div>
           </div>
 
-          <div className="rounded-2xl bg-slate-900 border border-slate-700 p-6">
-            <h2 className="text-2xl font-bold mb-4">AI Engineering Notes</h2>
+          <div className="rounded-2xl border border-slate-700 bg-slate-900 p-6">
+            <h2 className="text-2xl font-bold">
+              AI Engineering Notes
+            </h2>
 
-            <ul className="space-y-2 text-slate-300">
+            <h3 className="mt-2 text-xl font-black text-cyan-300">
+              AI Engineering পরামর্শ
+            </h3>
+
+            <ul className="mt-6 space-y-3 text-slate-300">
               {result.notes.map((note) => (
-                <li key={note}>• {note}</li>
+                <li
+                  key={note}
+                  className="rounded-xl border border-slate-800 bg-slate-950/60 p-4 leading-7"
+                >
+                  • {note}
+                </li>
               ))}
             </ul>
+
+            <div className="mt-5 rounded-xl border border-amber-400/20 bg-amber-950/20 p-4">
+              <p className="font-bold text-amber-300">
+                বাংলা ব্যাখ্যা
+              </p>
+
+              <p className="mt-2 text-sm leading-6 text-slate-400">
+                এই notes-গুলো marker efficiency, unused area এবং fabric
+                consumption-এর engineering interpretation প্রদান করে। Bulk
+                cutting-এর আগে factory-approved marker এবং trial result-এর
+                সঙ্গে তুলনা করুন।
+              </p>
+            </div>
           </div>
         </section>
 
-        <section className="mt-8 rounded-2xl bg-cyan-950/40 border border-cyan-800 p-6">
+        <section className="mt-8 rounded-2xl border border-cyan-800 bg-cyan-950/40 p-6">
           <h2 className="text-xl font-bold text-cyan-300">
             Why does AI calculate consumption in square inches?
           </h2>
 
-          <p className="mt-3 text-slate-300">
+          <h3 className="mt-2 text-lg font-black text-cyan-200">
+            AI কেন square inch-এ consumption হিসাব করে?
+          </h3>
+
+          <p className="mt-4 leading-8 text-slate-300">
             Pattern and marker geometry are area-based. AI first calculates
             square inches, then converts that area into linear fabric length by
-            dividing by usable fabric width. This gives a more professional and
-            auditable cutting calculation.
+            dividing it by the usable fabric width. This creates a more
+            professional and auditable cutting calculation.
+          </p>
+
+          <p className="mt-3 leading-8 text-slate-400">
+            Pattern এবং marker geometry area-ভিত্তিক। AI প্রথমে square
+            inch-এ area হিসাব করে, এরপর usable fabric width দিয়ে ভাগ করে
+            linear fabric length নির্ণয় করে। এতে cutting calculation আরও
+            পেশাদার, স্বচ্ছ এবং যাচাইযোগ্য হয়।
           </p>
         </section>
 
         <div className="mt-10 flex justify-end">
           <Link
-            href="/optifabric/cutting-assistant/savings"
-            className="rounded-2xl bg-cyan-500 px-8 py-4 text-slate-950 font-bold hover:bg-cyan-400"
+            href="/optifabric/pilot-dashboard"
+            className="rounded-2xl bg-cyan-500 px-8 py-4 font-bold text-slate-950 transition hover:bg-cyan-400"
           >
-            Continue →
+            <span className="block">Continue to Pilot Dashboard →</span>
+            <span className="mt-1 block text-sm">
+              Pilot Dashboard-এ এগিয়ে যান →
+            </span>
           </Link>
         </div>
       </div>
     </main>
+  );
+}
+
+function ResultRow({
+  labelEnglish,
+  labelBangla,
+  value,
+  highlighted = false,
+}: {
+  labelEnglish: string;
+  labelBangla: string;
+  value: string;
+  highlighted?: boolean;
+}) {
+  return (
+    <div
+      className={`rounded-2xl border p-4 ${
+        highlighted
+          ? "border-cyan-400/30 bg-cyan-950/30"
+          : "border-slate-800 bg-slate-950/60"
+      }`}
+    >
+      <p
+        className={
+          highlighted
+            ? "font-bold text-cyan-300"
+            : "font-bold text-white"
+        }
+      >
+        {labelEnglish}
+      </p>
+
+      <p className="mt-1 text-sm text-slate-400">
+        {labelBangla}
+      </p>
+
+      <p className="mt-3 text-lg font-black text-white">
+        {value}
+      </p>
+    </div>
   );
 }

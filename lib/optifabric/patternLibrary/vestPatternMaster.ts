@@ -1,0 +1,268 @@
+export const vestPatternMaster = [
+  {
+    id: "vest-front-body",
+    name: "Front Body",
+    required: true,
+    cutQuantity: 1,
+    cutOnFold: true,
+    custom: false,
+    sequence: 1,
+    description:
+      "Main front body pattern cut on the centre-front fold, including neckline, shoulder, armhole, side seam and hem shaping.",
+  },
+  {
+    id: "vest-back-body",
+    name: "Back Body",
+    required: true,
+    cutQuantity: 1,
+    cutOnFold: true,
+    custom: false,
+    sequence: 2,
+    description:
+      "Main back body pattern cut on the centre-back fold, including back neckline, shoulder, armhole, side seam and hem shaping.",
+  },
+  {
+    id: "vest-neck-binding",
+    name: "Neck Binding",
+    required: true,
+    cutQuantity: 1,
+    cutOnFold: false,
+    custom: false,
+    sequence: 3,
+    description:
+      "Knitted binding strip used to finish and stabilise the complete front and back neckline.",
+  },
+  {
+    id: "vest-armhole-binding",
+    name: "Armhole Binding",
+    required: true,
+    cutQuantity: 2,
+    cutOnFold: false,
+    custom: false,
+    sequence: 4,
+    description:
+      "Pair of knitted binding strips used to finish and stabilise the left and right armholes.",
+  },
+  {
+    id: "vest-back-neck-tape",
+    name: "Back Neck Reinforcement Tape",
+    required: false,
+    cutQuantity: 1,
+    cutOnFold: false,
+    custom: false,
+    sequence: 5,
+    description:
+      "Reinforcement tape covering the back neckline seam to improve comfort, appearance and dimensional stability.",
+  },
+  {
+    id: "vest-front-neck-facing",
+    name: "Front Neck Facing",
+    required: false,
+    cutQuantity: 1,
+    cutOnFold: true,
+    custom: false,
+    sequence: 6,
+    description:
+      "Optional front neckline facing used when the vest has a clean-faced neckline instead of bound construction.",
+  },
+  {
+    id: "vest-back-neck-facing",
+    name: "Back Neck Facing",
+    required: false,
+    cutQuantity: 1,
+    cutOnFold: true,
+    custom: false,
+    sequence: 7,
+    description:
+      "Optional back neckline facing paired with the front neck facing for a clean internal neckline finish.",
+  },
+  {
+    id: "vest-front-armhole-facing-left",
+    name: "Left Front Armhole Facing",
+    required: false,
+    cutQuantity: 1,
+    cutOnFold: false,
+    custom: false,
+    sequence: 8,
+    description:
+      "Optional left front armhole facing used for a clean-faced armhole construction.",
+  },
+  {
+    id: "vest-front-armhole-facing-right",
+    name: "Right Front Armhole Facing",
+    required: false,
+    cutQuantity: 1,
+    cutOnFold: false,
+    custom: false,
+    sequence: 9,
+    description:
+      "Optional right front armhole facing used for a clean-faced armhole construction.",
+  },
+  {
+    id: "vest-back-armhole-facing-left",
+    name: "Left Back Armhole Facing",
+    required: false,
+    cutQuantity: 1,
+    cutOnFold: false,
+    custom: false,
+    sequence: 10,
+    description:
+      "Optional left back armhole facing joined with the corresponding front facing.",
+  },
+  {
+    id: "vest-back-armhole-facing-right",
+    name: "Right Back Armhole Facing",
+    required: false,
+    cutQuantity: 1,
+    cutOnFold: false,
+    custom: false,
+    sequence: 11,
+    description:
+      "Optional right back armhole facing joined with the corresponding front facing.",
+  },
+  {
+    id: "vest-bottom-hem-facing-front",
+    name: "Front Bottom Hem Facing",
+    required: false,
+    cutQuantity: 1,
+    cutOnFold: true,
+    custom: false,
+    sequence: 12,
+    description:
+      "Optional shaped front hem facing used for a clean-finished or heavier bottom edge.",
+  },
+  {
+    id: "vest-bottom-hem-facing-back",
+    name: "Back Bottom Hem Facing",
+    required: false,
+    cutQuantity: 1,
+    cutOnFold: true,
+    custom: false,
+    sequence: 13,
+    description:
+      "Optional shaped back hem facing joined to the front hem facing at the side seams.",
+  },
+  {
+    id: "vest-chest-pocket",
+    name: "Chest Pocket",
+    required: false,
+    cutQuantity: 1,
+    cutOnFold: false,
+    custom: false,
+    sequence: 14,
+    description:
+      "Optional knitted chest patch pocket positioned on the wearer’s left or right front body.",
+  },
+  {
+    id: "vest-chest-pocket-facing",
+    name: "Chest Pocket Opening Facing",
+    required: false,
+    cutQuantity: 1,
+    cutOnFold: false,
+    custom: false,
+    sequence: 15,
+    description:
+      "Optional separate facing used to strengthen and clean-finish the chest pocket opening.",
+  },
+  {
+    id: "vest-centre-front-placket",
+    name: "Centre Front Placket",
+    required: false,
+    cutQuantity: 1,
+    cutOnFold: false,
+    custom: false,
+    sequence: 16,
+    description:
+      "Optional centre-front opening placket for button, snap or decorative opening constructions.",
+  },
+  {
+    id: "vest-centre-front-under-placket",
+    name: "Centre Front Under-Placket",
+    required: false,
+    cutQuantity: 1,
+    cutOnFold: false,
+    custom: false,
+    sequence: 17,
+    description:
+      "Optional under-placket positioned behind the centre-front opening to support fastening and prevent skin exposure.",
+  },
+  {
+    id: "vest-placket-interfacing",
+    name: "Placket Interfacing",
+    required: false,
+    cutQuantity: 1,
+    cutOnFold: false,
+    custom: false,
+    sequence: 18,
+    description:
+      "Optional fusible or non-fusible reinforcement piece used inside the centre-front placket.",
+  },
+  {
+    id: "vest-left-side-slit-facing",
+    name: "Left Side Slit Facing",
+    required: false,
+    cutQuantity: 2,
+    cutOnFold: false,
+    custom: false,
+    sequence: 19,
+    description:
+      "Optional pair of facing pieces used to clean-finish the front and back edges of the left side slit.",
+  },
+  {
+    id: "vest-right-side-slit-facing",
+    name: "Right Side Slit Facing",
+    required: false,
+    cutQuantity: 2,
+    cutOnFold: false,
+    custom: false,
+    sequence: 20,
+    description:
+      "Optional pair of facing pieces used to clean-finish the front and back edges of the right side slit.",
+  },
+  {
+    id: "vest-shoulder-reinforcement-tape",
+    name: "Shoulder Reinforcement Tape",
+    required: false,
+    cutQuantity: 2,
+    cutOnFold: false,
+    custom: false,
+    sequence: 21,
+    description:
+      "Pair of stabilising strips inserted into the shoulder seams to reduce stretching during sewing and wear.",
+  },
+  {
+    id: "vest-side-seam-reinforcement-tape",
+    name: "Side Seam Reinforcement Tape",
+    required: false,
+    cutQuantity: 2,
+    cutOnFold: false,
+    custom: false,
+    sequence: 22,
+    description:
+      "Optional stabilising strips used in high-stretch or lightweight vest side seams.",
+  },
+  {
+    id: "vest-snap-reinforcement-patch",
+    name: "Snap Reinforcement Patch",
+    required: false,
+    cutQuantity: 2,
+    cutOnFold: false,
+    custom: false,
+    sequence: 23,
+    description:
+      "Optional internal reinforcement patches placed behind snap fasteners or press studs.",
+  },
+  {
+    id: "vest-decoration-backing-patch",
+    name: "Decoration Backing Patch",
+    required: false,
+    cutQuantity: 1,
+    cutOnFold: false,
+    custom: false,
+    sequence: 24,
+    description:
+      "Optional backing piece supporting embroidery, heat transfer, badge or printed decoration on lightweight knitted fabric.",
+  },
+];
+
+export default vestPatternMaster;

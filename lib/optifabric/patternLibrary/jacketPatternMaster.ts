@@ -1,0 +1,246 @@
+import { PatternLibraryItem } from "./index";
+
+export const jacketPatternMaster: PatternLibraryItem[] = [
+  {
+    id: "jacket-front",
+    name: "Jacket Front",
+    required: true,
+    cutQuantity: 2,
+    cutOnFold: false,
+    custom: false,
+    sequence: 1,
+    description:
+      "Main left and right front body panels forming the jacket opening, chest, waist and lower body.",
+  },
+  {
+    id: "jacket-side-front",
+    name: "Side Front",
+    required: false,
+    cutQuantity: 2,
+    cutOnFold: false,
+    custom: false,
+    sequence: 2,
+    description:
+      "Shaped side-front panels used to create chest, waist and body contour in structured jacket styles.",
+  },
+  {
+    id: "jacket-back",
+    name: "Jacket Back",
+    required: true,
+    cutQuantity: 2,
+    cutOnFold: false,
+    custom: false,
+    sequence: 3,
+    description:
+      "Main left and right back body panels extending from the back neckline and shoulder to the hem.",
+  },
+  {
+    id: "jacket-side-back",
+    name: "Side Back",
+    required: false,
+    cutQuantity: 2,
+    cutOnFold: false,
+    custom: false,
+    sequence: 4,
+    description:
+      "Shaped side-back panels used for waist suppression, body contour and improved jacket fitting.",
+  },
+  {
+    id: "jacket-centre-back",
+    name: "Centre Back",
+    required: false,
+    cutQuantity: 2,
+    cutOnFold: false,
+    custom: false,
+    sequence: 5,
+    description:
+      "Centre-back panels used in jackets with a shaped centre seam, single vent or double-vent construction.",
+  },
+  {
+    id: "jacket-upper-sleeve",
+    name: "Upper Sleeve",
+    required: true,
+    cutQuantity: 2,
+    cutOnFold: false,
+    custom: false,
+    sequence: 6,
+    description:
+      "Upper section of the two-piece tailored sleeve, forming the principal sleeve shape and sleeve cap.",
+  },
+  {
+    id: "jacket-under-sleeve",
+    name: "Under Sleeve",
+    required: true,
+    cutQuantity: 2,
+    cutOnFold: false,
+    custom: false,
+    sequence: 7,
+    description:
+      "Lower section of the two-piece tailored sleeve, providing elbow shaping and controlled sleeve fitting.",
+  },
+  {
+    id: "jacket-collar",
+    name: "Upper Collar",
+    required: true,
+    cutQuantity: 1,
+    cutOnFold: true,
+    custom: false,
+    sequence: 8,
+    description:
+      "Visible upper collar forming the finished outer surface of the jacket collar.",
+  },
+  {
+    id: "jacket-under-collar",
+    name: "Under Collar",
+    required: true,
+    cutQuantity: 2,
+    cutOnFold: false,
+    custom: false,
+    sequence: 9,
+    description:
+      "Lower collar component supporting collar roll, shape and neckline fitting, commonly cut in two sections.",
+  },
+  {
+    id: "jacket-lapel",
+    name: "Lapel",
+    required: false,
+    cutQuantity: 2,
+    cutOnFold: false,
+    custom: false,
+    sequence: 10,
+    description:
+      "Separate lapel components used where the lapel is not developed as an integral part of the jacket front.",
+  },
+  {
+    id: "jacket-front-facing",
+    name: "Front Facing",
+    required: true,
+    cutQuantity: 2,
+    cutOnFold: false,
+    custom: false,
+    sequence: 11,
+    description:
+      "Internal left and right front facings finishing the front opening, lapel edge and front neckline.",
+  },
+  {
+    id: "jacket-back-neck-facing",
+    name: "Back Neck Facing",
+    required: true,
+    cutQuantity: 1,
+    cutOnFold: true,
+    custom: false,
+    sequence: 12,
+    description:
+      "Facing used to finish and stabilise the inside back neckline between the two front facings.",
+  },
+  {
+    id: "jacket-chest-welt",
+    name: "Chest Welt",
+    required: false,
+    cutQuantity: 1,
+    cutOnFold: false,
+    custom: false,
+    sequence: 13,
+    description:
+      "Welt component forming the opening of the optional outer breast pocket.",
+  },
+  {
+    id: "jacket-lower-welt",
+    name: "Lower Pocket Welt",
+    required: false,
+    cutQuantity: 2,
+    cutOnFold: false,
+    custom: false,
+    sequence: 14,
+    description:
+      "Welt components forming the openings of the left and right lower jacket pockets.",
+  },
+  {
+    id: "jacket-pocket-flap",
+    name: "Pocket Flap",
+    required: false,
+    cutQuantity: 2,
+    cutOnFold: false,
+    custom: false,
+    sequence: 15,
+    description:
+      "Outer flap components covering the left and right lower pocket openings.",
+  },
+  {
+    id: "jacket-pocket-bag",
+    name: "Pocket Bag",
+    required: false,
+    cutQuantity: 4,
+    cutOnFold: false,
+    custom: false,
+    sequence: 16,
+    description:
+      "Internal pocket bag components forming two complete lower jacket pockets.",
+  },
+  {
+    id: "jacket-pocket-facing",
+    name: "Pocket Facing",
+    required: false,
+    cutQuantity: 2,
+    cutOnFold: false,
+    custom: false,
+    sequence: 17,
+    description:
+      "Facing components reinforcing and finishing the lower pocket openings.",
+  },
+  {
+    id: "jacket-sleeve-vent",
+    name: "Sleeve Vent",
+    required: false,
+    cutQuantity: 2,
+    cutOnFold: false,
+    custom: false,
+    sequence: 18,
+    description:
+      "Vent components used to construct and reinforce the opening at each sleeve hem.",
+  },
+  {
+    id: "jacket-hem-facing",
+    name: "Hem Facing",
+    required: false,
+    cutQuantity: 2,
+    cutOnFold: false,
+    custom: false,
+    sequence: 19,
+    description:
+      "Separate facing components used to stabilise and finish the lower jacket hem.",
+  },
+  {
+    id: "jacket-front-interlining",
+    name: "Front Interlining",
+    required: false,
+    cutQuantity: 2,
+    cutOnFold: false,
+    custom: false,
+    sequence: 20,
+    description:
+      "Fusible or sew-in interlining components supporting the jacket front, chest, lapel and front edge.",
+  },
+  {
+    id: "jacket-collar-interlining",
+    name: "Collar Interlining",
+    required: false,
+    cutQuantity: 1,
+    cutOnFold: true,
+    custom: false,
+    sequence: 21,
+    description:
+      "Interlining component reinforcing the collar and helping maintain collar shape and roll.",
+  },
+  {
+    id: "jacket-shoulder-reinforcement",
+    name: "Shoulder Reinforcement",
+    required: false,
+    cutQuantity: 2,
+    cutOnFold: false,
+    custom: false,
+    sequence: 22,
+    description:
+      "Reinforcement components supporting the left and right shoulder areas and improving garment structure.",
+  },
+];

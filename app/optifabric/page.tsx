@@ -9,66 +9,93 @@ type OptiFabricModule = {
   status: string;
 };
 
-const modules: OptiFabricModule[] = [
+type ProductionCapability = {
+  step: string;
+  title: string;
+  titleBangla: string;
+  description: string;
+  descriptionBangla: string;
+};
+
+const productionCapabilities: ProductionCapability[] = [
+  {
+    step: "01",
+    title: "Create or Open Cutting Project",
+    titleBangla: "কাটিং প্রজেক্ট তৈরি বা খুলুন",
+    description:
+      "Start from the production project workspace so garment, order, fabric and engineering data remain connected throughout the cutting workflow.",
+    descriptionBangla:
+      "Production project workspace থেকে কাজ শুরু করুন, যাতে garment, order, fabric এবং engineering data পুরো cutting workflow জুড়ে একই থাকে।",
+  },
+  {
+    step: "02",
+    title: "Pattern & Geometry Engineering",
+    titleBangla: "প্যাটার্ন ও জ্যামিতি ইঞ্জিনিয়ারিং",
+    description:
+      "Upload or select pattern pieces, validate scale and geometry, and prepare engineering-ready pattern data.",
+    descriptionBangla:
+      "Pattern piece upload বা select করুন, scale ও geometry যাচাই করুন এবং engineering-ready pattern data প্রস্তুত করুন।",
+  },
+  {
+    step: "03",
+    title: "AI Marker Engineering",
+    titleBangla: "AI মার্কার ইঞ্জিনিয়ারিং",
+    description:
+      "Generate marker quantities, compare alternatives, detect voids, perform hole filling and intelligent compaction, and review AI recommendations.",
+    descriptionBangla:
+      "Marker quantity তৈরি ও তুলনা করুন, void detection, hole filling এবং intelligent compaction চালিয়ে AI recommendation যাচাই করুন।",
+  },
+  {
+    step: "04",
+    title: "Production Cutting Decision",
+    titleBangla: "প্রোডাকশন কাটিং সিদ্ধান্ত",
+    description:
+      "Review utilisation, waste, marker length, fabric consumption, engineering score and cutting readiness before production approval.",
+    descriptionBangla:
+      "Production approval-এর আগে utilisation, waste, marker length, fabric consumption, engineering score এবং cutting readiness যাচাই করুন।",
+  },
+];
+
+const demoModules: OptiFabricModule[] = [
   {
     title: "Engineering Wizard",
     titleBangla: "ইঞ্জিনিয়ারিং উইজার্ড",
     description:
-      "Follow the guided OptiFabric engineering workflow step by step.",
+      "Guided demonstration of the OptiFabric engineering workflow for presentations, learning and training.",
     descriptionBangla:
-      "ধাপে ধাপে OptiFabric engineering workflow সম্পন্ন করুন।",
+      "Presentation, learning এবং training-এর জন্য OptiFabric engineering workflow-এর guided demonstration।",
     href: "/optifabric/engineering-wizard",
-    status: "GUIDED WORKFLOW",
+    status: "DEMO / TRAINING",
   },
   {
     title: "RC1 Mini Pilot",
     titleBangla: "RC1 মিনি পাইলট",
     description:
-      "Start the complete commercial demonstration and pattern-analysis journey.",
+      "Preserved pilot workflow for demonstrations and historical validation. It is not the normal production entry point.",
     descriptionBangla:
-      "সম্পূর্ণ commercial demonstration এবং pattern-analysis journey শুরু করুন।",
+      "Demonstration ও historical validation-এর জন্য সংরক্ষিত pilot workflow। এটি normal production entry point নয়।",
     href: "/optifabric/mini-pilot",
-    status: "START HERE",
+    status: "LEGACY PILOT",
   },
   {
     title: "Interactive Boundary Tracing",
     titleBangla: "ইন্টার‌্যাক্টিভ বাউন্ডারি ট্রেসিং",
     description:
-      "Upload a pattern image, calibrate the scale and trace its cutting boundary.",
+      "Training workspace for uploading a pattern image, calibrating scale and tracing a cutting boundary.",
     descriptionBangla:
-      "Pattern image upload করুন, scale calibrate করুন এবং cutting boundary trace করুন।",
+      "Pattern image upload, scale calibration এবং cutting boundary tracing শেখার training workspace।",
     href: "/optifabric/mini-pilot/live-tracing",
-    status: "ENGINEERING",
-  },
-  {
-    title: "AI Marker Optimization",
-    titleBangla: "AI মার্কার অপটিমাইজেশন",
-    description:
-      "Review AI pattern placement, marker utilisation and fabric-saving potential.",
-    descriptionBangla:
-      "AI pattern placement, marker utilisation এবং fabric-saving potential যাচাই করুন।",
-    href: "/optifabric/mini-pilot/polygon-nesting",
-    status: "AI NESTING",
+    status: "TRAINING TOOL",
   },
   {
     title: "Pilot Dashboard",
     titleBangla: "পাইলট ড্যাশবোর্ড",
     description:
-      "Review the OptiFabric pilot workflow, progress and engineering results.",
+      "Review the earlier pilot workflow, progress and engineering demonstration results.",
     descriptionBangla:
-      "OptiFabric pilot workflow, progress এবং engineering result যাচাই করুন।",
+      "আগের pilot workflow, progress এবং engineering demonstration result পর্যালোচনা করুন।",
     href: "/optifabric/pilot-dashboard",
-    status: "PILOT CONTROL",
-  },
-  {
-    title: "Stripe Matching",
-    titleBangla: "স্ট্রাইপ ম্যাচিং",
-    description:
-      "Review stripe-sensitive pattern alignment and fabric-matching requirements.",
-    descriptionBangla:
-      "Stripe-sensitive pattern alignment এবং fabric-matching requirement যাচাই করুন।",
-    href: "/optifabric/stripe-matching",
-    status: "FABRIC CONTROL",
+    status: "PILOT ARCHIVE",
   },
 ];
 
@@ -77,25 +104,25 @@ const benefits = [
     title: "Fabric Saving",
     titleBangla: "কাপড় সাশ্রয়",
     description:
-      "Reduce avoidable waste through improved marker and lay planning.",
+      "Reduce avoidable waste through AI-supported marker optimisation, hole filling, intelligent compaction and improved lay planning.",
     descriptionBangla:
-      "উন্নত marker ও lay planning-এর মাধ্যমে অপ্রয়োজনীয় অপচয় কমান।",
+      "AI-supported marker optimisation, hole filling, intelligent compaction এবং উন্নত lay planning-এর মাধ্যমে অপ্রয়োজনীয় অপচয় কমান।",
   },
   {
     title: "Cutting Accuracy",
     titleBangla: "কাটিং নির্ভুলতা",
     description:
-      "Use calibrated scale information, pattern tracing and AI guidance.",
+      "Use calibrated geometry, cutting-gap controls, collision validation and engineering checks before production cutting.",
     descriptionBangla:
-      "Calibrated scale, pattern tracing এবং AI guidance ব্যবহার করুন।",
+      "Production cutting-এর আগে calibrated geometry, cutting-gap control, collision validation এবং engineering check ব্যবহার করুন।",
   },
   {
-    title: "Factory Profit",
-    titleBangla: "কারখানার লাভ",
+    title: "Engineering Decision Support",
+    titleBangla: "ইঞ্জিনিয়ারিং সিদ্ধান্ত সহায়তা",
     description:
-      "Compare present consumption with AI-supported saving opportunities.",
+      "Compare marker alternatives using utilisation, waste, marker length, cost, confidence and AI engineering recommendations.",
     descriptionBangla:
-      "বর্তমান consumption-এর সঙ্গে AI-supported saving opportunity তুলনা করুন।",
+      "Utilisation, waste, marker length, cost, confidence এবং AI engineering recommendation ব্যবহার করে marker alternative তুলনা করুন।",
   },
 ];
 
@@ -106,19 +133,24 @@ const releaseLinks = [
     href: "/optifabric/about",
   },
   {
-    title: "User Manual",
-    titleBangla: "ব্যবহার নির্দেশিকা",
+    title: "User Manual (Bilingual)",
+    titleBangla: "ব্যবহার নির্দেশিকা (দ্বিভাষিক)",
     href: "/optifabric/user-manual",
+  },
+  {
+    title: "User Manual (English Only)",
+    titleBangla: "User Manual (শুধু ইংরেজি)",
+    href: "/optifabric/user-manual/en",
+  },
+  {
+    title: "User Manual (Bangla Only)",
+    titleBangla: "ব্যবহার নির্দেশিকা (শুধু বাংলা)",
+    href: "/optifabric/user-manual/bn",
   },
   {
     title: "Play Store Assets",
     titleBangla: "Play Store উপকরণ",
     href: "/optifabric/play-store-assets",
-  },
-  {
-    title: "RC1 Release Freeze",
-    titleBangla: "RC1 রিলিজ ফ্রিজ",
-    href: "/optifabric/release-freeze",
   },
   {
     title: "Privacy Policy",
@@ -135,15 +167,15 @@ const releaseLinks = [
 export default function OptiFabricHomePage() {
   return (
     <main className="min-h-screen bg-slate-950 text-white">
-      <section className="border-b border-slate-800 bg-gradient-to-r from-cyan-950 via-slate-950 to-blue-950">
+      <section className="border-b border-slate-800 bg-gradient-to-r from-emerald-950 via-slate-950 to-slate-950">
         <div className="mx-auto max-w-7xl px-6 py-14">
           <div className="flex flex-wrap items-center gap-3">
-            <span className="rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-cyan-300">
+            <span className="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-emerald-300">
               MBNCON AI Engineering Solutions
             </span>
 
-            <span className="rounded-full border border-green-400/30 bg-green-400/10 px-4 py-2 text-xs font-black text-green-300">
-              RC1 COMMERCIAL PILOT
+            <span className="rounded-full border border-red-400/30 bg-red-400/10 px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-red-300">
+              Production Engineering Platform
             </span>
           </div>
 
@@ -151,43 +183,82 @@ export default function OptiFabricHomePage() {
             OptiFabric AI
           </h1>
 
-          <h2 className="mt-3 text-2xl font-black text-cyan-300 sm:text-3xl">
-            AI Digital Cutting Master
+          <h2 className="mt-3 text-2xl font-black text-emerald-300 sm:text-3xl">
+            AI Digital Cutting Master &amp; Engineering Assistant
           </h2>
 
           <p className="mt-6 max-w-4xl text-lg leading-8 text-slate-300 sm:text-xl">
-            AI Fabric Cutting and Engineering Optimization Platform for garment
-            factories, Cutting Masters, Cutting Supervisors, Production
-            Officers and Factory Managers.
+            Production-focused AI fabric cutting and engineering optimisation
+            platform for garment factories, Cutting Masters, Cutting
+            Supervisors, Production Officers and Factory Managers.
           </p>
 
           <p className="mt-3 max-w-4xl leading-8 text-slate-400">
             Garment factory, Cutting Master, Cutting Supervisor, Production
-            Officer এবং Factory Manager-এর জন্য AI fabric cutting ও
-            engineering optimization platform।
+            Officer এবং Factory Manager-এর জন্য production-focused AI fabric
+            cutting ও engineering optimisation platform।
           </p>
 
           <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:flex-wrap">
             <Link
-              href="/optifabric/mini-pilot"
-              className="rounded-2xl bg-cyan-400 px-6 py-4 text-center font-black text-slate-950 transition hover:bg-cyan-300"
+              href="/optifabric/project"
+              className="rounded-2xl bg-red-600 px-6 py-4 text-center font-black text-white transition hover:bg-red-500"
             >
-              Start RC1 Mini Pilot
+              Open Production Workspace
             </Link>
 
             <Link
-              href="/optifabric/engineering-wizard"
-              className="rounded-2xl border border-cyan-400 bg-cyan-950/40 px-6 py-4 text-center font-black text-cyan-200 transition hover:bg-cyan-900/60"
+              href="#demo-training"
+              className="rounded-2xl border border-violet-400/60 bg-violet-950/30 px-6 py-4 text-center font-black text-violet-200 transition hover:bg-violet-900/50"
             >
-              Open Engineering Wizard
+              Demo &amp; Training
             </Link>
 
             <Link
               href="/optifabric/user-manual"
-              className="rounded-2xl border border-slate-600 bg-slate-900 px-6 py-4 text-center font-bold text-white transition hover:border-cyan-400 hover:text-cyan-300"
+              className="rounded-2xl border border-slate-600 bg-slate-900 px-6 py-4 text-center font-bold text-white transition hover:border-emerald-400 hover:text-emerald-300"
             >
               Read User Manual
             </Link>
+
+            <Link
+              href="/optifabric/signup"
+              className="rounded-2xl border border-slate-600 bg-slate-900 px-6 py-4 text-center font-bold text-white transition hover:border-emerald-400 hover:text-emerald-300"
+            >
+              Sign Up
+            </Link>
+
+            <Link
+              href="/optifabric/login"
+              className="rounded-2xl border border-slate-600 bg-slate-900 px-6 py-4 text-center font-bold text-white transition hover:border-emerald-400 hover:text-emerald-300"
+            >
+              Sign In
+            </Link>
+
+            <Link
+              href="/optifabric/subscription"
+              className="rounded-2xl border border-slate-600 bg-slate-900 px-6 py-4 text-center font-bold text-white transition hover:border-emerald-400 hover:text-emerald-300"
+            >
+              Subscription
+            </Link>
+          </div>
+
+          <div className="mt-7 rounded-2xl border border-emerald-500/20 bg-emerald-950/15 p-5">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-300">
+              Production Navigation
+            </p>
+
+            <p className="mt-2 max-w-5xl leading-7 text-slate-300">
+              Cutting Masters should enter through the Production Workspace.
+              The earlier RC1 Mini Pilot and Engineering Wizard are retained
+              below only for demonstrations, presentations and training.
+            </p>
+
+            <p className="mt-2 max-w-5xl leading-7 text-slate-400">
+              Cutting Master-এর normal কাজ Production Workspace থেকে শুরু হবে।
+              RC1 Mini Pilot এবং Engineering Wizard শুধু demonstration,
+              presentation এবং training-এর জন্য নিচে সংরক্ষিত থাকবে।
+            </p>
           </div>
         </div>
       </section>
@@ -196,7 +267,7 @@ export default function OptiFabricHomePage() {
         <section>
           <div>
             <p className="text-sm font-black uppercase tracking-[0.2em] text-cyan-400">
-              Commercial Engineering Benefits
+              Production Engineering Benefits
             </p>
 
             <h2 className="mt-3 text-3xl font-black text-white">
@@ -236,46 +307,126 @@ export default function OptiFabricHomePage() {
 
         <section className="mt-14">
           <div>
-            <p className="text-sm font-black uppercase tracking-[0.2em] text-cyan-400">
-              Working Product Modules
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-400">
+              Production Workflow
             </p>
 
             <h2 className="mt-3 text-3xl font-black text-white">
-              OptiFabric AI Modules
+              Cutting Master Production Flow
             </h2>
 
-            <p className="mt-2 text-xl font-bold text-cyan-300">
-              OptiFabric AI মডিউল
+            <p className="mt-2 text-xl font-bold text-emerald-300">
+              কাটিং মাস্টারের প্রোডাকশন ওয়ার্কফ্লো
             </p>
 
             <p className="mt-4 max-w-4xl leading-8 text-slate-400">
-              The six cards below now connect only to routes that exist in the
-              current OptiFabric application.
+              The production user follows one project-based workflow. Demo and
+              pilot routes are intentionally separated so they do not interrupt
+              factory operation.
             </p>
           </div>
 
-          <div className="mt-7 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {modules.map((module, index) => (
+          <div className="mt-7 grid gap-6 md:grid-cols-2">
+            {productionCapabilities.map((capability) => (
+              <article
+                key={capability.step}
+                className="rounded-3xl border border-emerald-500/20 bg-slate-900/80 p-6 shadow-lg shadow-black/10"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-emerald-400/30 bg-emerald-400/10 font-black text-emerald-300">
+                    {capability.step}
+                  </div>
+
+                  <div>
+                    <h3 className="text-xl font-black text-white">
+                      {capability.title}
+                    </h3>
+
+                    <p className="mt-2 font-bold text-emerald-300">
+                      {capability.titleBangla}
+                    </p>
+                  </div>
+                </div>
+
+                <p className="mt-5 leading-7 text-slate-300">
+                  {capability.description}
+                </p>
+
+                <p className="mt-3 leading-7 text-slate-400">
+                  {capability.descriptionBangla}
+                </p>
+              </article>
+            ))}
+          </div>
+
+          <div className="mt-7 rounded-3xl border border-cyan-400/30 bg-cyan-950/20 p-7">
+            <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.2em] text-cyan-300">
+                  Start Production
+                </p>
+
+                <h3 className="mt-2 text-2xl font-black text-white">
+                  Enter the Project-Based Cutting Workspace
+                </h3>
+
+                <p className="mt-2 max-w-3xl leading-7 text-slate-400">
+                  Projects keep garment geometry, marker engineering and
+                  production decisions connected instead of sending the Cutting
+                  Master through the old pilot workflow.
+                </p>
+              </div>
+
+              <Link
+                href="/optifabric/project"
+                className="shrink-0 rounded-2xl bg-cyan-400 px-6 py-4 text-center font-black text-slate-950 transition hover:bg-cyan-300"
+              >
+                Open Production Workspace →
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        <section
+          id="demo-training"
+          className="mt-14 rounded-3xl border border-violet-500/20 bg-violet-950/10 p-7"
+        >
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-violet-300">
+              Demo &amp; Training
+            </p>
+
+            <h2 className="mt-3 text-3xl font-black text-white">
+              Demonstration and Training Tools
+            </h2>
+
+            <p className="mt-2 text-xl font-bold text-violet-300">
+              ডেমো ও ট্রেনিং টুল
+            </p>
+
+            <p className="mt-4 max-w-4xl leading-8 text-slate-400">
+              These routes are retained for presentations, demonstrations,
+              learning and controlled testing. They are separated from the
+              normal factory production workflow.
+            </p>
+          </div>
+
+          <div className="mt-7 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {demoModules.map((module) => (
               <Link
                 key={module.href}
                 href={module.href}
-                className="group rounded-3xl border border-slate-800 bg-slate-900/80 p-6 shadow-lg shadow-black/10 transition hover:-translate-y-1 hover:border-cyan-400 hover:bg-cyan-950/30"
+                className="group rounded-3xl border border-violet-500/20 bg-slate-950/50 p-6 transition hover:-translate-y-1 hover:border-violet-400/50 hover:bg-violet-950/30"
               >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-cyan-400/30 bg-cyan-400/10 font-black text-cyan-300">
-                    {String(index + 1).padStart(2, "0")}
-                  </div>
+                <span className="rounded-full border border-violet-500/30 bg-violet-950/40 px-3 py-2 text-[10px] font-black tracking-wide text-violet-300">
+                  {module.status}
+                </span>
 
-                  <span className="rounded-full border border-slate-700 bg-slate-950 px-3 py-2 text-[10px] font-black tracking-wide text-slate-400">
-                    {module.status}
-                  </span>
-                </div>
-
-                <h3 className="mt-6 text-xl font-black text-white transition group-hover:text-cyan-300">
+                <h3 className="mt-6 text-xl font-black text-white transition group-hover:text-violet-200">
                   {module.title}
                 </h3>
 
-                <p className="mt-2 font-bold text-cyan-300">
+                <p className="mt-2 font-bold text-violet-300">
                   {module.titleBangla}
                 </p>
 
@@ -287,8 +438,8 @@ export default function OptiFabricHomePage() {
                   {module.descriptionBangla}
                 </p>
 
-                <div className="mt-6 font-black text-cyan-400">
-                  Open Module →
+                <div className="mt-6 font-black text-violet-300">
+                  Open Demo / Training →
                 </div>
               </Link>
             ))}
@@ -305,35 +456,34 @@ export default function OptiFabricHomePage() {
           </h3>
 
           <p className="mt-5 max-w-5xl leading-8 text-slate-300">
-            Fabric width, ruler calibration, pattern boundaries, marker length
-            and fabric type directly affect pattern area, marker utilisation,
-            estimated consumption and possible fabric saving. OptiFabric
-            explains these relationships so that users without CAD experience
-            can make safer engineering decisions.
+            Fabric width, calibrated geometry, pattern boundaries, cutting
+            gaps, marker length, lay conditions and fabric type directly affect
+            pattern area, marker utilisation, fabric consumption and possible
+            saving. OptiFabric keeps these engineering relationships connected
+            so production decisions are traceable and reviewable.
           </p>
 
           <p className="mt-4 max-w-5xl leading-8 text-slate-400">
-            Fabric width, ruler calibration, pattern boundary, marker length এবং
-            fabric type সরাসরি pattern area, marker utilisation, estimated
-            consumption এবং সম্ভাব্য fabric saving-কে প্রভাবিত করে। তাই CAD
-            experience না থাকা ব্যবহারকারীও যেন নিরাপদ engineering decision
-            নিতে পারেন, OptiFabric প্রতিটি গুরুত্বপূর্ণ input-এর কারণ ব্যাখ্যা
-            করে।
+            Fabric width, calibrated geometry, pattern boundary, cutting gap,
+            marker length, lay condition এবং fabric type সরাসরি pattern area,
+            marker utilisation, fabric consumption এবং সম্ভাব্য saving-কে
+            প্রভাবিত করে। OptiFabric এই engineering relationship-গুলো connected
+            রাখে, যাতে production decision সহজে যাচাই করা যায়।
           </p>
         </section>
 
         <section className="mt-14">
           <div>
             <p className="text-sm font-black uppercase tracking-[0.2em] text-cyan-400">
-              RC1 Release Centre
+              Support &amp; Release Information
             </p>
 
             <h2 className="mt-3 text-3xl font-black text-white">
-              Documentation and Release Information
+              Documentation and Product Information
             </h2>
 
             <p className="mt-2 text-xl font-bold text-cyan-300">
-              ডকুমেন্টেশন ও রিলিজ তথ্য
+              ডকুমেন্টেশন ও প্রোডাক্ট তথ্য
             </p>
           </div>
 
@@ -365,16 +515,16 @@ export default function OptiFabricHomePage() {
 
           <p className="mt-5 leading-8 text-slate-300">
             OptiFabric AI supports engineering decisions. Pattern measurements,
-            marker proposals and savings estimates must be reviewed through
-            physical pattern checking and controlled trial cutting before bulk
-            production.
+            marker proposals, optimisation results and savings estimates must
+            be reviewed through physical pattern checking and controlled trial
+            cutting before bulk production.
           </p>
 
           <p className="mt-4 leading-8 text-slate-400">
             OptiFabric AI engineering decision-এ সহায়তা করে। Bulk production-এর
             আগে physical pattern checking এবং controlled trial cutting-এর
-            মাধ্যমে pattern measurement, marker proposal এবং savings estimate
-            যাচাই করতে হবে।
+            মাধ্যমে pattern measurement, marker proposal, optimisation result
+            এবং savings estimate যাচাই করতে হবে।
           </p>
         </section>
       </section>
@@ -383,6 +533,7 @@ export default function OptiFabricHomePage() {
         <div className="mx-auto flex max-w-7xl flex-col gap-5 px-6 py-10 text-sm text-slate-400 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="font-black text-white">OptiFabric AI</p>
+
             <p className="mt-1">
               AI Digital Cutting Master &amp; Engineering Assistant
             </p>

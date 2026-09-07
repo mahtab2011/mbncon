@@ -1,0 +1,726 @@
+C:\Users\mahta\Projects\mbncon\app\about-mbncon\page.tsx:60: href="/"
+C:\Users\mahta\Projects\mbncon\app\about-mbncon\page.tsx:105: href="/contact"
+C:\Users\mahta\Projects\mbncon\app\blog\ai-transformation-manufacturing\page.tsx:10: href="/blog"
+C:\Users\mahta\Projects\mbncon\app\blog\ai-transformation-manufacturing\page.tsx:131: href="/blog"
+C:\Users\mahta\Projects\mbncon\app\blog\ai-transformation-manufacturing\page.tsx:138: href="/contact"
+C:\Users\mahta\Projects\mbncon\app\blog\how-to-increase-productivity-manufacturing\page.tsx:10: href="/blog"
+C:\Users\mahta\Projects\mbncon\app\blog\how-to-increase-productivity-manufacturing\page.tsx:154: href="/blog"
+C:\Users\mahta\Projects\mbncon\app\blog\how-to-increase-productivity-manufacturing\page.tsx:161: href="/contact"
+C:\Users\mahta\Projects\mbncon\app\blog\page.tsx:74: href={post.href}
+C:\Users\mahta\Projects\mbncon\app\blog\page.tsx:109: href="/contact"
+C:\Users\mahta\Projects\mbncon\app\blog\page.tsx:116: href="/software"
+C:\Users\mahta\Projects\mbncon\app\components\manufacturing\ManufacturingSidebar.tsx:66: href={item.route}
+C:\Users\mahta\Projects\mbncon\app\components\optifabric\PresentationProgress.tsx:3: import { presentationSteps } from "@/lib/optifabric/presentationMode";
+C:\Users\mahta\Projects\mbncon\app\contact\page.tsx:163: href="/"
+C:\Users\mahta\Projects\mbncon\app\gpa\bottleneck-centre\page.tsx:73: href="/gpa/dashboard"
+C:\Users\mahta\Projects\mbncon\app\gpa\dashboard\page.tsx:62: href="/gpa"
+C:\Users\mahta\Projects\mbncon\app\gpa\dashboard\page.tsx:135: href="/gpa/bottleneck-centre"
+C:\Users\mahta\Projects\mbncon\app\gpa\dashboard\page.tsx:148: href="/gpa/bottleneck-centre"
+C:\Users\mahta\Projects\mbncon\app\gpa\dashboard\page.tsx:155: href="/gpa/mbo-centre"
+C:\Users\mahta\Projects\mbncon\app\gpa\dashboard\page.tsx:162: href="/gpa/lean-kaizen"
+C:\Users\mahta\Projects\mbncon\app\gpa\dashboard\page.tsx:169: href="/gpa/factory-health"
+C:\Users\mahta\Projects\mbncon\app\gpa\page.tsx:59: href="/gpa/dashboard"
+C:\Users\mahta\Projects\mbncon\app\gpa\page.tsx:66: href="/"
+C:\Users\mahta\Projects\mbncon\app\gpa\page.tsx:78: href={card.href}
+C:\Users\mahta\Projects\mbncon\app\insights-discussion\page.tsx:106: href="/"
+C:\Users\mahta\Projects\mbncon\app\manufacturing\bgmea-demo\page.tsx:80: href="/manufacturing/executive-welcome"
+C:\Users\mahta\Projects\mbncon\app\manufacturing\bgmea-demo\page.tsx:87: href="/manufacturing"
+C:\Users\mahta\Projects\mbncon\app\manufacturing\bgmea-demo\page.tsx:111: href={item.href}
+C:\Users\mahta\Projects\mbncon\app\manufacturing\enterprise-command-hub\page.tsx:643: href="/manufacturing/global-executive-dashboard"
+C:\Users\mahta\Projects\mbncon\app\manufacturing\enterprise-command-hub\page.tsx:648: href="/manufacturing/executive-command-centre"
+C:\Users\mahta\Projects\mbncon\app\manufacturing\enterprise-command-hub\page.tsx:653: href="/manufacturing/cutting-command-centre"
+C:\Users\mahta\Projects\mbncon\app\manufacturing\enterprise-command-hub\page.tsx:658: href="/manufacturing/fabric-inspection"
+C:\Users\mahta\Projects\mbncon\app\manufacturing\enterprise-command-hub\page.tsx:721: href={href}
+C:\Users\mahta\Projects\mbncon\app\manufacturing\executive-welcome\page.tsx:105: href="/manufacturing/global-executive-dashboard"
+C:\Users\mahta\Projects\mbncon\app\manufacturing\executive-welcome\page.tsx:112: href="/manufacturing/pilot-navigation-hub"
+C:\Users\mahta\Projects\mbncon\app\manufacturing\executive-welcome\page.tsx:165: href={link.href}
+C:\Users\mahta\Projects\mbncon\app\manufacturing\gpa\page.tsx:103: <Link href="/manufacturing/enterprise-command-hub" className="rounded-xl bg-white px-6 py-3 font-bold text-blue-700 shadow hover:bg-blue-50">
+C:\Users\mahta\Projects\mbncon\app\manufacturing\gpa\page.tsx:106: <Link href="/manufacturing/operation-bulletin-master" className="rounded-xl bg-blue-900 px-6 py-3 font-bold text-white shadow hover:bg-blue-950">
+C:\Users\mahta\Projects\mbncon\app\manufacturing\gpa\page.tsx:109: <Link href="/manufacturing/cutting-command-centre" className="rounded-xl bg-blue-900 px-6 py-3 font-bold text-white shadow hover:bg-blue-950">
+C:\Users\mahta\Projects\mbncon\app\manufacturing\gpa\page.tsx:112: <Link href="/manufacturing/fabric-consumption" className="rounded-xl bg-blue-900 px-6 py-3 font-bold text-white shadow hover:bg-blue-950">
+C:\Users\mahta\Projects\mbncon\app\manufacturing\gpa\page.tsx:115: <Link href="/manufacturing/fabric-optimizer" className="rounded-xl bg-blue-900 px-6 py-3 font-bold text-white shadow hover:bg-blue-950">
+C:\Users\mahta\Projects\mbncon\app\manufacturing\gpa\page.tsx:137: href={item.href}
+C:\Users\mahta\Projects\mbncon\app\manufacturing\pilot-navigation-hub\page.tsx:104: href={module.href}
+C:\Users\mahta\Projects\mbncon\app\manufacturing\search\page.tsx:169: href={item.route}
+C:\Users\mahta\Projects\mbncon\app\manufacturing\page.tsx:147: href={app.route}
+C:\Users\mahta\Projects\mbncon\app\optifabric\about\page.tsx:3: import AppReleaseInfo from "@/app/components/optifabric/AppReleaseInfo";
+C:\Users\mahta\Projects\mbncon\app\optifabric\about\page.tsx:4: import CommercialFooter from "@/app/components/optifabric/CommercialFooter";
+C:\Users\mahta\Projects\mbncon\app\optifabric\about\page.tsx:5: import { optiFabricReleaseConfig } from "@/lib/optifabric/releaseConfig";
+C:\Users\mahta\Projects\mbncon\app\optifabric\about\page.tsx:15: href="/optifabric"
+C:\Users\mahta\Projects\mbncon\app\optifabric\about\page.tsx:146: href={step.route}
+C:\Users\mahta\Projects\mbncon\app\optifabric\cutting-assistant\fabric-consumption\page.tsx:5: } from "@/lib/optifabric/fabricConsumptionEngine";
+C:\Users\mahta\Projects\mbncon\app\optifabric\cutting-assistant\fabric-consumption\page.tsx:21: href="/optifabric/cutting-assistant/marker-layout"
+C:\Users\mahta\Projects\mbncon\app\optifabric\cutting-assistant\fabric-consumption\page.tsx:110: href="/optifabric/cutting-assistant/savings"
+C:\Users\mahta\Projects\mbncon\app\optifabric\cutting-assistant\fabric-specs\page.tsx:9: href="/optifabric/cutting-assistant/upload"
+C:\Users\mahta\Projects\mbncon\app\optifabric\cutting-assistant\fabric-specs\page.tsx:139: href="/optifabric/cutting-assistant/pattern-analysis"
+C:\Users\mahta\Projects\mbncon\app\optifabric\cutting-assistant\marker-layout\page.tsx:5: } from "@/lib/optifabric/markerLayoutEngine";
+C:\Users\mahta\Projects\mbncon\app\optifabric\cutting-assistant\marker-layout\page.tsx:18: href="/optifabric/cutting-assistant/pattern-area"
+C:\Users\mahta\Projects\mbncon\app\optifabric\cutting-assistant\marker-layout\page.tsx:89: href="/optifabric/cutting-assistant/fabric-consumption"
+C:\Users\mahta\Projects\mbncon\app\optifabric\cutting-assistant\pattern-analysis\page.tsx:5: } from "@/lib/optifabric/patternBoundaryEngine";
+C:\Users\mahta\Projects\mbncon\app\optifabric\cutting-assistant\pattern-analysis\page.tsx:19: href="/optifabric/cutting-assistant/fabric-specs"
+C:\Users\mahta\Projects\mbncon\app\optifabric\cutting-assistant\pattern-analysis\page.tsx:97: href="/optifabric/cutting-assistant/pattern-area"
+C:\Users\mahta\Projects\mbncon\app\optifabric\cutting-assistant\pattern-area\page.tsx:5: } from "@/lib/optifabric/patternAreaEngine";
+C:\Users\mahta\Projects\mbncon\app\optifabric\cutting-assistant\pattern-area\page.tsx:19: href="/optifabric/cutting-assistant/pattern-analysis"
+C:\Users\mahta\Projects\mbncon\app\optifabric\cutting-assistant\pattern-area\page.tsx:79: href="/optifabric/cutting-assistant/marker-layout"
+C:\Users\mahta\Projects\mbncon\app\optifabric\cutting-assistant\upload\page.tsx:2: import PresentationProgress from "@/app/components/optifabric/PresentationProgress";
+C:\Users\mahta\Projects\mbncon\app\optifabric\cutting-assistant\upload\page.tsx:17: href="/optifabric/cutting-assistant"
+C:\Users\mahta\Projects\mbncon\app\optifabric\cutting-assistant\upload\page.tsx:111: href="/optifabric/cutting-assistant/fabric-specs"
+C:\Users\mahta\Projects\mbncon\app\optifabric\cutting-assistant\page.tsx:31: href="/optifabric"
+C:\Users\mahta\Projects\mbncon\app\optifabric\cutting-assistant\page.tsx:92: href="/optifabric/cutting-assistant/upload"
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\ai\page.tsx:20: <Link href="/optifabric/demo/layout" className="text-cyan-300">
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\ai\page.tsx:90: href="/optifabric/demo/results"
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\ai-nesting\page.tsx:5: import PresentationProgress from "@/app/components/optifabric/PresentationProgress";
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\ai-nesting\page.tsx:6: import AIExplanationCard from "@/app/components/optifabric/AIExplanationCard";
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\ai-nesting\page.tsx:7: import CommercialFooter from "@/app/components/optifabric/CommercialFooter";
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\ai-nesting\page.tsx:302: href="/optifabric/demo/polygon"
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\ai-nesting\page.tsx:309: href="/optifabric/demo/marker-efficiency"
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\ai-nesting\page.tsx:598: href="/optifabric/demo/marker-efficiency"
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\boundary-tracing\page.tsx:4: import PresentationProgress from "@/app/components/optifabric/PresentationProgress";
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\boundary-tracing\page.tsx:5: import AIExplanationCard from "@/app/components/optifabric/AIExplanationCard";
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\boundary-tracing\page.tsx:6: import CommercialFooter from "@/app/components/optifabric/CommercialFooter";
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\boundary-tracing\page.tsx:20: } from "@/lib/optifabric/polygonAreaEngine";
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\boundary-tracing\page.tsx:22: import { PolygonPoint } from "@/lib/optifabric/polygonTypes";
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\boundary-tracing\page.tsx:349: href="/optifabric/demo/photo-quality"
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\boundary-tracing\page.tsx:658: href="/optifabric/demo/polygon"
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\fabric-saving\page.tsx:5: import PresentationProgress from "@/app/components/optifabric/PresentationProgress";
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\fabric-saving\page.tsx:6: import AIExplanationCard from "@/app/components/optifabric/AIExplanationCard";
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\fabric-saving\page.tsx:7: import CommercialFooter from "@/app/components/optifabric/CommercialFooter";
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\fabric-saving\page.tsx:513: href="/optifabric/demo/marker-efficiency"
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\fabric-saving\page.tsx:520: href="/optifabric/demo/roi"
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\fabric-saving\page.tsx:940: href="/optifabric/demo/roi"
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\layout\page.tsx:19: <Link href="/optifabric/demo/pattern" className="text-cyan-300">
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\layout\page.tsx:78: href="/optifabric/demo/theatre"
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\marker-efficiency\page.tsx:395: href="/optifabric/demo/ai-nesting"
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\marker-efficiency\page.tsx:402: href="/optifabric/demo/fabric-saving"
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\marker-efficiency\page.tsx:759: href="/optifabric/demo/fabric-saving"
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\pattern\page.tsx:18: <Link href="/optifabric/demo/style" className="text-cyan-300">
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\pattern\page.tsx:55: href="/optifabric/demo/layout"
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\photo-quality\page.tsx:7: import { evaluatePhotoQuality } from "@/lib/optifabric/photoQualityEngine";
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\photo-quality\page.tsx:8: import PresentationProgress from "@/app/components/optifabric/PresentationProgress";
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\photo-quality\page.tsx:9: import AIExplanationCard from "@/app/components/optifabric/AIExplanationCard";
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\photo-quality\page.tsx:10: import CommercialFooter from "@/app/components/optifabric/CommercialFooter";
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\photo-quality\page.tsx:87: <Link href="/optifabric/demo/upload" className="text-cyan-300">
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\photo-quality\page.tsx:328: href="/optifabric/demo/boundary-tracing"
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\photo-quality\page.tsx:345: href="/optifabric/demo/boundary-tracing"
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\pilot-result\page.tsx:661: href: "/optifabric/demo/upload",
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\pilot-result\page.tsx:668: href: "/optifabric/demo/photo-quality",
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\pilot-result\page.tsx:675: href: "/optifabric/demo/boundary-tracing",
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\pilot-result\page.tsx:682: href: "/optifabric/demo/polygon",
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\pilot-result\page.tsx:689: href: "/optifabric/demo/ai-nesting",
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\pilot-result\page.tsx:696: href: "/optifabric/demo/marker-efficiency",
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\pilot-result\page.tsx:703: href: "/optifabric/demo/fabric-saving",
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\pilot-result\page.tsx:710: href: "/optifabric/demo/roi",
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\pilot-result\page.tsx:793: href="/optifabric/demo/roi"
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\pilot-result\page.tsx:800: href="/optifabric/demo"
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\pilot-result\page.tsx:807: href="/optifabric"
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\pilot-result\page.tsx:1290: href="/optifabric/demo"
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\pilot-result\page.tsx:1297: href="/optifabric/demo/roi"
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\pilot-result\page.tsx:1304: href="/optifabric/demo/fabric-saving"
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\pilot-result\page.tsx:1329: href={step.href}
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\polygon\page.tsx:4: import PresentationProgress from "@/app/components/optifabric/PresentationProgress";
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\polygon\page.tsx:5: import AIExplanationCard from "@/app/components/optifabric/AIExplanationCard";
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\polygon\page.tsx:6: import CommercialFooter from "@/app/components/optifabric/CommercialFooter";
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\polygon\page.tsx:39: href="/optifabric/demo/boundary-tracing"
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\polygon\page.tsx:303: href="/optifabric/demo/nesting"
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\presentation\page.tsx:6: import CommercialFooter from "@/app/components/optifabric/CommercialFooter";
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\presentation\page.tsx:7: import ExecutiveHeader from "@/app/components/optifabric/ExecutiveHeader";
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\presentation\page.tsx:8: import ExecutiveRibbon from "@/app/components/optifabric/ExecutiveRibbon";
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\presentation\page.tsx:9: import PresentationReadinessBar from "@/app/components/optifabric/PresentationReadinessBar";
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\presentation\page.tsx:10: import PresentationSpeakerPanel from "@/app/components/optifabric/PresentationSpeakerPanel";
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\presentation\page.tsx:11: import FactoryDemoPanel from "@/app/components/optifabric/FactoryDemoPanel";
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\presentation\page.tsx:12: import AppReleaseInfo from "@/app/components/optifabric/AppReleaseInfo";
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\presentation\page.tsx:171: href="/optifabric"
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\presentation\page.tsx:574: href="/optifabric/demo/upload"
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\presentation\page.tsx:581: href="/optifabric/demo/roi"
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\results\page.tsx:17: <Link href="/optifabric/demo/ai" className="text-cyan-300">
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\results\page.tsx:123: href="/optifabric/demo/upload"
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\results\page.tsx:129: href="/optifabric/demo/roi"
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\results\page.tsx:135: href="/optifabric/demo"
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\roi\page.tsx:5: import PresentationProgress from "@/app/components/optifabric/PresentationProgress";
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\roi\page.tsx:6: import AIExplanationCard from "@/app/components/optifabric/AIExplanationCard";
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\roi\page.tsx:7: import CommercialFooter from "@/app/components/optifabric/CommercialFooter";
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\roi\page.tsx:512: href="/optifabric/demo/fabric-saving"
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\roi\page.tsx:519: href="/optifabric/demo/pilot-result"
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\roi\page.tsx:944: href="/optifabric/demo/pilot-result"
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\route-audit\page.tsx:35: href: "/optifabric/demo",
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\route-audit\page.tsx:46: href: "/optifabric/demo/upload",
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\route-audit\page.tsx:57: href: "/optifabric/demo/photo-quality",
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\route-audit\page.tsx:68: href: "/optifabric/demo/boundary-tracing",
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\route-audit\page.tsx:79: href: "/optifabric/demo/polygon",
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\route-audit\page.tsx:90: href: "/optifabric/demo/ai-nesting",
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\route-audit\page.tsx:101: href: "/optifabric/demo/marker-efficiency",
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\route-audit\page.tsx:112: href: "/optifabric/demo/fabric-saving",
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\route-audit\page.tsx:123: href: "/optifabric/demo/roi",
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\route-audit\page.tsx:134: href: "/optifabric/demo/pilot-result",
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\route-audit\page.tsx:170: "Check the exact folder name inside app/optifabric/demo.",
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\route-audit\page.tsx:218: "app/optifabric/demo-?? ????? ???? ????????? ??? ??????? ?????",
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\route-audit\page.tsx:390: href="/optifabric/demo"
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\route-audit\page.tsx:397: href="/optifabric/demo/pilot-result"
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\route-audit\page.tsx:404: href="/optifabric"
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\route-audit\page.tsx:675: href={route.href}
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\style\page.tsx:11: href: "/optifabric/demo/pattern?style=tshirt",
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\style\page.tsx:18: href: "/optifabric/demo/pattern?style=shirt",
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\style\page.tsx:25: href: "/optifabric/demo/pattern?style=trouser",
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\style\page.tsx:33: <Link href="/optifabric/demo" className="text-cyan-300">
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\style\page.tsx:50: href={item.href}
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\theatre\page.tsx:70: <Link href="/optifabric/demo/layout" className="text-cyan-300">
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\theatre\page.tsx:184: href="/optifabric/demo/results"
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\upload\page.tsx:4: import AIGuidancePanel from "@/app/components/optifabric/AIGuidancePanel";
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\upload\page.tsx:5: import AICoach from "@/app/components/optifabric/AICoach";
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\upload\page.tsx:6: import AIExplanationCard from "@/app/components/optifabric/AIExplanationCard";
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\upload\page.tsx:7: import CommercialBanner from "@/app/components/optifabric/CommercialBanner";
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\upload\page.tsx:8: import PresentationProgress from "@/app/components/optifabric/PresentationProgress";
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\upload\page.tsx:9: import CommercialFooter from "@/app/components/optifabric/CommercialFooter";
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\upload\page.tsx:35: href="/optifabric/demo/results"
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\upload\page.tsx:283: href="/optifabric/demo/photo-quality"
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\page.tsx:43: href="/optifabric/demo/style"
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\page.tsx:50: href="/optifabric/pilot-dashboard"
+C:\Users\mahta\Projects\mbncon\app\optifabric\demo\page.tsx:96: href="/optifabric/demo/style"
+C:\Users\mahta\Projects\mbncon\app\optifabric\engineering-wizard\page.tsx:6: import { analyzeScaleDetection } from "../../../lib/optifabric/scaleDetectionEngine";
+C:\Users\mahta\Projects\mbncon\app\optifabric\engineering-wizard\page.tsx:7: import { analyzeNotches } from "../../../lib/optifabric/notchDetectionEngine";
+C:\Users\mahta\Projects\mbncon\app\optifabric\engineering-wizard\page.tsx:8: import { analyzeGrainLine } from "../../../lib/optifabric/grainLineDetectionEngine";
+C:\Users\mahta\Projects\mbncon\app\optifabric\engineering-wizard\page.tsx:9: import { analyzeFabricRepeat } from "../../../lib/optifabric/fabricRepeatDetectionEngine";
+C:\Users\mahta\Projects\mbncon\app\optifabric\engineering-wizard\page.tsx:10: import { calculateFabricConsumption } from "../../../lib/optifabric/fabricConsumptionAdvisor";
+C:\Users\mahta\Projects\mbncon\app\optifabric\engineering-wizard\page.tsx:91: href="/optifabric/pilot-dashboard"
+C:\Users\mahta\Projects\mbncon\app\optifabric\mini-pilot\live-tracing\page.tsx:5: import { fabricPatternTypes } from "@/lib/optifabric/fabricPatternTypes";
+C:\Users\mahta\Projects\mbncon\app\optifabric\mini-pilot\live-tracing\page.tsx:6: import { loadImage } from "@/lib/optifabric/imageLoader";
+C:\Users\mahta\Projects\mbncon\app\optifabric\mini-pilot\live-tracing\page.tsx:7: import { inspectPatternImage, VisionAiResult } from "@/lib/optifabric/visionAiEngine";
+C:\Users\mahta\Projects\mbncon\app\optifabric\mini-pilot\live-tracing\page.tsx:8: import { inspectTracedPattern } from "@/lib/optifabric/patternInspectionEngine";
+C:\Users\mahta\Projects\mbncon\app\optifabric\mini-pilot\live-tracing\page.tsx:12: } from "@/lib/optifabric/polygonAreaEngine";
+C:\Users\mahta\Projects\mbncon\app\optifabric\mini-pilot\live-tracing\page.tsx:13: import { PolygonPoint } from "@/lib/optifabric/polygonTypes";
+C:\Users\mahta\Projects\mbncon\app\optifabric\mini-pilot\live-tracing\page.tsx:97: href="/optifabric/mini-pilot"
+C:\Users\mahta\Projects\mbncon\app\optifabric\mini-pilot\live-tracing\page.tsx:299: href="/optifabric/mini-pilot/polygon-nesting"
+C:\Users\mahta\Projects\mbncon\app\optifabric\mini-pilot\polygon-nesting\page.tsx:5: import { fabricPatternTypes } from "@/lib/optifabric/fabricPatternTypes";
+C:\Users\mahta\Projects\mbncon\app\optifabric\mini-pilot\polygon-nesting\page.tsx:51: href="/optifabric/mini-pilot/live-tracing"
+C:\Users\mahta\Projects\mbncon\app\optifabric\mini-pilot\page.tsx:4: import { fabricPatternTypes } from "@/lib/optifabric/fabricPatternTypes";
+C:\Users\mahta\Projects\mbncon\app\optifabric\mini-pilot\page.tsx:5: import { miniPilotDictionary } from "@/lib/optifabric/miniPilotDictionary";
+C:\Users\mahta\Projects\mbncon\app\optifabric\pilot-dashboard\page.tsx:8: href: "/optifabric/mini-pilot/live-tracing",
+C:\Users\mahta\Projects\mbncon\app\optifabric\pilot-dashboard\page.tsx:13: href: "/optifabric/mini-pilot/polygon-nesting",
+C:\Users\mahta\Projects\mbncon\app\optifabric\pilot-dashboard\page.tsx:18: href: "/optifabric/cutting-assistant/pattern-analysis",
+C:\Users\mahta\Projects\mbncon\app\optifabric\pilot-dashboard\page.tsx:23: href: "/optifabric/stripe-matching",
+C:\Users\mahta\Projects\mbncon\app\optifabric\pilot-dashboard\page.tsx:28: href: "/optifabric/cutting-assistant/pattern-area",
+C:\Users\mahta\Projects\mbncon\app\optifabric\pilot-dashboard\page.tsx:90: href={module.href}
+C:\Users\mahta\Projects\mbncon\app\optifabric\play-store-assets\page.tsx:81: fileName: "/optifabric/privacy-policy",
+C:\Users\mahta\Projects\mbncon\app\optifabric\play-store-assets\page.tsx:93: fileName: "/optifabric/terms-and-conditions",
+C:\Users\mahta\Projects\mbncon\app\optifabric\play-store-assets\page.tsx:115: route: "/optifabric/upload",
+C:\Users\mahta\Projects\mbncon\app\optifabric\play-store-assets\page.tsx:124: route: "/optifabric/upload",
+C:\Users\mahta\Projects\mbncon\app\optifabric\play-store-assets\page.tsx:133: route: "/optifabric/live-tracing",
+C:\Users\mahta\Projects\mbncon\app\optifabric\play-store-assets\page.tsx:142: route: "/optifabric/polygon-demo",
+C:\Users\mahta\Projects\mbncon\app\optifabric\play-store-assets\page.tsx:151: route: "/optifabric/polygon-nesting",
+C:\Users\mahta\Projects\mbncon\app\optifabric\play-store-assets\page.tsx:160: route: "/optifabric/polygon-nesting",
+C:\Users\mahta\Projects\mbncon\app\optifabric\play-store-assets\page.tsx:169: route: "/optifabric/complete-pilot-result",
+C:\Users\mahta\Projects\mbncon\app\optifabric\play-store-assets\page.tsx:396: href="/optifabric"
+C:\Users\mahta\Projects\mbncon\app\optifabric\play-store-assets\page.tsx:403: href="/optifabric/privacy-policy"
+C:\Users\mahta\Projects\mbncon\app\optifabric\play-store-assets\page.tsx:410: href="/optifabric/terms-and-conditions"
+C:\Users\mahta\Projects\mbncon\app\optifabric\privacy-policy\page.tsx:92: href="/optifabric"
+C:\Users\mahta\Projects\mbncon\app\optifabric\privacy-policy\page.tsx:99: href="/optifabric/about"
+C:\Users\mahta\Projects\mbncon\app\optifabric\release-freeze\page.tsx:672: href="/optifabric"
+C:\Users\mahta\Projects\mbncon\app\optifabric\release-freeze\page.tsx:679: href="/optifabric/user-manual"
+C:\Users\mahta\Projects\mbncon\app\optifabric\release-freeze\page.tsx:686: href="/optifabric/play-store-assets"
+C:\Users\mahta\Projects\mbncon\app\optifabric\release-freeze\page.tsx:693: href="/optifabric/privacy-policy"
+C:\Users\mahta\Projects\mbncon\app\optifabric\release-freeze\page.tsx:700: href="/optifabric/terms-and-conditions"
+C:\Users\mahta\Projects\mbncon\app\optifabric\stripe-matching\page.tsx:7: } from "../../../lib/optifabric/stripeMatchingEngine";
+C:\Users\mahta\Projects\mbncon\app\optifabric\terms-and-conditions\page.tsx:264: href="/optifabric"
+C:\Users\mahta\Projects\mbncon\app\optifabric\terms-and-conditions\page.tsx:271: href="/optifabric/privacy-policy"
+C:\Users\mahta\Projects\mbncon\app\optifabric\terms-and-conditions\page.tsx:291: href="/optifabric"
+C:\Users\mahta\Projects\mbncon\app\optifabric\terms-and-conditions\page.tsx:298: href="/optifabric/about"
+C:\Users\mahta\Projects\mbncon\app\optifabric\terms-and-conditions\page.tsx:305: href="/optifabric/privacy-policy"
+C:\Users\mahta\Projects\mbncon\app\optifabric\user-manual\page.tsx:47: route: "/optifabric/upload",
+C:\Users\mahta\Projects\mbncon\app\optifabric\user-manual\page.tsx:107: route: "/optifabric/upload",
+C:\Users\mahta\Projects\mbncon\app\optifabric\user-manual\page.tsx:163: route: "/optifabric/live-tracing",
+C:\Users\mahta\Projects\mbncon\app\optifabric\user-manual\page.tsx:227: route: "/optifabric/polygon-demo",
+C:\Users\mahta\Projects\mbncon\app\optifabric\user-manual\page.tsx:290: route: "/optifabric/polygon-nesting",
+C:\Users\mahta\Projects\mbncon\app\optifabric\user-manual\page.tsx:348: route: "/optifabric/polygon-nesting",
+C:\Users\mahta\Projects\mbncon\app\optifabric\user-manual\page.tsx:410: route: "/optifabric/complete-pilot-result",
+C:\Users\mahta\Projects\mbncon\app\optifabric\user-manual\page.tsx:481: route: "/optifabric/polygon-nesting",
+C:\Users\mahta\Projects\mbncon\app\optifabric\user-manual\page.tsx:541: route: "/optifabric/complete-pilot-result",
+C:\Users\mahta\Projects\mbncon\app\optifabric\user-manual\page.tsx:612: route: "/optifabric/complete-pilot-result",
+C:\Users\mahta\Projects\mbncon\app\optifabric\user-manual\page.tsx:672: route: "/optifabric/complete-pilot-result",
+C:\Users\mahta\Projects\mbncon\app\optifabric\user-manual\page.tsx:818: href={`#${role.id}`}
+C:\Users\mahta\Projects\mbncon\app\optifabric\user-manual\page.tsx:911: href="/optifabric"
+C:\Users\mahta\Projects\mbncon\app\optifabric\user-manual\page.tsx:918: href="/optifabric/play-store-assets"
+C:\Users\mahta\Projects\mbncon\app\optifabric\user-manual\page.tsx:925: href="/optifabric/privacy-policy"
+C:\Users\mahta\Projects\mbncon\app\optifabric\user-manual\page.tsx:932: href="/optifabric/terms-and-conditions"
+C:\Users\mahta\Projects\mbncon\app\optifabric\page.tsx:20: href: "/optifabric/engineering-wizard",
+C:\Users\mahta\Projects\mbncon\app\optifabric\page.tsx:30: href: "/optifabric/mini-pilot",
+C:\Users\mahta\Projects\mbncon\app\optifabric\page.tsx:40: href: "/optifabric/mini-pilot/live-tracing",
+C:\Users\mahta\Projects\mbncon\app\optifabric\page.tsx:50: href: "/optifabric/mini-pilot/polygon-nesting",
+C:\Users\mahta\Projects\mbncon\app\optifabric\page.tsx:60: href: "/optifabric/pilot-dashboard",
+C:\Users\mahta\Projects\mbncon\app\optifabric\page.tsx:70: href: "/optifabric/stripe-matching",
+C:\Users\mahta\Projects\mbncon\app\optifabric\page.tsx:106: href: "/optifabric/about",
+C:\Users\mahta\Projects\mbncon\app\optifabric\page.tsx:111: href: "/optifabric/user-manual",
+C:\Users\mahta\Projects\mbncon\app\optifabric\page.tsx:116: href: "/optifabric/play-store-assets",
+C:\Users\mahta\Projects\mbncon\app\optifabric\page.tsx:121: href: "/optifabric/release-freeze",
+C:\Users\mahta\Projects\mbncon\app\optifabric\page.tsx:126: href: "/optifabric/privacy-policy",
+C:\Users\mahta\Projects\mbncon\app\optifabric\page.tsx:131: href: "/optifabric/terms-and-conditions",
+C:\Users\mahta\Projects\mbncon\app\optifabric\page.tsx:172: href="/optifabric/mini-pilot"
+C:\Users\mahta\Projects\mbncon\app\optifabric\page.tsx:179: href="/optifabric/engineering-wizard"
+C:\Users\mahta\Projects\mbncon\app\optifabric\page.tsx:186: href="/optifabric/user-manual"
+C:\Users\mahta\Projects\mbncon\app\optifabric\page.tsx:261: href={module.href}
+C:\Users\mahta\Projects\mbncon\app\optifabric\page.tsx:344: href={item.href}
+C:\Users\mahta\Projects\mbncon\app\optifabric\page.tsx:393: href="/optifabric/privacy-policy"
+C:\Users\mahta\Projects\mbncon\app\optifabric\page.tsx:400: href="/optifabric/terms-and-conditions"
+C:\Users\mahta\Projects\mbncon\app\optifabric\page.tsx:407: href="/optifabric/user-manual"
+C:\Users\mahta\Projects\mbncon\app\software\accounts-receivable-cashflow-intelligence\page.tsx:47: href="/software"
+C:\Users\mahta\Projects\mbncon\app\software\accounts-receivable-cashflow-intelligence\page.tsx:73: href={href}
+C:\Users\mahta\Projects\mbncon\app\software\accounts-receivable-cashflow-intelligence\page.tsx:100: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\accounts-receivable-cashflow-intelligence\page.tsx:126: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\adaptive-leadership-assessment\page.tsx:437: href={href}
+C:\Users\mahta\Projects\mbncon\app\software\adaptive-recovery-intelligence\page.tsx:47: href="/software"
+C:\Users\mahta\Projects\mbncon\app\software\adaptive-recovery-intelligence\page.tsx:181: href="/software/organisational-resilience-intelligence"
+C:\Users\mahta\Projects\mbncon\app\software\adaptive-recovery-intelligence\page.tsx:194: href="/software/resilience-leadership-framework"
+C:\Users\mahta\Projects\mbncon\app\software\adaptive-recovery-intelligence\page.tsx:207: href="/software/executive-escalation-engine"
+C:\Users\mahta\Projects\mbncon\app\software\ai-analytics-decision-intelligence\page.tsx:30: href="/software"
+C:\Users\mahta\Projects\mbncon\app\software\ai-buyer-profitability-intelligence\page.tsx:244: href={card.href}
+C:\Users\mahta\Projects\mbncon\app\software\ai-buyer-profitability-intelligence\page.tsx:349: href={`#buyer-${slugify(record.buyer)}`}
+C:\Users\mahta\Projects\mbncon\app\software\ai-buyer-profitability-intelligence\page.tsx:389: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\ai-buyer-satisfaction-intelligence\page.tsx:250: href={String(href)}
+C:\Users\mahta\Projects\mbncon\app\software\ai-cashflow-risk-intelligence\page.tsx:298: href={`#${slugify(item.area)}`}
+C:\Users\mahta\Projects\mbncon\app\software\ai-compliance-risk-intelligence\page.tsx:193: href="#total-issues"
+C:\Users\mahta\Projects\mbncon\app\software\ai-compliance-risk-intelligence\page.tsx:204: href="#open-issues"
+C:\Users\mahta\Projects\mbncon\app\software\ai-compliance-risk-intelligence\page.tsx:215: href="#critical-issues"
+C:\Users\mahta\Projects\mbncon\app\software\ai-compliance-risk-intelligence\page.tsx:226: href="#ai-risk-score"
+C:\Users\mahta\Projects\mbncon\app\software\ai-compliance-risk-intelligence\page.tsx:237: href="#financial-exposure"
+C:\Users\mahta\Projects\mbncon\app\software\ai-compliance-risk-intelligence\page.tsx:290: href={`#${record.id.toLowerCase()}`}
+C:\Users\mahta\Projects\mbncon\app\software\ai-compliance-risk-intelligence\page.tsx:324: href={`#${record.id.toLowerCase()}`}
+C:\Users\mahta\Projects\mbncon\app\software\ai-cost-reduction-intelligence\page.tsx:210: href="#monthly-loss-exposure"
+C:\Users\mahta\Projects\mbncon\app\software\ai-cost-reduction-intelligence\page.tsx:226: href="#savings-potential"
+C:\Users\mahta\Projects\mbncon\app\software\ai-cost-reduction-intelligence\page.tsx:242: href="#critical-cost-areas"
+C:\Users\mahta\Projects\mbncon\app\software\ai-cost-reduction-intelligence\page.tsx:257: href="#high-priority-areas"
+C:\Users\mahta\Projects\mbncon\app\software\ai-cost-reduction-intelligence\page.tsx:348: href={`#${slugify(record.costArea)}`}
+C:\Users\mahta\Projects\mbncon\app\software\ai-cost-reduction-intelligence\page.tsx:386: href={`#${slugify(record.costArea)}`}
+C:\Users\mahta\Projects\mbncon\app\software\ai-department-accountability-tracker\page.tsx:229: href="#total-actions"
+C:\Users\mahta\Projects\mbncon\app\software\ai-department-accountability-tracker\page.tsx:240: href="#open-actions"
+C:\Users\mahta\Projects\mbncon\app\software\ai-department-accountability-tracker\page.tsx:251: href="#overdue-actions"
+C:\Users\mahta\Projects\mbncon\app\software\ai-department-accountability-tracker\page.tsx:262: href="#critical-actions"
+C:\Users\mahta\Projects\mbncon\app\software\ai-department-accountability-tracker\page.tsx:273: href="#departments"
+C:\Users\mahta\Projects\mbncon\app\software\ai-department-accountability-tracker\page.tsx:334: href={`#${slugify(record.issue)}`}
+C:\Users\mahta\Projects\mbncon\app\software\ai-department-accountability-tracker\page.tsx:360: href={`#${slugify(record.issue)}`}
+C:\Users\mahta\Projects\mbncon\app\software\ai-document-evidence-control-centre\page.tsx:257: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\ai-document-evidence-control-centre\page.tsx:348: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\ai-enterprise-report-generator\page.tsx:344: href={`#${slugify(item.title)}`}
+C:\Users\mahta\Projects\mbncon\app\software\ai-enterprise-report-generator\page.tsx:403: href={`#future-${slugify(item)}`}
+C:\Users\mahta\Projects\mbncon\app\software\ai-executive-kpi-command-centre\page.tsx:224: href="#factory-health-score"
+C:\Users\mahta\Projects\mbncon\app\software\ai-executive-kpi-command-centre\page.tsx:237: href="#excellent-kpis"
+C:\Users\mahta\Projects\mbncon\app\software\ai-executive-kpi-command-centre\page.tsx:250: href="#warning-kpis"
+C:\Users\mahta\Projects\mbncon\app\software\ai-executive-kpi-command-centre\page.tsx:263: href="#critical-kpis"
+C:\Users\mahta\Projects\mbncon\app\software\ai-executive-kpi-command-centre\page.tsx:276: href="#executive-assessment"
+C:\Users\mahta\Projects\mbncon\app\software\ai-executive-kpi-command-centre\page.tsx:316: href={`#${slugify(kpi.title)}`}
+C:\Users\mahta\Projects\mbncon\app\software\ai-executive-kpi-command-centre\page.tsx:437: href={`#${slugify(kpi.title)}`}
+C:\Users\mahta\Projects\mbncon\app\software\ai-executive-report\page.tsx:299: href={`#${slugify(item)}`}
+C:\Users\mahta\Projects\mbncon\app\software\ai-executive-report\page.tsx:325: href={`#${slugify(title)}`}
+C:\Users\mahta\Projects\mbncon\app\software\ai-factory-energy-optimisation-engine\page.tsx:243: href="#total-energy-cost"
+C:\Users\mahta\Projects\mbncon\app\software\ai-factory-energy-optimisation-engine\page.tsx:257: href="#electricity-usage"
+C:\Users\mahta\Projects\mbncon\app\software\ai-factory-energy-optimisation-engine\page.tsx:274: href="#generator-fuel"
+C:\Users\mahta\Projects\mbncon\app\software\ai-factory-energy-optimisation-engine\page.tsx:291: href="#critical-risks"
+C:\Users\mahta\Projects\mbncon\app\software\ai-factory-energy-optimisation-engine\page.tsx:304: href="#high-risk-areas"
+C:\Users\mahta\Projects\mbncon\app\software\ai-factory-energy-optimisation-engine\page.tsx:397: href={`#${slugify(record.department)}`}
+C:\Users\mahta\Projects\mbncon\app\software\ai-factory-energy-optimisation-engine\page.tsx:448: href={`#${slugify(record.department)}`}
+C:\Users\mahta\Projects\mbncon\app\software\ai-factory-health-engine\page.tsx:274: href={`#${slugify(record.area)}`}
+C:\Users\mahta\Projects\mbncon\app\software\ai-factory-war-room-command-centre\page.tsx:298: href={`#${slugify(alert.title)}`}
+C:\Users\mahta\Projects\mbncon\app\software\ai-factory-war-room-dashboard\page.tsx:175: href="#total-active-risks"
+C:\Users\mahta\Projects\mbncon\app\software\ai-factory-war-room-dashboard\page.tsx:188: href="#critical-alerts"
+C:\Users\mahta\Projects\mbncon\app\software\ai-factory-war-room-dashboard\page.tsx:199: href="#high-risks"
+C:\Users\mahta\Projects\mbncon\app\software\ai-factory-war-room-dashboard\page.tsx:210: href="#ai-executive-risk-score"
+C:\Users\mahta\Projects\mbncon\app\software\ai-factory-war-room-dashboard\page.tsx:223: href="#financial-exposure"
+C:\Users\mahta\Projects\mbncon\app\software\ai-factory-war-room-dashboard\page.tsx:285: href={`#${slugify(record.issue)}`}
+C:\Users\mahta\Projects\mbncon\app\software\ai-factory-war-room-dashboard\page.tsx:314: href={`#${slugify(record.issue)}`}
+C:\Users\mahta\Projects\mbncon\app\software\ai-global-search-module-finder\page.tsx:99: href="#modules-found"
+C:\Users\mahta\Projects\mbncon\app\software\ai-global-search-module-finder\page.tsx:109: href="#search-mode"
+C:\Users\mahta\Projects\mbncon\app\software\ai-global-search-module-finder\page.tsx:119: href="#navigation-status"
+C:\Users\mahta\Projects\mbncon\app\software\ai-global-search-module-finder\page.tsx:131: href={module.href}
+C:\Users\mahta\Projects\mbncon\app\software\ai-governance-ethics\page.tsx:30: href="/software"
+C:\Users\mahta\Projects\mbncon\app\software\ai-industrial-engineering-intelligence\page.tsx:224: href="#critical-flow-risks"
+C:\Users\mahta\Projects\mbncon\app\software\ai-industrial-engineering-intelligence\page.tsx:237: href="#high-process-risks"
+C:\Users\mahta\Projects\mbncon\app\software\ai-industrial-engineering-intelligence\page.tsx:250: href="#average-line-efficiency"
+C:\Users\mahta\Projects\mbncon\app\software\ai-industrial-engineering-intelligence\page.tsx:263: href="#total-idle-time"
+C:\Users\mahta\Projects\mbncon\app\software\ai-industrial-engineering-intelligence\page.tsx:325: href={`#${slugify(
+C:\Users\mahta\Projects\mbncon\app\software\ai-industrial-engineering-intelligence\page.tsx:363: href={`#${slugify(`${record.productionLine}-${record.product}`)}`}
+C:\Users\mahta\Projects\mbncon\app\software\ai-inventory-intelligence-engine\page.tsx:234: href="#total-inventory-value"
+C:\Users\mahta\Projects\mbncon\app\software\ai-inventory-intelligence-engine\page.tsx:250: href="#critical-inventory-risks"
+C:\Users\mahta\Projects\mbncon\app\software\ai-inventory-intelligence-engine\page.tsx:265: href="#high-risk-inventory"
+C:\Users\mahta\Projects\mbncon\app\software\ai-inventory-intelligence-engine\page.tsx:280: href="#shortage-risk-items"
+C:\Users\mahta\Projects\mbncon\app\software\ai-inventory-intelligence-engine\page.tsx:376: href={`#${slugify(record.material)}`}
+C:\Users\mahta\Projects\mbncon\app\software\ai-inventory-intelligence-engine\page.tsx:424: href={`#${slugify(record.material)}`}
+C:\Users\mahta\Projects\mbncon\app\software\ai-kaizen-improvement-tracker\page.tsx:238: href="#completed-projects"
+C:\Users\mahta\Projects\mbncon\app\software\ai-kaizen-improvement-tracker\page.tsx:253: href="#estimated-savings"
+C:\Users\mahta\Projects\mbncon\app\software\ai-kaizen-improvement-tracker\page.tsx:269: href="#actual-savings"
+C:\Users\mahta\Projects\mbncon\app\software\ai-kaizen-improvement-tracker\page.tsx:285: href="#average-participation"
+C:\Users\mahta\Projects\mbncon\app\software\ai-kaizen-improvement-tracker\page.tsx:384: href={`#${slugify(record.initiative)}`}
+C:\Users\mahta\Projects\mbncon\app\software\ai-kaizen-improvement-tracker\page.tsx:429: href={`#${slugify(record.initiative)}`}
+C:\Users\mahta\Projects\mbncon\app\software\ai-lean-manufacturing-intelligence-centre\page.tsx:236: href="#critical-lean-risks"
+C:\Users\mahta\Projects\mbncon\app\software\ai-lean-manufacturing-intelligence-centre\page.tsx:251: href="#high-waste-exposure"
+C:\Users\mahta\Projects\mbncon\app\software\ai-lean-manufacturing-intelligence-centre\page.tsx:266: href="#estimated-waste-loss"
+C:\Users\mahta\Projects\mbncon\app\software\ai-lean-manufacturing-intelligence-centre\page.tsx:282: href="#improvement-potential"
+C:\Users\mahta\Projects\mbncon\app\software\ai-lean-manufacturing-intelligence-centre\page.tsx:374: href={`#${slugify(record.wasteType)}`}
+C:\Users\mahta\Projects\mbncon\app\software\ai-lean-manufacturing-intelligence-centre\page.tsx:421: href={`#${slugify(record.wasteType)}`}
+C:\Users\mahta\Projects\mbncon\app\software\ai-management-review-centre\page.tsx:276: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\ai-management-review-centre\page.tsx:363: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\ai-master-control-centre\page.tsx:202: href="#active-enterprise-modules"
+C:\Users\mahta\Projects\mbncon\app\software\ai-master-control-centre\page.tsx:217: href="#intelligence-engines"
+C:\Users\mahta\Projects\mbncon\app\software\ai-master-control-centre\page.tsx:232: href="#platform-status"
+C:\Users\mahta\Projects\mbncon\app\software\ai-master-control-centre\page.tsx:273: href={module.href}
+C:\Users\mahta\Projects\mbncon\app\software\ai-master-control-centre\page.tsx:355: href="#directors-and-owners"
+C:\Users\mahta\Projects\mbncon\app\software\ai-master-control-centre\page.tsx:372: href="#managers-and-officers"
+C:\Users\mahta\Projects\mbncon\app\software\ai-notification-escalation-centre\page.tsx:308: href="#critical-escalation-alerts"
+C:\Users\mahta\Projects\mbncon\app\software\ai-notification-escalation-centre\page.tsx:321: href="#high-priority-alerts"
+C:\Users\mahta\Projects\mbncon\app\software\ai-notification-escalation-centre\page.tsx:334: href="#live-governance-monitoring"
+C:\Users\mahta\Projects\mbncon\app\software\ai-notification-escalation-centre\page.tsx:364: href={`#${slugify(item.title)}`}
+C:\Users\mahta\Projects\mbncon\app\software\ai-notification-escalation-centre\page.tsx:431: href={`#${slugify(item)}`}
+C:\Users\mahta\Projects\mbncon\app\software\ai-order-profitability-intelligence\page.tsx:240: href="#total-order-value"
+C:\Users\mahta\Projects\mbncon\app\software\ai-order-profitability-intelligence\page.tsx:255: href="#actual-order-cost"
+C:\Users\mahta\Projects\mbncon\app\software\ai-order-profitability-intelligence\page.tsx:270: href="#profit-leakage"
+C:\Users\mahta\Projects\mbncon\app\software\ai-order-profitability-intelligence\page.tsx:285: href="#average-margin"
+C:\Users\mahta\Projects\mbncon\app\software\ai-order-profitability-intelligence\page.tsx:300: href="#risky-orders"
+C:\Users\mahta\Projects\mbncon\app\software\ai-order-profitability-intelligence\page.tsx:354: href={`#${slugify(record.orderNo)}`}
+C:\Users\mahta\Projects\mbncon\app\software\ai-order-profitability-intelligence\page.tsx:399: href={`#${slugify(record.orderNo)}`}
+C:\Users\mahta\Projects\mbncon\app\software\ai-production-recovery-intelligence\page.tsx:201: href="#active-recovery-orders"
+C:\Users\mahta\Projects\mbncon\app\software\ai-production-recovery-intelligence\page.tsx:216: href="#delayed-production-hours"
+C:\Users\mahta\Projects\mbncon\app\software\ai-production-recovery-intelligence\page.tsx:231: href="#critical-recovery-orders"
+C:\Users\mahta\Projects\mbncon\app\software\ai-production-recovery-intelligence\page.tsx:246: href="#average-recovery-probability"
+C:\Users\mahta\Projects\mbncon\app\software\ai-production-recovery-intelligence\page.tsx:336: href={`#${slugify(record.orderNo)}`}
+C:\Users\mahta\Projects\mbncon\app\software\ai-production-recovery-intelligence\page.tsx:387: href={`#${slugify(record.orderNo)}`}
+C:\Users\mahta\Projects\mbncon\app\software\ai-quality-failure-prediction-engine\page.tsx:253: href="#critical-quality-risks"
+C:\Users\mahta\Projects\mbncon\app\software\ai-quality-failure-prediction-engine\page.tsx:268: href="#high-quality-exposure"
+C:\Users\mahta\Projects\mbncon\app\software\ai-quality-failure-prediction-engine\page.tsx:283: href="#failure-probability"
+C:\Users\mahta\Projects\mbncon\app\software\ai-quality-failure-prediction-engine\page.tsx:298: href="#rejection-rate"
+C:\Users\mahta\Projects\mbncon\app\software\ai-quality-failure-prediction-engine\page.tsx:402: href={`#${slugify(record.product)}`}
+C:\Users\mahta\Projects\mbncon\app\software\ai-quality-failure-prediction-engine\page.tsx:441: href={`#${slugify(record.product)}`}
+C:\Users\mahta\Projects\mbncon\app\software\ai-raw-material-consumption-intelligence\page.tsx:237: href="#total-wastage-cost"
+C:\Users\mahta\Projects\mbncon\app\software\ai-raw-material-consumption-intelligence\page.tsx:253: href="#critical-consumption-risks"
+C:\Users\mahta\Projects\mbncon\app\software\ai-raw-material-consumption-intelligence\page.tsx:268: href="#high-risk-areas"
+C:\Users\mahta\Projects\mbncon\app\software\ai-raw-material-consumption-intelligence\page.tsx:283: href="#average-consumption-variance"
+C:\Users\mahta\Projects\mbncon\app\software\ai-raw-material-consumption-intelligence\page.tsx:378: href={`#${slugify(record.material)}`}
+C:\Users\mahta\Projects\mbncon\app\software\ai-raw-material-consumption-intelligence\page.tsx:425: href={`#${slugify(record.material)}`}
+C:\Users\mahta\Projects\mbncon\app\software\ai-shipment-recovery-intelligence\page.tsx:230: href={card.href}
+C:\Users\mahta\Projects\mbncon\app\software\ai-shipment-recovery-intelligence\page.tsx:367: href="#shipment-recovery-feed"
+C:\Users\mahta\Projects\mbncon\app\software\ai-supplier-performance-intelligence-centre\page.tsx:278: href={card.href}
+C:\Users\mahta\Projects\mbncon\app\software\ai-supplier-performance-intelligence-centre\page.tsx:420: href="#supplier-risk-feed"
+C:\Users\mahta\Projects\mbncon\app\software\ai-tqm-intelligence-centre\page.tsx:290: href={card.href}
+C:\Users\mahta\Projects\mbncon\app\software\ai-tqm-intelligence-centre\page.tsx:424: href="#tqm-intelligence-feed"
+C:\Users\mahta\Projects\mbncon\app\software\ai-transformation-intelligence\page.tsx:78: href={domain.href}
+C:\Users\mahta\Projects\mbncon\app\software\ai-user-role-access-control-centre\page.tsx:330: href={card.href}
+C:\Users\mahta\Projects\mbncon\app\software\ai-user-role-access-control-centre\page.tsx:384: href="#governance-checklist"
+C:\Users\mahta\Projects\mbncon\app\software\ai-user-role-access-control-centre\page.tsx:479: href="#enterprise-kpis"
+C:\Users\mahta\Projects\mbncon\app\software\air-shipment-risk\page.tsx:398: href={card.href}
+C:\Users\mahta\Projects\mbncon\app\software\air-shipment-risk\page.tsx:476: href="#enterprise-kpis"
+C:\Users\mahta\Projects\mbncon\app\software\assessment-report-generator\page.tsx:71: href="/"
+C:\Users\mahta\Projects\mbncon\app\software\assessment-report-generator\page.tsx:101: href={card.href}
+C:\Users\mahta\Projects\mbncon\app\software\assessment-report-generator\page.tsx:166: href="#recommended-action-plan"
+C:\Users\mahta\Projects\mbncon\app\software\assessment-report-generator\page.tsx:193: href="#consultancy-output"
+C:\Users\mahta\Projects\mbncon\app\software\business-excellence-maturity\page.tsx:97: href="/"
+C:\Users\mahta\Projects\mbncon\app\software\business-excellence-maturity\page.tsx:126: href={card.href}
+C:\Users\mahta\Projects\mbncon\app\software\business-excellence-maturity\page.tsx:197: href="#consultancy-application"
+C:\Users\mahta\Projects\mbncon\app\software\buyer-behaviour-intelligence\page.tsx:94: href="/"
+C:\Users\mahta\Projects\mbncon\app\software\buyer-behaviour-intelligence\page.tsx:123: href={card.href}
+C:\Users\mahta\Projects\mbncon\app\software\buyer-behaviour-intelligence\page.tsx:176: href="#consultancy-application"
+C:\Users\mahta\Projects\mbncon\app\software\buyer-behaviour-intelligence\page.tsx:212: href="#consultancy-application"
+C:\Users\mahta\Projects\mbncon\app\software\buyer-order-entry\page.tsx:471: href={card.href}
+C:\Users\mahta\Projects\mbncon\app\software\buyer-risk-intelligence\page.tsx:86: href={card.href}
+C:\Users\mahta\Projects\mbncon\app\software\buyer-risk-intelligence\page.tsx:133: href="#ai-recommendation"
+C:\Users\mahta\Projects\mbncon\app\software\buyer-risk-intelligence\page.tsx:150: href="#ai-recommendation"
+C:\Users\mahta\Projects\mbncon\app\software\buyer-risk-intelligence\page.tsx:163: href="#ai-recommendation"
+C:\Users\mahta\Projects\mbncon\app\software\change-management-intelligence\page.tsx:137: href={card.href}
+C:\Users\mahta\Projects\mbncon\app\software\change-management-intelligence\page.tsx:198: href="#adaptive-change"
+C:\Users\mahta\Projects\mbncon\app\software\change-management-intelligence\page.tsx:231: href="#human-transformation"
+C:\Users\mahta\Projects\mbncon\app\software\change-management-intelligence\page.tsx:248: href="#human-transformation"
+C:\Users\mahta\Projects\mbncon\app\software\change-management-intelligence\page.tsx:275: href="#human-transformation"
+C:\Users\mahta\Projects\mbncon\app\software\change-management-intelligence\page.tsx:313: href="#enterprise-kpis"
+C:\Users\mahta\Projects\mbncon\app\software\compliance-audit-entry\page.tsx:205: href={card.href}
+C:\Users\mahta\Projects\mbncon\app\software\compliance-audit-intelligence\page.tsx:66: href="/"
+C:\Users\mahta\Projects\mbncon\app\software\compliance-audit-intelligence\page.tsx:95: href={card.href}
+C:\Users\mahta\Projects\mbncon\app\software\compliance-audit-intelligence\page.tsx:148: href="#consultancy-application"
+C:\Users\mahta\Projects\mbncon\app\software\compliance-audit-intelligence\page.tsx:178: href="#consultancy-application"
+C:\Users\mahta\Projects\mbncon\app\software\components-accessories-supply-intelligence\page.tsx:80: href="/"
+C:\Users\mahta\Projects\mbncon\app\software\components-accessories-supply-intelligence\page.tsx:109: href={card.href}
+C:\Users\mahta\Projects\mbncon\app\software\components-accessories-supply-intelligence\page.tsx:162: href="#consultancy-application"
+C:\Users\mahta\Projects\mbncon\app\software\components-accessories-supply-intelligence\page.tsx:192: href="#consultancy-application"
+C:\Users\mahta\Projects\mbncon\app\software\components-accessories-supply-intelligence\page.tsx:222: href="#consultancy-application"
+C:\Users\mahta\Projects\mbncon\app\software\components-quality-checklist\page.tsx:79: href="/"
+C:\Users\mahta\Projects\mbncon\app\software\components-quality-checklist\page.tsx:108: href={card.href}
+C:\Users\mahta\Projects\mbncon\app\software\components-quality-checklist\page.tsx:223: href="#consultancy-application"
+C:\Users\mahta\Projects\mbncon\app\software\continuous-improvement-tracker\page.tsx:69: href="/"
+C:\Users\mahta\Projects\mbncon\app\software\continuous-improvement-tracker\page.tsx:98: href={card.href}
+C:\Users\mahta\Projects\mbncon\app\software\continuous-improvement-tracker\page.tsx:149: href="#consultancy-application"
+C:\Users\mahta\Projects\mbncon\app\software\corrective-action-system\page.tsx:55: href="/"
+C:\Users\mahta\Projects\mbncon\app\software\corrective-action-system\page.tsx:84: href={card.href}
+C:\Users\mahta\Projects\mbncon\app\software\corrective-action-system\page.tsx:134: href="#consultancy-application"
+C:\Users\mahta\Projects\mbncon\app\software\costing-profit-leakage-intelligence\page.tsx:66: href="/"
+C:\Users\mahta\Projects\mbncon\app\software\costing-profit-leakage-intelligence\page.tsx:95: href={card.href}
+C:\Users\mahta\Projects\mbncon\app\software\costing-profit-leakage-intelligence\page.tsx:148: href="#consultancy-application"
+C:\Users\mahta\Projects\mbncon\app\software\costing-profit-leakage-intelligence\page.tsx:178: href="#consultancy-application"
+C:\Users\mahta\Projects\mbncon\app\software\costing-profitability-entry\page.tsx:240: href={card.href}
+C:\Users\mahta\Projects\mbncon\app\software\crisis-readiness-intelligence\page.tsx:47: href="/software"
+C:\Users\mahta\Projects\mbncon\app\software\crisis-readiness-intelligence\page.tsx:190: href="/software/adaptive-recovery-intelligence"
+C:\Users\mahta\Projects\mbncon\app\software\crisis-readiness-intelligence\page.tsx:203: href="/software/executive-escalation-engine"
+C:\Users\mahta\Projects\mbncon\app\software\crisis-readiness-intelligence\page.tsx:216: href="/software/organisational-resilience-intelligence"
+C:\Users\mahta\Projects\mbncon\app\software\department-ranking\page.tsx:467: href={card.href}
+C:\Users\mahta\Projects\mbncon\app\software\department-ranking\page.tsx:522: href="#consultancy-application"
+C:\Users\mahta\Projects\mbncon\app\software\department-risk-heatmap\page.tsx:327: href={card.href}
+C:\Users\mahta\Projects\mbncon\app\software\department-risk-heatmap\page.tsx:393: href="#consultancy-application"
+C:\Users\mahta\Projects\mbncon\app\software\dhu-quality-defect-entry\page.tsx:106: <Link href="/software" className="text-sm font-semibold text-cyan-300">
+C:\Users\mahta\Projects\mbncon\app\software\digital-transformation-readiness\page.tsx:64: href="/"
+C:\Users\mahta\Projects\mbncon\app\software\digital-transformation-readiness\page.tsx:93: href={card.href}
+C:\Users\mahta\Projects\mbncon\app\software\digital-transformation-readiness\page.tsx:146: href="#consultancy-application"
+C:\Users\mahta\Projects\mbncon\app\software\digital-transformation-readiness\page.tsx:176: href="#consultancy-application"
+C:\Users\mahta\Projects\mbncon\app\software\emotional-intelligence-leadership\page.tsx:47: href="/software"
+C:\Users\mahta\Projects\mbncon\app\software\emotional-intelligence-leadership\page.tsx:190: href="/software/resilience-leadership-framework"
+C:\Users\mahta\Projects\mbncon\app\software\emotional-intelligence-leadership\page.tsx:203: href="/software/employee-empowerment-intelligence"
+C:\Users\mahta\Projects\mbncon\app\software\emotional-intelligence-leadership\page.tsx:216: href="/software/leadership-dashboard"
+C:\Users\mahta\Projects\mbncon\app\software\executive-analytics-dashboard\page.tsx:330: window.location.href = `#${slugify(title)}`;
+C:\Users\mahta\Projects\mbncon\app\software\executive-command-centre\page.tsx:143: window.location.href = card.href;
+C:\Users\mahta\Projects\mbncon\app\software\executive-command-centre\page.tsx:166: window.location.href = card.href;
+C:\Users\mahta\Projects\mbncon\app\software\executive-command-war-room\page.tsx:101: href="/software"
+C:\Users\mahta\Projects\mbncon\app\software\executive-dashboard\page.tsx:360: window.location.href = `#${slugify("Executive AI Summary")}`;
+C:\Users\mahta\Projects\mbncon\app\software\executive-dashboard\page.tsx:375: window.location.href = `#${slugify("Executive AI Summary")}`;
+C:\Users\mahta\Projects\mbncon\app\software\executive-dashboard\page.tsx:389: window.location.href = `#${slugify("Forecast Intelligence")}`;
+C:\Users\mahta\Projects\mbncon\app\software\executive-dashboard\page.tsx:403: window.location.href = `#${slugify("Forecast Intelligence")}`;
+C:\Users\mahta\Projects\mbncon\app\software\executive-dashboard\page.tsx:420: href={item.href}
+C:\Users\mahta\Projects\mbncon\app\software\executive-dashboard\page.tsx:439: window.location.href = `#${slugify("Executive AI Summary")}`;
+C:\Users\mahta\Projects\mbncon\app\software\executive-dashboard\page.tsx:451: window.location.href = `#${slugify("Forecast Intelligence")}`;
+C:\Users\mahta\Projects\mbncon\app\software\executive-dashboard\page.tsx:463: window.location.href = `#${slugify("Operational Risks")}`;
+C:\Users\mahta\Projects\mbncon\app\software\executive-dashboard\page.tsx:635: window.location.href = `#${slugify("Executive AI Summary")}`;
+C:\Users\mahta\Projects\mbncon\app\software\executive-dashboard\page.tsx:654: window.location.href = `#${slugify("Executive AI Summary")}`;
+C:\Users\mahta\Projects\mbncon\app\software\executive-dashboard\page.tsx:669: window.location.href = `#${slugify("Executive AI Summary")}`;
+C:\Users\mahta\Projects\mbncon\app\software\executive-dashboard\page.tsx:693: href="/software/lean-kaizen-entry"
+C:\Users\mahta\Projects\mbncon\app\software\executive-dashboard\page.tsx:699: href="/software/gemba-observation-entry"
+C:\Users\mahta\Projects\mbncon\app\software\executive-dashboard\page.tsx:705: href="/software/muda-scoring-entry"
+C:\Users\mahta\Projects\mbncon\app\software\executive-dashboard\page.tsx:711: href="/software/tqm-entry"
+C:\Users\mahta\Projects\mbncon\app\software\executive-dashboard\page.tsx:717: href="/software/factory-benchmark-entry"
+C:\Users\mahta\Projects\mbncon\app\software\executive-dashboard\page.tsx:723: href={`#${slugify("Executive AI Summary")}`}
+C:\Users\mahta\Projects\mbncon\app\software\executive-dashboard\page.tsx:846: href={href}
+C:\Users\mahta\Projects\mbncon\app\software\executive-dashboard\page.tsx:871: window.location.href = `#${slugify(target)}`;
+C:\Users\mahta\Projects\mbncon\app\software\executive-dashboard\page.tsx:895: window.location.href = `#${slugify("Executive AI Summary")}`;
+C:\Users\mahta\Projects\mbncon\app\software\executive-decision-dashboard\page.tsx:141: href={decision.href}
+C:\Users\mahta\Projects\mbncon\app\software\executive-report-generator\page.tsx:221: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\executive-report-generator\page.tsx:247: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\executive-report-generator\page.tsx:271: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\executive-report-generator\page.tsx:289: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\factory-loss-intelligence\page.tsx:42: href="/"
+C:\Users\mahta\Projects\mbncon\app\software\factory-loss-intelligence\page.tsx:74: href={`#${slugify(label)}`}
+C:\Users\mahta\Projects\mbncon\app\software\factory-loss-intelligence\page.tsx:94: href={`#${slugify(item)}`}
+C:\Users\mahta\Projects\mbncon\app\software\forecasting\page.tsx:69: href={`#${slugify(label)}`}
+C:\Users\mahta\Projects\mbncon\app\software\forecasting\page.tsx:106: href={`#${slugify(item)}`}
+C:\Users\mahta\Projects\mbncon\app\software\future-improvement-programme\page.tsx:59: href="/"
+C:\Users\mahta\Projects\mbncon\app\software\future-improvement-programme\page.tsx:91: href={`#${slugify(label)}`}
+C:\Users\mahta\Projects\mbncon\app\software\future-improvement-programme\page.tsx:111: href={`#${slugify(item.period)}`}
+C:\Users\mahta\Projects\mbncon\app\software\garment-manufacturing-performance-investigation-centre\page.tsx:157: href="/investigation/executive-dashboard"
+C:\Users\mahta\Projects\mbncon\app\software\garment-manufacturing-performance-investigation-centre\page.tsx:173: href="/software/garment-manufacturing-performance-investigation-centre/auto-data-analysis"
+C:\Users\mahta\Projects\mbncon\app\software\idle-manpower-intelligence\page.tsx:64: href={`#${slugify(label)}`}
+C:\Users\mahta\Projects\mbncon\app\software\idle-manpower-intelligence\page.tsx:148: href={`#${slugify(item)}`}
+C:\Users\mahta\Projects\mbncon\app\software\inventory-entry\page.tsx:181: href={`#${slugify(item)}`}
+C:\Users\mahta\Projects\mbncon\app\software\inventory-stock-intelligence\page.tsx:146: href="/software"
+C:\Users\mahta\Projects\mbncon\app\software\inventory-stock-intelligence\page.tsx:179: href={`#${slugify(label)}`}
+C:\Users\mahta\Projects\mbncon\app\software\inventory-stock-intelligence\page.tsx:210: href={`#${item.id}`}
+C:\Users\mahta\Projects\mbncon\app\software\leadership-dashboard\page.tsx:113: href={`#${slugify(label)}`}
+C:\Users\mahta\Projects\mbncon\app\software\leadership-dashboard\page.tsx:198: href={`#${slugify(card.title)}`}
+C:\Users\mahta\Projects\mbncon\app\software\leadership-intelligence\page.tsx:219: href={`#${slugify(card.title)}`}
+C:\Users\mahta\Projects\mbncon\app\software\leadership-intelligence\page.tsx:254: href={`#${slugify(card.title)}`}
+C:\Users\mahta\Projects\mbncon\app\software\lean-audit-checklist\page.tsx:50: href="/"
+C:\Users\mahta\Projects\mbncon\app\software\lean-audit-checklist\page.tsx:82: href={`#${slugify(label)}`}
+C:\Users\mahta\Projects\mbncon\app\software\lean-audit-checklist\page.tsx:102: href={`#${slugify(item)}`}
+C:\Users\mahta\Projects\mbncon\app\software\lean-kaizen-dashboard\page.tsx:43: href={`#${slugify(kpi.title)}`}
+C:\Users\mahta\Projects\mbncon\app\software\lean-kaizen-dashboard\page.tsx:101: href={`#${slugify(item)}`}
+C:\Users\mahta\Projects\mbncon\app\software\lean-kaizen-entry\page.tsx:174: href={`#${slugify(key)}`}
+C:\Users\mahta\Projects\mbncon\app\software\lean-manufacturing-system\page.tsx:48: href="/"
+C:\Users\mahta\Projects\mbncon\app\software\lean-manufacturing-system\page.tsx:78: href={`#${slugify(label)}`}
+C:\Users\mahta\Projects\mbncon\app\software\lean-manufacturing-system\page.tsx:101: href={`#${slugify(item)}`}
+C:\Users\mahta\Projects\mbncon\app\software\lean-manufacturing-system\page.tsx:124: href={`#${slugify(item)}`}
+C:\Users\mahta\Projects\mbncon\app\software\line-balancing-intelligence\page.tsx:72: href={`#${slugify(card.title)}`}
+C:\Users\mahta\Projects\mbncon\app\software\local-transport-booking-entry\page.tsx:174: href={`#${slugify(key)}`}
+C:\Users\mahta\Projects\mbncon\app\software\machine-maintenance-intelligence\page.tsx:48: href="/"
+C:\Users\mahta\Projects\mbncon\app\software\machine-maintenance-intelligence\page.tsx:77: href={`#${slugify(label)}`}
+C:\Users\mahta\Projects\mbncon\app\software\machine-maintenance-intelligence\page.tsx:102: href={`#${slugify(item)}`}
+C:\Users\mahta\Projects\mbncon\app\software\machine-maintenance-intelligence\page.tsx:128: href={`#${slugify(item)}`}
+C:\Users\mahta\Projects\mbncon\app\software\maintenance-entry\page.tsx:144: href={`#${slugify(item)}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-kpi-dashboard\page.tsx:91: href={`#${slugify(item.title)}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-kpi-dashboard\page.tsx:118: href={`#${slugify(item.shift)}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-kpi-dashboard\page.tsx:190: href={`#${slugify(item)}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\ai-productivity-analytics\page.tsx:68: href={`#${slugify(item.title)}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\ai-productivity-analytics\page.tsx:91: href={`#${slugify(item)}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\ai-productivity-analytics\page.tsx:132: href={`#${slugify(item)}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\ai-productivity-assistant\page.tsx:126: href={`#${slugify(item)}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\ai-productivity-assistant\page.tsx:147: href={`#${slugify(item)}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\bottleneck-analysis\page.tsx:150: href={`#${slugify(
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\bottleneck-analysis\page.tsx:165: href={`#${slugify(
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\bottleneck-analysis\page.tsx:180: href={`#${slugify(
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\bottleneck-analysis\page.tsx:288: href={`#${slugify(row.process)}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\bottleneck-analysis\page.tsx:484: href={`#${slugify(item.title)}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\customer-complaint-corrective-action\page.tsx:148: href="#live-complaint-register"
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\customer-complaint-corrective-action\page.tsx:161: href="#live-complaint-register"
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\customer-complaint-corrective-action\page.tsx:174: href="#live-complaint-register"
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\customer-complaint-corrective-action\page.tsx:390: href={`#${slugify(row.complaintType)}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\customer-complaint-corrective-action\page.tsx:426: href={`#${slugify(item)}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\daily-management-system\page.tsx:168: href="#live-daily-management-board"
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\daily-management-system\page.tsx:374: href={`#${slugify(row.department)}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\daily-management-system\page.tsx:484: href={`#${slugify(item)}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\daily-production-report\page.tsx:138: href={`#${slugify(card.title)}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\daily-production-report\page.tsx:179: href={`#${slugify(item)}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\daily-production-reporting\page.tsx:118: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\daily-production-reporting\page.tsx:208: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\dashboard-demo\page.tsx:114: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\dashboard-demo\page.tsx:141: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\gemba-audit-system\page.tsx:155: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\gemba-audit-system\page.tsx:382: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\kaizen-system\page.tsx:206: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\kaizen-system\page.tsx:271: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\kaizen-system\page.tsx:308: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\kpi-analytics-demo\page.tsx:91: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\leadership-coaching-form\page.tsx:111: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\machine-downtime\page.tsx:184: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\machine-downtime\page.tsx:450: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\management-excellence\inner-game-of-management\page.tsx:115: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\management-excellence\inner-game-of-tennis\page.tsx:100: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\management-excellence\management-assessment-form\page.tsx:128: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\muda-intelligence\page.tsx:121: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\oee-system\page.tsx:173: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\oee-system\page.tsx:215: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\problem-solving-workflow\page.tsx:87: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\staff-skill-matrix\page.tsx:192: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\tqm-system\page.tsx:112: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\value-added-productivity\page.tsx:81: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\value-added-productivity\page.tsx:103: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\page.tsx:125: href="/contact"
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\page.tsx:132: href="#framework"
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\page.tsx:168: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\page.tsx:235: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\page.tsx:282: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\page.tsx:335: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\page.tsx:378: href="/contact"
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-productivity\page.tsx:385: href="/services"
+C:\Users\mahta\Projects\mbncon\app\software\manufacturing-value-stream-assessment\page.tsx:329: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\material-entry\page.tsx:192: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\organisational-resilience-intelligence\page.tsx:47: href="/software"
+C:\Users\mahta\Projects\mbncon\app\software\organisational-resilience-intelligence\page.tsx:191: href="/software/organisational-resilience-intelligence"
+C:\Users\mahta\Projects\mbncon\app\software\organisational-resilience-intelligence\page.tsx:204: href="/software/leadership-dashboard"
+C:\Users\mahta\Projects\mbncon\app\software\organisational-resilience-intelligence\page.tsx:217: href="/software/future-improvement-programme"
+C:\Users\mahta\Projects\mbncon\app\software\predictive-ai-intelligence\page.tsx:31: href="/software"
+C:\Users\mahta\Projects\mbncon\app\software\production-entry\merchandising-order-tracking-intelligence\page.tsx:56: href="/"
+C:\Users\mahta\Projects\mbncon\app\software\production-entry\merchandising-order-tracking-intelligence\page.tsx:97: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\production-entry\order-cancellation-buyer-risk-intelligence\page.tsx:76: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\production-entry\overtime-optimization-intelligence\page.tsx:107: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\production-entry\preventive-maintenance-intelligence\page.tsx:102: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\production-entry\production-bottleneck-intelligence\page.tsx:93: href={`#${sectionId}`}
+C:\Users\mahta\Projects\mbncon\app\software\production-entry\page.tsx:190: href={`#${targetId}`}
+C:\Users\mahta\Projects\mbncon\app\software\production-planning-line-balancing\page.tsx:160: href="/software"
+C:\Users\mahta\Projects\mbncon\app\software\production-planning-line-balancing\page.tsx:190: href={`#${id}`}
+C:\Users\mahta\Projects\mbncon\app\software\production-planning-line-balancing\page.tsx:228: href={`#${item.id}`}
+C:\Users\mahta\Projects\mbncon\app\software\production-planning-line-balancing\page.tsx:257: href={`#${item.id}`}
+C:\Users\mahta\Projects\mbncon\app\software\production-planning-line-balancing\page.tsx:290: href="#top"
+C:\Users\mahta\Projects\mbncon\app\software\profit-leakage-intelligence\page.tsx:360: href={`#${targetId}`}
+C:\Users\mahta\Projects\mbncon\app\software\quality-entry\page.tsx:238: href={`#${targetId}`}
+C:\Users\mahta\Projects\mbncon\app\software\qulaity-assurance-entry-rawmaterials\page.tsx:248: href={`#${targetId}`}
+C:\Users\mahta\Projects\mbncon\app\software\resilience-leadership-framework\page.tsx:47: href="/software"
+C:\Users\mahta\Projects\mbncon\app\software\resilience-leadership-framework\page.tsx:191: href="/software/organisational-resilience-intelligence"
+C:\Users\mahta\Projects\mbncon\app\software\resilience-leadership-framework\page.tsx:204: href="/software/leadership-dashboard"
+C:\Users\mahta\Projects\mbncon\app\software\resilience-leadership-framework\page.tsx:217: href="/software/future-improvement-programme"
+C:\Users\mahta\Projects\mbncon\app\software\risk-escalation-entry\page.tsx:254: href={`#${targetId}`}
+C:\Users\mahta\Projects\mbncon\app\software\root-cause-analysis\page.tsx:80: href="/software"
+C:\Users\mahta\Projects\mbncon\app\software\root-cause-analysis\page.tsx:109: href={`#${targetId}`}
+C:\Users\mahta\Projects\mbncon\app\software\root-cause-analysis\page.tsx:148: href={`#${itemId}`}
+C:\Users\mahta\Projects\mbncon\app\software\root-cause-analysis\page.tsx:177: href={`#${itemId}`}
+C:\Users\mahta\Projects\mbncon\app\software\root-cause-analysis\page.tsx:268: href="#top"
+C:\Users\mahta\Projects\mbncon\app\software\sample-development-intelligence\page.tsx:80: href="/software"
+C:\Users\mahta\Projects\mbncon\app\software\sample-development-intelligence\page.tsx:110: href={`#${targetId}`}
+C:\Users\mahta\Projects\mbncon\app\software\sample-development-intelligence\page.tsx:149: href={`#${itemId}`}
+C:\Users\mahta\Projects\mbncon\app\software\sample-development-intelligence\page.tsx:180: href={`#${itemId}`}
+C:\Users\mahta\Projects\mbncon\app\software\sample-development-intelligence\page.tsx:276: href="#top"
+C:\Users\mahta\Projects\mbncon\app\software\shipment-delay-prediction\page.tsx:315: href={`#${targetId}`}
+C:\Users\mahta\Projects\mbncon\app\software\shipment-entry\page.tsx:246: href={`#${targetId}`}
+C:\Users\mahta\Projects\mbncon\app\software\shipment-schedule-entry\page.tsx:254: href={`#${targetId}`}
+C:\Users\mahta\Projects\mbncon\app\software\shipping-line-booking-entry\page.tsx:254: href={`#${targetId}`}
+C:\Users\mahta\Projects\mbncon\app\software\skill-matrix-training-intelligence\page.tsx:80: href="/software"
+C:\Users\mahta\Projects\mbncon\app\software\skill-matrix-training-intelligence\page.tsx:109: href={`#${targetId}`}
+C:\Users\mahta\Projects\mbncon\app\software\skill-matrix-training-intelligence\page.tsx:148: href={`#${itemId}`}
+C:\Users\mahta\Projects\mbncon\app\software\skill-matrix-training-intelligence\page.tsx:179: href={`#${itemId}`}
+C:\Users\mahta\Projects\mbncon\app\software\skill-matrix-training-intelligence\page.tsx:278: href="#top"
+C:\Users\mahta\Projects\mbncon\app\software\supplier-order-entry\page.tsx:254: href={`#${targetId}`}
+C:\Users\mahta\Projects\mbncon\app\software\supplier-performance-intelligence\page.tsx:163: href="/software"
+C:\Users\mahta\Projects\mbncon\app\software\sustainability-esg-intelligence\page.tsx:80: href="/software"
+C:\Users\mahta\Projects\mbncon\app\software\sustainability-esg-intelligence\page.tsx:109: href={`#${targetId}`}
+C:\Users\mahta\Projects\mbncon\app\software\sustainability-esg-intelligence\page.tsx:148: href={`#${itemId}`}
+C:\Users\mahta\Projects\mbncon\app\software\sustainability-esg-intelligence\page.tsx:179: href={`#${itemId}`}
+C:\Users\mahta\Projects\mbncon\app\software\sustainability-esg-intelligence\page.tsx:279: href="#top"
+C:\Users\mahta\Projects\mbncon\app\software\tqm-entry\page.tsx:250: href={`#${targetId}`}
+C:\Users\mahta\Projects\mbncon\app\software\tqm-forms\page.tsx:69: href="/software"
+C:\Users\mahta\Projects\mbncon\app\software\tqm-forms\page.tsx:98: href={`#${targetId}`}
+C:\Users\mahta\Projects\mbncon\app\software\tqm-forms\page.tsx:136: href={`#${formId}`}
+C:\Users\mahta\Projects\mbncon\app\software\tqm-forms\page.tsx:244: href="#top"
+C:\Users\mahta\Projects\mbncon\app\software\tqm-system\page.tsx:80: href="/software"
+C:\Users\mahta\Projects\mbncon\app\software\tqm-system\page.tsx:109: href={`#${targetId}`}
+C:\Users\mahta\Projects\mbncon\app\software\tqm-system\page.tsx:148: href={`#${itemId}`}
+C:\Users\mahta\Projects\mbncon\app\software\tqm-system\page.tsx:173: href={`#${itemId}`}
+C:\Users\mahta\Projects\mbncon\app\software\tqm-system\page.tsx:269: href="#top"
+C:\Users\mahta\Projects\mbncon\app\software\training-manual\page.tsx:244: href={`#${targetId}`}
+C:\Users\mahta\Projects\mbncon\app\software\training-manual\page.tsx:293: href={section.moduleHref}
+C:\Users\mahta\Projects\mbncon\app\software\training-manual\page.tsx:301: href="#top"
+C:\Users\mahta\Projects\mbncon\app\software\training-manual\page.tsx:328: href={href}
+C:\Users\mahta\Projects\mbncon\app\software\transport-logistics-intelligence\page.tsx:73: href="/software"
+C:\Users\mahta\Projects\mbncon\app\software\transport-logistics-intelligence\page.tsx:103: href={`#${targetId}`}
+C:\Users\mahta\Projects\mbncon\app\software\transport-logistics-intelligence\page.tsx:141: href={`#${itemId}`}
+C:\Users\mahta\Projects\mbncon\app\software\transport-logistics-intelligence\page.tsx:245: href="#top"
+C:\Users\mahta\Projects\mbncon\app\software\utilities-consumption-intelligence\page.tsx:82: href="/software"
+C:\Users\mahta\Projects\mbncon\app\software\utilities-consumption-intelligence\page.tsx:111: href={`#${targetId}`}
+C:\Users\mahta\Projects\mbncon\app\software\utilities-consumption-intelligence\page.tsx:150: href={`#${itemId}`}
+C:\Users\mahta\Projects\mbncon\app\software\utilities-consumption-intelligence\page.tsx:181: href={`#${itemId}`}
+C:\Users\mahta\Projects\mbncon\app\software\utilities-consumption-intelligence\page.tsx:283: href="#top"
+C:\Users\mahta\Projects\mbncon\app\software\utilities-entry\page.tsx:206: href={`#${targetId}`}
+C:\Users\mahta\Projects\mbncon\app\software\utility-cost-intelligence\page.tsx:101: href={`#${targetId}`}
+C:\Users\mahta\Projects\mbncon\app\software\utility-cost-intelligence\page.tsx:313: href="#top"
+C:\Users\mahta\Projects\mbncon\app\software\warehouse-security-loss-intelligence\page.tsx:82: href="/software"
+C:\Users\mahta\Projects\mbncon\app\software\warehouse-security-loss-intelligence\page.tsx:111: href={`#${targetId}`}
+C:\Users\mahta\Projects\mbncon\app\software\warehouse-security-loss-intelligence\page.tsx:150: href={`#${itemId}`}
+C:\Users\mahta\Projects\mbncon\app\software\warehouse-security-loss-intelligence\page.tsx:181: href={`#${itemId}`}
+C:\Users\mahta\Projects\mbncon\app\software\warehouse-security-loss-intelligence\page.tsx:281: href="#top"
+C:\Users\mahta\Projects\mbncon\app\software\wastage-entry\page.tsx:214: href={`#${targetId}`}
+C:\Users\mahta\Projects\mbncon\app\software\workforce-absence-intelligence\page.tsx:82: href="/software"
+C:\Users\mahta\Projects\mbncon\app\software\workforce-absence-intelligence\page.tsx:112: href={`#${targetId}`}
+C:\Users\mahta\Projects\mbncon\app\software\workforce-absence-intelligence\page.tsx:151: href={`#${itemId}`}
+C:\Users\mahta\Projects\mbncon\app\software\workforce-absence-intelligence\page.tsx:182: href={`#${itemId}`}
+C:\Users\mahta\Projects\mbncon\app\software\workforce-absence-intelligence\page.tsx:281: href="#top"
+C:\Users\mahta\Projects\mbncon\app\software\workforce-entry\page.tsx:207: href={`#${targetId}`}
+C:\Users\mahta\Projects\mbncon\app\software\page.tsx:833: href={`#${slugify(card.target)}`}
+C:\Users\mahta\Projects\mbncon\app\software\page.tsx:924: href="#top"
+C:\Users\mahta\Projects\mbncon\app\software\page.tsx:935: href={module.href}
+C:\Users\mahta\Projects\mbncon\app\updates\page.tsx:42: href="/"
+C:\Users\mahta\Projects\mbncon\app\page.tsx:174: href="/software"
+C:\Users\mahta\Projects\mbncon\app\page.tsx:181: href="/software#module-explorer"
+C:\Users\mahta\Projects\mbncon\app\page.tsx:188: href="#contact"
+C:\Users\mahta\Projects\mbncon\app\page.tsx:266: href="/software"
+C:\Users\mahta\Projects\mbncon\app\page.tsx:277: href={card.href}
+C:\Users\mahta\Projects\mbncon\app\page.tsx:310: href="/software#productivity-improvement-and-operational-excellence"
+C:\Users\mahta\Projects\mbncon\app\page.tsx:328: href="/software#leadership-human-performance-and-skill-development"
+C:\Users\mahta\Projects\mbncon\app\page.tsx:345: href="/software/organisational-resilience-intelligence"
+C:\Users\mahta\Projects\mbncon\app\page.tsx:363: href="/software#executive-intelligence-and-enterprise-control"
+C:\Users\mahta\Projects\mbncon\app\page.tsx:414: href="/updates"
+C:\Users\mahta\Projects\mbncon\app\page.tsx:433: href="/contact"
+C:\Users\mahta\Projects\mbncon\app\page.tsx:452: href="/network"
+C:\Users\mahta\Projects\mbncon\app\page.tsx:501: href="#top"
+C:\Users\mahta\Projects\mbncon\components\software\DashboardShell.tsx:65: href="/"
+C:\Users\mahta\Projects\mbncon\components\software\DashboardShell.tsx:72: href="/software"
+C:\Users\mahta\Projects\mbncon\components\software\InternalSearch.tsx:85: href={module.href}
+C:\Users\mahta\Projects\mbncon\components\software\Navbar.tsx:14: href="/"
+C:\Users\mahta\Projects\mbncon\components\software\Navbar.tsx:22: href="/about-mbncon"
+C:\Users\mahta\Projects\mbncon\components\software\Navbar.tsx:29: href="/insights-discussion"
+C:\Users\mahta\Projects\mbncon\components\software\Navbar.tsx:36: href="/software"
+C:\Users\mahta\Projects\mbncon\components\software\Navbar.tsx:43: href="/software#modules"
+C:\Users\mahta\Projects\mbncon\components\software\Navbar.tsx:50: href="/contact"
+C:\Users\mahta\Projects\mbncon\components\software\Navbar.tsx:70: href="/about-mbncon"
+C:\Users\mahta\Projects\mbncon\components\software\Navbar.tsx:77: href="/insights-discussion"
+C:\Users\mahta\Projects\mbncon\components\software\Navbar.tsx:84: href="/software"
+C:\Users\mahta\Projects\mbncon\components\software\Navbar.tsx:91: href="/software#modules"
+C:\Users\mahta\Projects\mbncon\components\software\Navbar.tsx:98: href="/contact"
+C:\Users\mahta\Projects\mbncon\components\software\ScoreRing.tsx:44: href={`#${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
+C:\Users\mahta\Projects\mbncon\components\software\Sidebar.tsx:924: href={link.href}
+C:\Users\mahta\Projects\mbncon\components\software\Topbar.tsx:15: href="/about-mbncon"
+C:\Users\mahta\Projects\mbncon\components\software\Topbar.tsx:22: href="/insights-discussion"
+C:\Users\mahta\Projects\mbncon\components\software\Topbar.tsx:29: href="/software#modules"
+C:\Users\mahta\Projects\mbncon\components\software\Topbar.tsx:36: href="/software/training-manual"
+C:\Users\mahta\Projects\mbncon\components\software\Topbar.tsx:79: href="/contact"
+C:\Users\mahta\Projects\mbncon\lib\optifabric\releaseConfig.ts:73: route: "/optifabric/demo/upload",
+C:\Users\mahta\Projects\mbncon\lib\optifabric\releaseConfig.ts:79: route: "/optifabric/demo/photo-quality",
+C:\Users\mahta\Projects\mbncon\lib\optifabric\releaseConfig.ts:85: route: "/optifabric/demo/boundary-tracing",
+C:\Users\mahta\Projects\mbncon\lib\optifabric\releaseConfig.ts:91: route: "/optifabric/demo/polygon",
+C:\Users\mahta\Projects\mbncon\lib\optifabric\releaseConfig.ts:97: route: "/optifabric/demo/ai-nesting",
+C:\Users\mahta\Projects\mbncon\lib\optifabric\releaseConfig.ts:103: route: "/optifabric/demo/fabric-saving",
+C:\Users\mahta\Projects\mbncon\lib\optifabric\releaseConfig.ts:109: route: "/optifabric/demo/roi",

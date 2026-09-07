@@ -1,0 +1,109 @@
+// OptiFabric's subscription/licensing backend — built at the user's explicit
+// request, mirroring the same system already built for OptiSewing
+// (OptiSewing-Reconstructed/working/apps/api/prisma/schema.prisma): free access
+// for Bangladesh, paid trial/subscription for everyone else, tamper-evident
+// signed Subscription rows, and JWT auth with token revocation. This schema is
+// intentionally lean — only what auth + subscription need, not a reconstruction
+// of any historical system (OptiFabric has no prior backend at all).
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Factory {
+  id            String   @id @default(uuid())
+  factoryCode   String   @unique
+  factoryName   String
+  country       String
+  city          String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  users        User[]
+  subscription Subscription?
+  auditEvents  AuditEvent[]
+}
+
+model User {
+  id                 String   @id @default(uuid())
+  factoryId          String
+  email              String
+  passwordHash       String
+  role               String
+  isActive           Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  factory Factory @relation(fields: [factoryId], references: [id], onDelete: Restrict)
+
+  @@unique([factoryId, email])
+}
+
+enum SubscriptionPlanType {
+  TRIAL
+  MONTHLY
+  ANNUAL
+  // Bangladesh-registered factories only — 3 free seats, permanently, no trial
+  // countdown. Extra seats beyond 3 are billed offline by an OptiFabric
+  // Bangladesh representative — see PlatformRepGuard / grantBangladeshExtraSeats.
+  BD_FREE_REGIONAL
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  GRACE_PERIOD
+  EXPIRED
+  CANCELLED
+  // Bangladesh-registered factories only — see BD_FREE_REGIONAL above.
+  FREE_REGIONAL
+}
+
+model Subscription {
+  id                 String               @id @default(uuid())
+  factoryId          String               @unique
+  planType           SubscriptionPlanType @default(TRIAL)
+  status             SubscriptionStatus   @default(TRIALING)
+  trialEndsAt        DateTime
+  currentPeriodStart DateTime?
+  currentPeriodEnd   DateTime?
+  graceEndsAt        DateTime?
+  includedSeats      Int                  @default(2)
+  extraSeats          Int                  @default(0)
+  cancelAtPeriodEnd  Boolean              @default(false)
+  // HMAC-SHA256 signature over the fields above, keyed by the server-only
+  // LICENSE_SIGNING_SECRET. Recomputed and compared on every read; a mismatch
+  // means the row was edited outside SubscriptionService and is treated as
+  // CANCELLED.
+  signature          String
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+
+  factory Factory @relation(fields: [factoryId], references: [id], onDelete: Cascade)
+}
+
+model AuditEvent {
+  id          String   @id @default(uuid())
+  factoryId   String
+  entityName  String
+  entityId    String
+  actionType  String
+  performedBy String
+  detailsJson Json?
+  timestamp   DateTime @default(now())
+
+  factory Factory @relation(fields: [factoryId], references: [id], onDelete: Restrict)
+}
+
+model RevokedTokenRecord {
+  id        String   @id @default(uuid())
+  tokenJti  String   @unique
+  revokedAt DateTime @default(now())
+  expiresAt DateTime
+
+  @@index([tokenJti])
+}

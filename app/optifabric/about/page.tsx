@@ -15,7 +15,10 @@ export default function OptiFabricAboutPage() {
             href="/optifabric"
             className="text-cyan-300 hover:text-cyan-200"
           >
-            ← Back to OptiFabric
+            <span className="block">← Back to OptiFabric</span>
+<span className="mt-1 block text-sm text-slate-400">
+  ← OptiFabric অ্যাপে ফিরে যান
+</span>
           </Link>
 
           <span className="w-fit rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-2 text-sm font-bold text-cyan-300">
@@ -24,9 +27,15 @@ export default function OptiFabricAboutPage() {
         </div>
 
         <section className="rounded-3xl border border-cyan-500/20 bg-gradient-to-r from-cyan-950 via-blue-950 to-slate-900 p-6 shadow-2xl sm:p-8 lg:p-10">
-          <p className="text-sm font-bold uppercase tracking-[0.25em] text-cyan-300">
-            About the Product
-          </p>
+          <div>
+  <p className="text-sm font-bold uppercase tracking-[0.25em] text-cyan-300">
+    About the App
+  </p>
+
+  <p className="mt-2 text-base font-bold text-cyan-200">
+    অ্যাপ পরিচিতি
+  </p>
+</div>
 
           <h1 className="mt-4 break-words text-3xl font-black leading-tight sm:text-5xl lg:text-6xl">
             {config.productName}
@@ -42,26 +51,36 @@ export default function OptiFabricAboutPage() {
 
           <p className="mt-6 max-w-5xl break-words text-base leading-7 text-slate-300 sm:text-lg">
             OptiFabric AI is a commercial garment-pattern engineering and
-            fabric-optimisation application designed to support factory cutting
+            fabric-optimisation app designed to support factory cutting
             teams without requiring advanced CAD knowledge.
           </p>
 
           <p className="mt-3 max-w-5xl break-words text-base leading-7 text-slate-400 sm:text-lg">
             OptiFabric AI একটি বাণিজ্যিক গার্মেন্টস প্যাটার্ন ইঞ্জিনিয়ারিং ও
-            কাপড় অপ্টিমাইজেশন অ্যাপ্লিকেশন। উন্নত CAD জ্ঞান ছাড়াই কারখানার
+            কাপড় অপ্টিমাইজেশন অ্যাপ। উন্নত CAD জ্ঞান ছাড়াই কারখানার
             কাটিং টিমকে সহায়তা করার জন্য এটি তৈরি করা হয়েছে।
           </p>
         </section>
 
         <section className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
           <div className="rounded-3xl border border-slate-700 bg-slate-900 p-5 shadow-xl sm:p-8">
-            <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-300">
-              Product Mission
-            </p>
+            <div>
+  <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-300">
+    App Mission
+  </p>
+
+  <p className="mt-2 font-bold text-cyan-200">
+    অ্যাপের লক্ষ্য
+  </p>
+</div>
 
             <h2 className="mt-3 break-words text-2xl font-black sm:text-3xl">
-              Make Engineering Intelligence Accessible
-            </h2>
+  Make Engineering Intelligence Accessible
+</h2>
+
+<p className="mt-2 text-lg font-bold text-slate-300">
+  ইঞ্জিনিয়ারিং বুদ্ধিমত্তা সবার জন্য সহজলভ্য করা
+</p>
 
             <p className="mt-4 break-words leading-7 text-slate-300">
               OptiFabric AI converts complex pattern-engineering activities into
@@ -77,36 +96,54 @@ export default function OptiFabricAboutPage() {
           </div>
 
           <div className="rounded-3xl border border-slate-700 bg-slate-900 p-5 shadow-xl sm:p-8">
-            <p className="text-sm font-bold uppercase tracking-[0.2em] text-green-300">
-              Commercial Objective
-            </p>
+            <div>
+  <p className="text-sm font-bold uppercase tracking-[0.2em] text-green-300">
+    Commercial Objective
+  </p>
+
+  <p className="mt-2 font-bold text-green-200">
+    অ্যাপের বাণিজ্যিক লক্ষ্য
+  </p>
+</div>
 
             <h2 className="mt-3 break-words text-2xl font-black sm:text-3xl">
               Reduce Fabric Waste and Improve Decisions
             </h2>
+            <p className="mt-2 text-lg font-bold text-slate-300">
+  কাপড়ের অপচয় কমানো এবং সিদ্ধান্ত উন্নত করা
+</p>
 
             <p className="mt-4 break-words leading-7 text-slate-300">
-              The product helps factories understand pattern quality, marker
+              The app helps factories understand pattern quality, marker
               efficiency, potential fabric savings and commercial return before
               production decisions are finalised.
             </p>
 
             <p className="mt-4 break-words leading-7 text-slate-400">
               উৎপাদনের সিদ্ধান্ত চূড়ান্ত করার আগে প্যাটার্নের মান, মার্কার
-              দক্ষতা, সম্ভাব্য কাপড় সাশ্রয় এবং বাণিজ্যিক লাভ বুঝতে এই পণ্য
-              কারখানাকে সহায়তা করে।
+              দক্ষতা, সম্ভাব্য কাপড় সাশ্রয় এবং বাণিজ্যিক লাভ বুঝতে এই অ্যাপ
+              কারখানাকে সহায়তা করে।
             </p>
           </div>
         </section>
 
         <section className="mt-8 rounded-3xl border border-slate-700 bg-slate-900 p-5 shadow-xl sm:p-8">
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-300">
-            Who It Is Designed For
-          </p>
+<div>
+  <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-300">
+    Who the App Is Designed For
+  </p>
 
+  <p className="mt-2 font-bold text-cyan-200">
+    অ্যাপটি যাদের জন্য তৈরি
+  </p>
+</div>
           <h2 className="mt-3 break-words text-2xl font-black sm:text-3xl">
-            Factory Users
-          </h2>
+  Factory Users
+</h2>
+
+<p className="mt-2 text-lg font-bold text-slate-300">
+  ফ্যাক্টরি ব্যবহারকারী
+</p>
 
           <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {config.targetUsers.map((user) => (
@@ -127,9 +164,15 @@ export default function OptiFabricAboutPage() {
         </section>
 
         <section className="mt-8 rounded-3xl border border-slate-700 bg-slate-900 p-5 shadow-xl sm:p-8">
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-300">
-            Commercial Workflow
-          </p>
+          <div>
+  <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-300">
+    Commercial App Workflow
+  </p>
+
+  <p className="mt-2 font-bold text-cyan-200">
+    অ্যাপের বাণিজ্যিক কার্যপ্রবাহ
+  </p>
+</div>
 
           <h2 className="mt-3 break-words text-2xl font-black sm:text-3xl">
             Seven Guided Engineering Stages
@@ -163,7 +206,8 @@ export default function OptiFabricAboutPage() {
                 </div>
 
                 <span className="w-fit shrink-0 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-2 text-xs font-bold text-cyan-300">
-                  Open Step →
+                  <span className="block">Open Step →</span>
+<span className="mt-1 block">ধাপ খুলুন →</span>
                 </span>
               </Link>
             ))}
@@ -172,30 +216,80 @@ export default function OptiFabricAboutPage() {
 
         <section className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
           <div className="rounded-3xl border border-blue-500/20 bg-blue-950/20 p-5 shadow-xl sm:p-8">
-            <p className="text-sm font-bold uppercase tracking-[0.2em] text-blue-300">
-              Product Principles
-            </p>
+            <div>
+  <p className="text-sm font-bold uppercase tracking-[0.2em] text-blue-300">
+    App Principles
+  </p>
+
+  <p className="mt-2 font-bold text-blue-200">
+    অ্যাপের মূলনীতি
+  </p>
+</div>
 
             <div className="mt-5 space-y-4">
-              <Principle text="Simple English and Bangla guidance" />
-              <Principle text="No advanced CAD experience required" />
-              <Principle text="Every AI request explains why the information is needed" />
-              <Principle text="Factory-friendly mobile workflow" />
-              <Principle text="Engineering decisions supported by commercial ROI" />
+              <Principle
+  english="Simple English and Bangla guidance"
+  bangla="সহজ ইংরেজি ও বাংলা নির্দেশনা"
+/>
+
+<Principle
+  english="No advanced CAD experience required"
+  bangla="উন্নত CAD অভিজ্ঞতা প্রয়োজন নেই"
+/>
+
+<Principle
+  english="Every AI request explains why the information is needed"
+  bangla="AI কেন তথ্যটি চায়, প্রতিটি ধাপে তার ব্যাখ্যা দেওয়া হয়"
+/>
+
+<Principle
+  english="Factory-friendly mobile workflow"
+  bangla="ফ্যাক্টরি-বান্ধব মোবাইল কার্যপ্রবাহ"
+/>
+
+<Principle
+  english="Engineering decisions supported by commercial ROI"
+  bangla="বাণিজ্যিক ROI দিয়ে ইঞ্জিনিয়ারিং সিদ্ধান্তকে সহায়তা করা হয়"
+/>
             </div>
           </div>
 
           <div className="rounded-3xl border border-green-500/20 bg-green-950/20 p-5 shadow-xl sm:p-8">
-            <p className="text-sm font-bold uppercase tracking-[0.2em] text-green-300">
-              Commercial Use
-            </p>
+            <div>
+              <p className="text-sm font-bold uppercase tracking-[0.2em] text-green-300">
+                Commercial App Use
+              </p>
+
+              <p className="mt-2 font-bold text-green-200">
+                অ্যাপের বাণিজ্যিক ব্যবহার
+              </p>
+            </div>
 
             <div className="mt-5 space-y-4">
-              <Principle text="BGMEA and industry presentations" />
-              <Principle text="Controlled garment-factory trials" />
-              <Principle text="Buyer and investor demonstrations" />
-              <Principle text="Cutting-team training and onboarding" />
-              <Principle text="Commercial subscription validation" />
+              <Principle
+                english="BGMEA and industry presentations"
+                bangla="BGMEA ও শিল্প উপস্থাপনা"
+              />
+
+              <Principle
+                english="Controlled garment-factory trials"
+                bangla="নিয়ন্ত্রিত গার্মেন্টস ফ্যাক্টরি ট্রায়াল"
+              />
+
+              <Principle
+                english="Buyer and investor demonstrations"
+                bangla="Buyer ও investor demonstration"
+              />
+
+              <Principle
+                english="Cutting-team training and onboarding"
+                bangla="Cutting team training ও onboarding"
+              />
+
+              <Principle
+                english="Commercial subscription validation"
+                bangla="Commercial subscription validation"
+              />
             </div>
           </div>
         </section>
@@ -205,9 +299,15 @@ export default function OptiFabricAboutPage() {
         </div>
 
         <section className="mt-8 rounded-3xl border border-amber-500/20 bg-amber-950/20 p-5 shadow-xl sm:p-8">
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-amber-300">
-            Controlled Pilot Notice
-          </p>
+          <div>
+            <p className="text-sm font-bold uppercase tracking-[0.2em] text-amber-300">
+              Controlled App Pilot Notice
+            </p>
+
+            <p className="mt-2 font-bold text-amber-200">
+              নিয়ন্ত্রিত অ্যাপ পাইলট নির্দেশনা
+            </p>
+          </div>
 
           <p className="mt-4 break-words leading-7 text-slate-300">
             {config.controlledPilotNotice}
@@ -219,9 +319,15 @@ export default function OptiFabricAboutPage() {
         </section>
 
         <section className="mt-8 rounded-3xl border border-slate-700 bg-slate-900 p-5 shadow-xl sm:p-8">
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-300">
-            Developer and Support
-          </p>
+          <div>
+            <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-300">
+              Developer and App Support
+            </p>
+
+            <p className="mt-2 font-bold text-cyan-200">
+              ডেভেলপার ও অ্যাপ সহায়তা
+            </p>
+          </div>
 
           <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <InfoCard
@@ -249,12 +355,26 @@ export default function OptiFabricAboutPage() {
   );
 }
 
-function Principle({ text }: { text: string }) {
+function Principle({
+  english,
+  bangla,
+}: {
+  english: string;
+  bangla: string;
+}) {
   return (
     <div className="flex min-w-0 items-start gap-3 rounded-2xl border border-slate-700 bg-slate-950/60 p-4">
       <span className="shrink-0 font-black text-green-300">✓</span>
 
-      <p className="break-words leading-6 text-slate-300">{text}</p>
+      <div className="min-w-0">
+        <p className="break-words font-bold leading-6 text-slate-200">
+          {english}
+        </p>
+
+        <p className="mt-2 break-words leading-6 text-slate-400">
+          {bangla}
+        </p>
+      </div>
     </div>
   );
 }
