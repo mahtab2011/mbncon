@@ -25,6 +25,31 @@ export default function Navbar() {
             About MBNCON
           </Link>
 
+          <div className="group relative">
+            <button
+              type="button"
+              className="rounded-full border border-white/10 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
+            >
+              Solutions ▾
+            </button>
+
+            <div className="invisible absolute left-0 top-full z-50 mt-2 w-48 rounded-2xl border border-white/10 bg-slate-900 py-2 opacity-0 shadow-xl transition group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+              <Link
+                href="/optifabric"
+                className="block px-4 py-2.5 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
+              >
+                OptiFabric
+              </Link>
+
+              <Link
+                href="/optisewing"
+                className="block px-4 py-2.5 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
+              >
+                OptiSewing
+              </Link>
+            </div>
+          </div>
+
           <Link
             href="/insights-discussion"
             className="rounded-full border border-emerald-400/20 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-emerald-400/10"
@@ -71,6 +96,20 @@ export default function Navbar() {
               className="rounded-2xl border border-cyan-400/20 px-4 py-3 text-slate-200"
             >
               About MBNCON
+            </Link>
+
+            <Link
+              href="/optifabric"
+              className="rounded-2xl border border-white/10 px-4 py-3 text-slate-200"
+            >
+              OptiFabric
+            </Link>
+
+            <Link
+              href="/optisewing"
+              className="rounded-2xl border border-white/10 px-4 py-3 text-slate-200"
+            >
+              OptiSewing
             </Link>
 
             <Link

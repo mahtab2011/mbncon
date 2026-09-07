@@ -296,6 +296,55 @@ export default function HomePage() {
 
       <section className="px-6 py-16">
         <div className="mx-auto max-w-7xl rounded-3xl border border-slate-300 bg-slate-100 p-8 shadow-sm transition duration-300 hover:shadow-xl sm:p-10">
+          <p className="text-sm font-bold uppercase tracking-widest text-emerald-700">
+            Manufacturing Productivity Applications
+          </p>
+
+          <h2 className="mt-4 max-w-4xl text-3xl font-extrabold text-slate-950">
+            Standalone Applications for Garment Manufacturers
+          </h2>
+
+          <div className="mt-8 grid gap-6 md:grid-cols-2">
+            <Link
+              href="/optifabric"
+              className="rounded-2xl border border-emerald-300 bg-emerald-100 p-6 shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-2xl"
+            >
+              <h3 className="text-2xl font-bold text-emerald-950">
+                OptiFabric
+              </h3>
+
+              <p className="mt-4 leading-7 text-emerald-950">
+                Fabric utilisation and cutting-room productivity.
+              </p>
+
+              <p className="mt-5 text-sm font-bold text-emerald-900">
+                Explore OptiFabric →
+              </p>
+            </Link>
+
+            <Link
+              href="/optisewing"
+              className="rounded-2xl border border-violet-300 bg-violet-100 p-6 shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-2xl"
+            >
+              <h3 className="text-2xl font-bold text-violet-950">
+                OptiSewing
+              </h3>
+
+              <p className="mt-4 leading-7 text-violet-950">
+                Garment production, industrial engineering and continuous
+                improvement.
+              </p>
+
+              <p className="mt-5 text-sm font-bold text-violet-900">
+                Explore OptiSewing →
+              </p>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="px-6 py-16">
+        <div className="mx-auto max-w-7xl rounded-3xl border border-slate-300 bg-slate-100 p-8 shadow-sm transition duration-300 hover:shadow-xl sm:p-10">
           <p className="text-sm font-bold uppercase tracking-widest text-violet-700">
             Practical Business Transformation
           </p>

@@ -1,4 +1,13 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+import ProductPlans from "@/components/software/ProductPlans";
+
+export const metadata: Metadata = {
+  title: "OptiFabric | Fabric Planning & Cutting Productivity | MBNCON",
+  description:
+    "OptiFabric provides practical digital tools for fabric utilisation, cutting-room productivity, marker planning and manufacturing improvement.",
+};
 
 type OptiFabricModule = {
   title: string;
@@ -503,6 +512,8 @@ export default function OptiFabricHomePage() {
             ))}
           </div>
         </section>
+
+        <ProductPlans />
 
         <section className="mt-14 rounded-3xl border border-amber-400/30 bg-amber-950/20 p-7">
           <h2 className="text-2xl font-black text-amber-300">
