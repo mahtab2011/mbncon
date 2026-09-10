@@ -82,6 +82,11 @@ import type {
   SavedGeometryRecord,
 } from "@/lib/optifabric/geometrySaveTypes";
 
+import {
+  savePatternGeometry,
+  type ServerProjectMeta,
+} from "@/lib/optifabric/projectApi";
+
 
 interface TraceablePatternStatus
   extends PatternStatus,
@@ -114,6 +119,12 @@ interface TracingProject
   stylePatternSelectionLockedAt?: string;
 
   updatedAt?: string;
+
+  // Present when this project was created via the server-first flow (see
+  // app/optifabric/project/new/page.tsx) — its presence is how saveGeometry
+  // below decides whether to attempt a server PUT at all. A legacy
+  // local-only project (no _server) never touches the network here.
+  _server?: ServerProjectMeta;
 }
 
 interface ImageDimensions {
@@ -435,6 +446,11 @@ const [
   geometrySaveError,
   setGeometrySaveError,
 ] = useState("");
+
+const [
+  savingGeometry,
+  setSavingGeometry,
+] = useState(false);
   const projectStorageKey =
     `optifabric-project-${projectId}`;
 
@@ -1293,7 +1309,7 @@ function panViewport(
   });
 }
 
-  function saveGeometry() {
+  async function saveGeometry() {
     if (
       !project ||
       !pattern
@@ -1313,6 +1329,8 @@ function panViewport(
       new Date().toISOString();
 setGeometrySaveError("");
 
+let geometryRecord: SavedGeometryRecord;
+
 try {
   const polygonLeft = Math.min(
     ...boundary.vertices.map(
@@ -1326,7 +1344,7 @@ try {
     )
   );
 
-  const geometryRecord =
+  geometryRecord =
     createSavedGeometryRecord({
       projectId:
         project.id,
@@ -1387,14 +1405,6 @@ try {
           })
         ),
     });
-
-  saveGeometryRecord(
-    geometryRecord
-  );
-
-  setSavedGeometry(
-    geometryRecord
-  );
 } catch (error) {
   const errorMessage =
     error instanceof Error
@@ -1411,6 +1421,74 @@ try {
 
   return;
 }
+
+// Server-first (Stage 2B-1): only attempted for projects created via the
+// server-backed flow (project._server present) — a legacy local-only
+// project never touches the network here and behaves exactly as before.
+// Nothing below this block runs (no local write of any kind, no "saved"
+// state, no success message) unless the server PUT above actually
+// succeeded — the in-memory boundary/calibration the user just traced is
+// never touched on failure, so nothing is lost; they can simply try Save
+// again.
+if (project._server) {
+  setSavingGeometry(true);
+
+  try {
+    await savePatternGeometry(
+      project.id,
+      pattern.id,
+      {
+        polygon: geometryRecord.polygon,
+        calibration,
+        measurements: {
+          widthCm: widthCm ?? 0,
+          heightCm: heightCm ?? 0,
+          areaSqCm: areaSquareCm ?? 0,
+          perimeterCm: perimeterCm ?? 0,
+          pixelArea: areaSquarePixels,
+          pixelsPerCm: calibration.pixelsPerCm ?? 0,
+          vertexCount: boundary.vertices.length,
+          boundaryQualityScore: boundaryQuality.score,
+          orientation: geometryRecord.orientation,
+          // Backend PatternGeometry has no dedicated confidence/markerReady
+          // columns (Stage 1 only defined polygon/calibration/grainLine/
+          // measurements) — carried inside measurements instead of
+          // inventing new backend fields for this stage.
+          confidence: boundaryQuality.score,
+          markerReady: geometryReady,
+        },
+      }
+    );
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : "The server could not be reached.";
+
+    setSavingGeometry(false);
+
+    setGeometrySaveError(
+      `Server save failed: ${errorMessage}. Your traced geometry has not been lost — it is still shown below and you can try Save again.`
+    );
+
+    setMessage(
+      `Geometry was NOT saved to the server: ${errorMessage}`
+    );
+
+    return;
+  }
+
+  setSavingGeometry(false);
+}
+
+saveGeometryRecord(
+  geometryRecord
+);
+
+setSavedGeometry(
+  geometryRecord
+);
+
     const savedTracing:
       SavedPatternTracingData = {
         patternId:
@@ -2055,7 +2133,7 @@ async function handleAutomaticScaleDetection() {
     scaleBusy
   }
 
-  savingGeometry={false}
+  savingGeometry={savingGeometry}
 />
 
         {(aiDetectionMessage ||

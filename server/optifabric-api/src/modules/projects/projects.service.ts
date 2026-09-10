@@ -244,14 +244,19 @@ export class ProjectsService {
   }
 
   async getProject(user: AuthenticatedUser, projectId: string) {
-    // Includes patternPieces (Stage 2A) so a client with no local cache at
+    // Includes patternPieces (Stage 2A) — and, per piece, its optional
+    // finalized geometry (Stage 2B-1) — so a client with no local cache at
     // all (a fresh browser/device) can rebuild a working project object
-    // from this single response — see lib/optifabric/projectApi.ts's
-    // mapServerProjectToCachedProject. Geometry is never included: it stays
-    // local-only until a later stage.
+    // from this single response. See lib/optifabric/projectApi.ts's
+    // mapServerProjectToCachedProject / extractSavedGeometryRecords.
     const project = await this.prisma.project.findFirst({
       where: { id: projectId, factoryId: user.factoryId },
-      include: { patternPieces: { orderBy: { sequence: "asc" } } },
+      include: {
+        patternPieces: {
+          orderBy: { sequence: "asc" },
+          include: { geometry: true },
+        },
+      },
     });
     if (!project) {
       throw new NotFoundException(`No project found with id "${projectId}".`);

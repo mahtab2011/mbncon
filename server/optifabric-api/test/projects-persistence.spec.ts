@@ -272,12 +272,56 @@ describe("ProjectsService.getProject", () => {
     expect(prisma.project.findFirst).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { id: "project-1", factoryId: "factory-a" },
-        include: { patternPieces: { orderBy: { sequence: "asc" } } },
+        include: { patternPieces: { orderBy: { sequence: "asc" }, include: { geometry: true } } },
       }),
     );
     expect(result.patternPieces).toEqual([
       { id: "project-1-front-body", patternId: "front-body", name: "Front Body" },
     ]);
+  });
+
+  // Stage 2B-1: GET /projects/:id must return each piece's saved geometry
+  // (nested include), not just the piece itself — the fresh-device frontend
+  // mapper (lib/optifabric/projectApi.ts's extractSavedGeometryRecords)
+  // depends on this to reconstruct geometry without any local cache.
+  it("returns each pattern piece's saved geometry, when present", async () => {
+    const { prisma } = buildPrismaMock();
+    prisma.project.findFirst.mockResolvedValue({
+      id: "project-1",
+      factoryId: "factory-a",
+      patternPieces: [
+        {
+          id: "project-1-front-body",
+          patternId: "front-body",
+          name: "Front Body",
+          geometry: {
+            id: "project-1-front-body-geometry",
+            patternPieceId: "project-1-front-body",
+            polygonJson: [{ x: 0, y: 0 }, { x: 10, y: 0 }, { x: 10, y: 10 }],
+            calibrationJson: { pixelsPerCm: 12.5 },
+            grainLineJson: null,
+            measurementJson: { widthCm: 20, heightCm: 15 },
+          },
+        },
+        { id: "project-1-back-body", patternId: "back-body", name: "Back Body", geometry: null },
+      ],
+    });
+    const service = new ProjectsService(prisma as never);
+
+    const result = await service.getProject(userA, "project-1");
+
+    expect(result.patternPieces[0].geometry).toEqual(
+      expect.objectContaining({ polygonJson: expect.any(Array), calibrationJson: { pixelsPerCm: 12.5 } }),
+    );
+    expect(result.patternPieces[1].geometry).toBeNull();
+  });
+
+  it("denies reading a project (with geometry) belonging to another factory", async () => {
+    const { prisma } = buildPrismaMock();
+    prisma.project.findFirst.mockResolvedValue(null);
+    const service = new ProjectsService(prisma as never);
+
+    await expect(service.getProject(userA, "project-owned-by-factory-b")).rejects.toBeInstanceOf(NotFoundException);
   });
 });
 

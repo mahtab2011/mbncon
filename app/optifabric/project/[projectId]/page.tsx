@@ -9,11 +9,13 @@ import {
   getGarmentDisplayName,
 } from "@/lib/optifabric/projectMaster";
 import {
+  extractSavedGeometryRecords,
   extractStatusCode,
   getProject as getServerProject,
   mapServerProjectToCachedProject,
   type CachedProject,
 } from "@/lib/optifabric/projectApi";
+import { saveGeometryRecord } from "@/lib/optifabric/geometrySaveEngine";
 
 type WorkflowStatus = "waiting" | "in-progress" | "completed";
 
@@ -109,8 +111,9 @@ export default function EngineeringCommandCentrePage() {
           // browser never had (nothing the server can help with), or a
           // server-backed project being opened for the first time on this
           // device/browser. Ask the server before concluding "not found":
-          // only its patterns/core fields are reconstructed here (never
-          // geometry/marker state, which stays local-only regardless).
+          // its patterns and any finalized (saved) pattern geometry are
+          // reconstructed here (Stage 2B-1) — never marker/AI results,
+          // which are never persisted server-side at all.
           try {
             const serverProject = await getServerProject(projectId);
             if (cancelled) return;
@@ -122,6 +125,19 @@ export default function EngineeringCommandCentrePage() {
               `optifabric-project-${projectId}`,
               JSON.stringify(cachedProject)
             );
+
+            // Each pattern's finalized geometry also lives under its own
+            // optifabric-geometry-{projectId}-{patternId} key (see
+            // lib/optifabric/geometrySaveEngine.ts) — a SEPARATE key from
+            // the main project object above, independently read by the
+            // pattern-tracing page. Writing both here means that page shows
+            // the correct "Saved: YES" state immediately, without needing
+            // any changes of its own.
+            for (const record of extractSavedGeometryRecords(
+              serverProject
+            )) {
+              saveGeometryRecord(record);
+            }
 
             setProject(cachedProject);
             setLoadError("");

@@ -11,6 +11,25 @@
 // garmentSubcategory? (lib/optifabric/projectMaster.ts).
 import { apiFetch } from "./apiClient";
 import type { EngineeringProject, PatternStatus } from "./projectMaster";
+import type { GeometryPoint } from "./patternGeometryTypes";
+import { calculateBoundingBox } from "./patternGeometryEngine";
+import type { SavedGeometryRecord } from "./geometrySaveTypes";
+import type { PatternTracingProjectFields } from "./patternTracingTypes";
+
+// A PatternGeometry row as returned by the backend (server/optifabric-api
+// PatternGeometry model) — the four Json fields are opaque/shape-agnostic
+// there (see that model's own schema.prisma comment), so they're typed
+// `unknown` here too rather than assuming one particular frontend shape.
+export interface ServerPatternGeometry {
+  id: string;
+  patternPieceId: string;
+  polygonJson: unknown;
+  calibrationJson: unknown;
+  grainLineJson: unknown;
+  measurementJson: unknown;
+  createdAt: string;
+  updatedAt: string;
+}
 
 // PatternPiece core fields as returned by the backend (server/optifabric-api
 // PatternPiece model) — deliberately narrower than the frontend's
@@ -28,6 +47,9 @@ export interface ServerPatternPiece {
   custom: boolean;
   createdAt: string;
   updatedAt: string;
+  // Present on GET /projects/:id (Stage 2B-1); null when no geometry has
+  // been saved for this piece yet.
+  geometry?: ServerPatternGeometry | null;
 }
 
 export interface ServerProject {
@@ -95,6 +117,29 @@ export function getProject(id: string): Promise<ServerProject> {
   return apiFetch<ServerProject>(`/projects/${id}`);
 }
 
+// Mirrors the backend's UpsertPatternGeometryDto exactly (server/
+// optifabric-api's PUT /projects/:projectId/patterns/:patternId/geometry) —
+// polygon is required, the rest optional. `patternId` here is always the
+// plain client-side pattern id (e.g. "front-body"); the backend derives its
+// own composite primary key internally — callers never need to know it.
+export interface SavePatternGeometryInput {
+  polygon: unknown;
+  calibration?: unknown;
+  grainLine?: unknown;
+  measurements?: unknown;
+}
+
+export function savePatternGeometry(
+  projectId: string,
+  patternId: string,
+  geometry: SavePatternGeometryInput,
+): Promise<ServerPatternGeometry> {
+  return apiFetch<ServerPatternGeometry>(
+    `/projects/${projectId}/patterns/${encodeURIComponent(patternId)}/geometry`,
+    { method: "PUT", body: JSON.stringify(geometry) },
+  );
+}
+
 // The server-authoritative fields carried alongside a cached
 // EngineeringProject once a project is backed by the server — presence of
 // this key is how the frontend distinguishes a server-backed project from a
@@ -141,12 +186,158 @@ export function mapPatternsToInitialPatterns(
   }));
 }
 
+// -- Stage 2B-1: finalized PatternGeometry reconstruction --------------------
+//
+// PatternGeometry's Json fields are opaque/shape-agnostic on the backend, so
+// these readers defensively pick out only the fields this codebase's own
+// save path (see the trace page's saveGeometry()) is known to write, and
+// return undefined for anything absent/malformed rather than guessing.
+function readNumberField(source: unknown, key: string): number | undefined {
+  if (!source || typeof source !== "object") return undefined;
+  const value = (source as Record<string, unknown>)[key];
+  return typeof value === "number" && Number.isFinite(value) ? value : undefined;
+}
+
+function readOrientationField(source: unknown): "portrait" | "landscape" | undefined {
+  if (!source || typeof source !== "object") return undefined;
+  const value = (source as Record<string, unknown>).orientation;
+  return value === "portrait" || value === "landscape" ? value : undefined;
+}
+
+// Same two tolerated polygon shapes the backend's own validation accepts
+// (see ProjectsService.polygonPointCount) — a plain point array, or an
+// object carrying its points under `.points`.
+function readPolygonPoints(polygon: unknown): GeometryPoint[] {
+  const isPoint = (value: unknown): value is GeometryPoint =>
+    Boolean(value) &&
+    typeof value === "object" &&
+    typeof (value as { x?: unknown }).x === "number" &&
+    typeof (value as { y?: unknown }).y === "number";
+
+  const candidate = Array.isArray(polygon)
+    ? polygon
+    : polygon && typeof polygon === "object" && Array.isArray((polygon as { points?: unknown }).points)
+      ? (polygon as { points: unknown[] }).points
+      : [];
+
+  return candidate.filter(isPoint).map((point) => ({ x: point.x, y: point.y }));
+}
+
+// One ServerPatternPiece's geometry -> the flat local fallback fields the
+// pattern-tracing page (app/optifabric/project/[projectId]/patterns/
+// [patternId]/trace/page.tsx) already reads as first-priority fields on a
+// project's pattern entry (its own polygonVertices ?? geometryVertices ??
+// patternTracing?.boundary.vertices chain, etc.) — so a reconstructed
+// project "just works" there without that page needing any changes.
+// Deliberately does NOT fabricate a full patternTracing/
+// SavedPatternTracingData object: that requires image metadata (fileName,
+// naturalWidth, ...) which is never persisted server-side, and inventing it
+// would violate "reconstruct only what is supported by actual persisted
+// server data."
+function mapGeometryToTracingProjectFields(
+  geometry: ServerPatternGeometry,
+): Partial<PatternTracingProjectFields> {
+  const polygon = readPolygonPoints(geometry.polygonJson);
+  if (polygon.length === 0) return {};
+
+  const pixelsPerCm =
+    readNumberField(geometry.measurementJson, "pixelsPerCm") ??
+    readNumberField(geometry.calibrationJson, "pixelsPerCm");
+  const pixelsPerInch = readNumberField(geometry.calibrationJson, "pixelsPerInch");
+
+  return {
+    polygonVertices: polygon,
+    geometryVertices: polygon,
+    ...(pixelsPerCm !== undefined ? { pixelsPerCm } : {}),
+    ...(pixelsPerInch !== undefined ? { pixelsPerInch } : {}),
+    calibratedWidthCm: readNumberField(geometry.measurementJson, "widthCm"),
+    calibratedHeightCm: readNumberField(geometry.measurementJson, "heightCm"),
+    calibratedAreaSqCm: readNumberField(geometry.measurementJson, "areaSqCm"),
+    calibratedPerimeterCm: readNumberField(geometry.measurementJson, "perimeterCm"),
+    geometryTracingCompleted: true,
+    geometryTracingCompletedAt: geometry.updatedAt,
+  };
+}
+
+// One ServerPatternPiece's geometry -> a SavedGeometryRecord, matching
+// exactly what lib/optifabric/geometrySaveEngine.ts's own
+// createSavedGeometryRecord()/saveGeometryRecord() would have produced
+// locally — so the trace page's independent
+// loadGeometryRecord(projectId, patternId) call (a SEPARATE localStorage key
+// from the main project object) finds it and shows "Saved: YES" on a fresh
+// device, exactly as it would if this browser had saved it originally.
+// geometryVersion is set to a distinct marker (not a fabricated RC4-013
+// client-engine tag) since this record was assembled from server data, not
+// produced by a specific local tracing session.
+function mapPieceGeometryToSavedGeometryRecord(
+  serverProject: ServerProject,
+  piece: ServerPatternPiece,
+): SavedGeometryRecord | null {
+  if (!piece.geometry) return null;
+
+  const polygon = readPolygonPoints(piece.geometry.polygonJson);
+  if (polygon.length === 0) return null;
+
+  const boundingBoxSource = calculateBoundingBox(polygon);
+  const pixelsPerCm =
+    readNumberField(piece.geometry.measurementJson, "pixelsPerCm") ??
+    readNumberField(piece.geometry.calibrationJson, "pixelsPerCm") ??
+    0;
+
+  return {
+    id: `${serverProject.id}-${piece.patternId}-geometry`,
+    projectId: serverProject.id,
+    patternId: piece.patternId,
+    garmentType: serverProject.name,
+    patternPiece: piece.name,
+    widthCm: readNumberField(piece.geometry.measurementJson, "widthCm") ?? 0,
+    heightCm: readNumberField(piece.geometry.measurementJson, "heightCm") ?? 0,
+    areaSqCm: readNumberField(piece.geometry.measurementJson, "areaSqCm") ?? 0,
+    perimeterCm: readNumberField(piece.geometry.measurementJson, "perimeterCm") ?? 0,
+    pixelArea: readNumberField(piece.geometry.measurementJson, "pixelArea") ?? 0,
+    pixelsPerCm,
+    vertexCount: readNumberField(piece.geometry.measurementJson, "vertexCount") ?? polygon.length,
+    // Only ever true here: the trace page only PUTs geometry once its own
+    // geometryReady check (which requires a closed boundary) has passed.
+    boundaryClosed: true,
+    boundaryQualityScore: readNumberField(piece.geometry.measurementJson, "boundaryQualityScore") ?? 0,
+    boundingBox: {
+      left: boundingBoxSource.minX,
+      top: boundingBoxSource.minY,
+      width: boundingBoxSource.width,
+      height: boundingBoxSource.height,
+    },
+    orientation: readOrientationField(piece.geometry.measurementJson) ?? "portrait",
+    geometryVersion: "server-reconstructed",
+    savedAt: piece.geometry.updatedAt,
+    polygon,
+  };
+}
+
+// GET /projects/:id's patternPieces -> the SavedGeometryRecord[] this
+// project's saved pieces would produce, for the caller to persist under
+// each piece's own optifabric-geometry-{projectId}-{patternId} key (via
+// geometrySaveEngine's saveGeometryRecord) alongside the main project cache
+// — see app/optifabric/project/[projectId]/page.tsx's fresh-device branch.
+// Only used for genuinely fresh devices (no prior local cache at all); the
+// existing "refresh an already-cached server project" path deliberately
+// leaves patterns/geometry alone, so this is never called there.
+export function extractSavedGeometryRecords(serverProject: ServerProject): SavedGeometryRecord[] {
+  const records: SavedGeometryRecord[] = [];
+  for (const piece of serverProject.patternPieces ?? []) {
+    const record = mapPieceGeometryToSavedGeometryRecord(serverProject, piece);
+    if (record) records.push(record);
+  }
+  return records;
+}
+
 // Server response -> a local working EngineeringProject cache, used to
 // reconstruct a server-backed project on a device/browser with no existing
 // optifabric-project-{id} entry (see app/optifabric/project/[projectId]/
-// page.tsx). Deliberately does not fabricate anything: patterns come only
-// from serverProject.patternPieces (never invented), and no geometry/marker
-// state is created — those remain local-only until a later stage.
+// page.tsx). Patterns come only from serverProject.patternPieces (never
+// invented); each pattern's finalized geometry (Stage 2B-1), when present,
+// is reconstructed via mapGeometryToTracingProjectFields — never marker/AI
+// results, which are never persisted server-side at all.
 //
 // Important id mapping: a ServerPatternPiece's own `id` is the backend's
 // composite primary key (`${projectId}-${patternId}`) — NOT what the rest
@@ -167,6 +358,7 @@ export function mapServerProjectToCachedProject(
       sequence: piece.sequence,
       uploaded: false,
       recognised: false,
+      ...(piece.geometry ? mapGeometryToTracingProjectFields(piece.geometry) : {}),
     }),
   );
 
