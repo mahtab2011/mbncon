@@ -142,6 +142,10 @@ model Project {
   // the numeric part is a single global monotonic sequence rather than a
   // per-year counter — simplest construction that is still trivially
   // race-free under concurrent POST /projects calls.
+  // MAINTENANCE: "ProjectCodeSeq" is hand-written SQL, not modeled here —
+  // if Project is ever dropped or renamed in a future migration, that
+  // migration must explicitly DROP/rename the sequence too; Prisma has no
+  // record of it and will never do this automatically.
   code       String    @unique
   name       String
   // Soft delete / archive marker. Null = active. Set by DELETE /projects/:id,

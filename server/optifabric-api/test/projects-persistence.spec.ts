@@ -3,9 +3,10 @@
 // ProjectsService, mirroring the buildPrismaMock()/tx pattern used by
 // test/auth-signup.spec.ts (this codebase's unit tests mock Prisma directly
 // rather than spinning up a Nest testing module / real database).
-import { BadRequestException, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ConflictException, NotFoundException } from "@nestjs/common";
 import { ProjectsService } from "../src/modules/projects/projects.service";
 import { AuthenticatedUser } from "../src/modules/auth/auth.types";
+import { MAX_NAME_LENGTH, MAX_POLYGON_POINTS } from "../src/modules/projects/projects.constants";
 
 function buildPrismaMock() {
   const project = {
@@ -13,6 +14,8 @@ function buildPrismaMock() {
     findMany: jest.fn(),
     create: jest.fn(),
     update: jest.fn(),
+    updateMany: jest.fn(),
+    findUniqueOrThrow: jest.fn(),
   };
   const patternPiece = { upsert: jest.fn() };
   const patternGeometry = { upsert: jest.fn() };
@@ -72,6 +75,14 @@ describe("ProjectsService.createProject", () => {
     const { prisma } = buildPrismaMock();
     const service = new ProjectsService(prisma as never);
     await expect(service.createProject(userA, { name: "   " })).rejects.toBeInstanceOf(BadRequestException);
+  });
+
+  it("rejects a name longer than MAX_NAME_LENGTH", async () => {
+    const { prisma } = buildPrismaMock();
+    const service = new ProjectsService(prisma as never);
+    await expect(
+      service.createProject(userA, { name: "x".repeat(MAX_NAME_LENGTH + 1) }),
+    ).rejects.toBeInstanceOf(BadRequestException);
   });
 });
 
@@ -171,6 +182,104 @@ describe("ProjectsService cross-factory access", () => {
     await expect(service.listMarkerRuns(userA, "project-b")).rejects.toBeInstanceOf(NotFoundException);
     expect(prisma.markerRun.findMany).not.toHaveBeenCalled();
   });
+
+  // Stage 1A: a stale-version update attempt on another factory's project
+  // must still surface as 404, never 409 — a 409 would disclose that a
+  // project with that id exists (just with a different version) even
+  // though the caller has no access to it at all.
+  it("denies a stale-update attempt on a project belonging to another factory as 404, not 409", async () => {
+    const { prisma, tx } = buildPrismaMock();
+    tx.project.findFirst.mockResolvedValue(null);
+    const service = new ProjectsService(prisma as never);
+
+    await expect(
+      service.updateProject(userA, "project-b", {
+        name: "New name",
+        expectedUpdatedAt: new Date("2026-01-01T00:00:00.000Z").toISOString(),
+      }),
+    ).rejects.toBeInstanceOf(NotFoundException);
+    expect(tx.project.updateMany).not.toHaveBeenCalled();
+  });
+});
+
+describe("ProjectsService.updateProject optimistic concurrency", () => {
+  const CURRENT_UPDATED_AT = new Date("2026-01-01T00:00:00.000Z");
+
+  it("succeeds when expectedUpdatedAt matches the project's current updatedAt", async () => {
+    const { prisma, tx } = buildPrismaMock();
+    tx.project.findFirst.mockResolvedValue({
+      id: "project-1",
+      factoryId: "factory-a",
+      archivedAt: null,
+      updatedAt: CURRENT_UPDATED_AT,
+    });
+    tx.project.updateMany.mockResolvedValue({ count: 1 });
+    tx.project.findUniqueOrThrow.mockResolvedValue({ id: "project-1", name: "New name" });
+    const service = new ProjectsService(prisma as never);
+
+    const result = await service.updateProject(userA, "project-1", {
+      name: "New name",
+      expectedUpdatedAt: CURRENT_UPDATED_AT.toISOString(),
+    });
+
+    expect(tx.project.updateMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: "project-1", factoryId: "factory-a", updatedAt: CURRENT_UPDATED_AT },
+      }),
+    );
+    expect(result.name).toBe("New name");
+  });
+
+  it("rejects a stale expectedUpdatedAt with 409, without touching the row", async () => {
+    const { prisma, tx } = buildPrismaMock();
+    tx.project.findFirst.mockResolvedValue({
+      id: "project-1",
+      factoryId: "factory-a",
+      archivedAt: null,
+      updatedAt: CURRENT_UPDATED_AT,
+    });
+    // The conditional UPDATE's own WHERE clause is what decides staleness —
+    // simulated here by the DB-side match failing (0 rows affected), not by
+    // comparing timestamps in the test/application code.
+    tx.project.updateMany.mockResolvedValue({ count: 0 });
+    const service = new ProjectsService(prisma as never);
+
+    await expect(
+      service.updateProject(userA, "project-1", {
+        name: "New name",
+        expectedUpdatedAt: new Date("2020-01-01T00:00:00.000Z").toISOString(),
+      }),
+    ).rejects.toBeInstanceOf(ConflictException);
+    expect(tx.project.findUniqueOrThrow).not.toHaveBeenCalled();
+  });
+
+  it("rejects an invalid expectedUpdatedAt timestamp with 400", async () => {
+    const { prisma, tx } = buildPrismaMock();
+    const service = new ProjectsService(prisma as never);
+
+    await expect(
+      service.updateProject(userA, "project-1", { name: "New name", expectedUpdatedAt: "not-a-date" }),
+    ).rejects.toBeInstanceOf(BadRequestException);
+    expect(tx.project.findFirst).not.toHaveBeenCalled();
+  });
+
+  it("falls back to an unconditional update when expectedUpdatedAt is omitted (backward compatibility)", async () => {
+    const { prisma, tx } = buildPrismaMock();
+    tx.project.findFirst.mockResolvedValue({
+      id: "project-1",
+      factoryId: "factory-a",
+      archivedAt: null,
+      updatedAt: CURRENT_UPDATED_AT,
+    });
+    tx.project.update.mockResolvedValue({ id: "project-1", name: "New name" });
+    const service = new ProjectsService(prisma as never);
+
+    const result = await service.updateProject(userA, "project-1", { name: "New name" });
+
+    expect(tx.project.updateMany).not.toHaveBeenCalled();
+    expect(tx.project.update).toHaveBeenCalledWith({ where: { id: "project-1" }, data: { name: "New name" } });
+    expect(result.name).toBe("New name");
+  });
 });
 
 describe("ProjectsService.upsertPatternPiece", () => {
@@ -214,6 +323,42 @@ describe("ProjectsService.upsertPatternPiece", () => {
 
     await expect(
       service.upsertPatternPiece(userA, "project-1", "front-body", { name: "Front Body" }),
+    ).rejects.toBeInstanceOf(BadRequestException);
+  });
+
+  it("rejects a name longer than MAX_NAME_LENGTH", async () => {
+    const { prisma } = buildPrismaMock();
+    const service = new ProjectsService(prisma as never);
+
+    await expect(
+      service.upsertPatternPiece(userA, "project-1", "front-body", { name: "x".repeat(MAX_NAME_LENGTH + 1) }),
+    ).rejects.toBeInstanceOf(BadRequestException);
+  });
+
+  it.each([
+    ["negative", -1],
+    ["fractional", 1.5],
+    ["excessively large", 100_000_001],
+  ])("rejects a %s sequence value", async (_label, value) => {
+    const { prisma } = buildPrismaMock();
+    const service = new ProjectsService(prisma as never);
+
+    await expect(
+      service.upsertPatternPiece(userA, "project-1", "front-body", { name: "Front Body", sequence: value }),
+    ).rejects.toBeInstanceOf(BadRequestException);
+  });
+
+  it.each([
+    ["negative", -1],
+    ["zero", 0],
+    ["fractional", 2.5],
+    ["excessively large", 100_000_001],
+  ])("rejects a %s cutQuantity value", async (_label, value) => {
+    const { prisma } = buildPrismaMock();
+    const service = new ProjectsService(prisma as never);
+
+    await expect(
+      service.upsertPatternPiece(userA, "project-1", "front-body", { name: "Front Body", cutQuantity: value }),
     ).rejects.toBeInstanceOf(BadRequestException);
   });
 });
@@ -277,6 +422,58 @@ describe("ProjectsService.upsertPatternGeometry", () => {
       service.upsertPatternGeometry(userA, "project-1", "front-body", { polygon: [] }),
     ).rejects.toBeInstanceOf(BadRequestException);
   });
+
+  // Stage 1A payload investigation: these two accept-case tests cover both
+  // of the frontend's non-interchangeable in-flight polygon shapes (a flat
+  // point array, and a richer object carrying its points under `.points`)
+  // at a realistically large-but-legitimate size (800 points — well above a
+  // typical piece, comfortably below MAX_POLYGON_POINTS), confirming the
+  // structural check doesn't pick a winner between them or reject
+  // legitimate detailed tracing data.
+  it("accepts a large, realistic polygon in the flat point-array shape", async () => {
+    const { prisma, tx } = buildPrismaMock();
+    tx.project.findFirst.mockResolvedValue({ id: "project-1", factoryId: "factory-a", archivedAt: null });
+    tx.patternGeometry.upsert.mockResolvedValue({ id: "project-1-front-body-geometry" });
+    const service = new ProjectsService(prisma as never);
+
+    const polygon = Array.from({ length: 800 }, (_, i) => ({ x: i, y: i * 2 }));
+
+    await expect(service.upsertPatternGeometry(userA, "project-1", "front-body", { polygon })).resolves.toBeDefined();
+  });
+
+  it("accepts a large, realistic polygon in the rich points-object shape", async () => {
+    const { prisma, tx } = buildPrismaMock();
+    tx.project.findFirst.mockResolvedValue({ id: "project-1", factoryId: "factory-a", archivedAt: null });
+    tx.patternGeometry.upsert.mockResolvedValue({ id: "project-1-front-body-geometry" });
+    const service = new ProjectsService(prisma as never);
+
+    const polygon = {
+      points: Array.from({ length: 800 }, (_, i) => ({ id: `p-${i}`, x: i, y: i * 2, sequence: i })),
+      closed: true,
+    };
+
+    await expect(service.upsertPatternGeometry(userA, "project-1", "front-body", { polygon })).resolves.toBeDefined();
+  });
+
+  it("rejects a polygon exceeding MAX_POLYGON_POINTS", async () => {
+    const { prisma } = buildPrismaMock();
+    const service = new ProjectsService(prisma as never);
+
+    const polygon = Array.from({ length: MAX_POLYGON_POINTS + 1 }, (_, i) => ({ x: i, y: i }));
+
+    await expect(
+      service.upsertPatternGeometry(userA, "project-1", "front-body", { polygon }),
+    ).rejects.toBeInstanceOf(BadRequestException);
+  });
+
+  it("rejects a polygon that is neither an array nor a points-bearing object", async () => {
+    const { prisma } = buildPrismaMock();
+    const service = new ProjectsService(prisma as never);
+
+    await expect(
+      service.upsertPatternGeometry(userA, "project-1", "front-body", { polygon: "not-a-polygon" }),
+    ).rejects.toBeInstanceOf(BadRequestException);
+  });
 });
 
 describe("ProjectsService.createMarkerRun", () => {
@@ -297,6 +494,51 @@ describe("ProjectsService.createMarkerRun", () => {
     expect(tx.auditEvent.create).toHaveBeenCalledWith(
       expect.objectContaining({ data: expect.objectContaining({ actionType: "MARKER_RUN_CREATED" }) }),
     );
+  });
+
+  // Stage 1A payload investigation: a realistically large marker run (40
+  // distinct pieces in the snapshot, 300 placed instances in the result,
+  // each carrying its own 100-point polygon — see main.ts's sizing note)
+  // must still be accepted at the service/validation layer. The actual
+  // byte-size ceiling (5 MB, see JSON_BODY_LIMIT in main.ts) is enforced by
+  // Express's body parser before a request ever reaches this service, and
+  // isn't exercised by this unit-test suite (no supertest/live-server
+  // tests exist in this codebase — see test/auth-signup.spec.ts's own
+  // comment on the convention this suite follows).
+  it("accepts a large, realistic marker snapshot/result payload", async () => {
+    const { prisma, tx } = buildPrismaMock();
+    tx.project.findFirst.mockResolvedValue({ id: "project-1", factoryId: "factory-a", archivedAt: null });
+    tx.markerRun.create.mockImplementation(({ data }: { data: Record<string, unknown> }) =>
+      Promise.resolve({ id: "marker-run-1", ...data }),
+    );
+    const service = new ProjectsService(prisma as never);
+
+    const pieces = Array.from({ length: 40 }, (_, i) => ({
+      id: `piece-${i}`,
+      patternId: `pattern-${i}`,
+      polygon: Array.from({ length: 100 }, (_, j) => ({ x: j, y: j })),
+    }));
+    const placedPieces = Array.from({ length: 300 }, (_, i) => ({
+      id: `placed-${i}`,
+      sourcePieceId: `piece-${i % 40}`,
+      transformedPolygon: Array.from({ length: 100 }, (_, j) => ({ x: j, y: j })),
+    }));
+
+    await expect(
+      service.createMarkerRun(userA, "project-1", {
+        snapshot: { pieces, settings: { fabricWidthCm: 150 } },
+        result: { success: true, layout: { placedPieces }, statistics: { markerEfficiencyPercent: 82.4 } },
+      }),
+    ).resolves.toBeDefined();
+  });
+
+  it("rejects a snapshot/result that is an array instead of a JSON object", async () => {
+    const { prisma } = buildPrismaMock();
+    const service = new ProjectsService(prisma as never);
+
+    await expect(
+      service.createMarkerRun(userA, "project-1", { snapshot: [], result: { success: true } }),
+    ).rejects.toBeInstanceOf(BadRequestException);
   });
 });
 

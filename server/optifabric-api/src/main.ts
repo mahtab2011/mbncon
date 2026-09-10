@@ -12,14 +12,47 @@ import { config as loadDotenv } from "dotenv";
 loadDotenv({ path: path.resolve(process.cwd(), ".env") });
 
 import { NestFactory } from "@nestjs/core";
+import { NestExpressApplication } from "@nestjs/platform-express";
 import helmet from "helmet";
 import { AppModule } from "./app.module";
 import { validateEnv } from "./config/env-validation.config";
 
+// Explicit JSON body-size ceiling for the whole API, replacing Express/
+// body-parser's incidental ~100kb default. Sized from an investigation of
+// OptiFabric's actual geometry/marker payload shapes (lib/optifabric/
+// geometry/patternGeometry.ts, geometrySaveTypes.ts, markerTypes.ts):
+//  - a single pattern piece's saved geometry (PUT .../patterns/:id/geometry)
+//    is small even at the high end — a very detailed traced boundary
+//    (roughly 500-1000 points at ~100 bytes/point in the richer of the two
+//    frontend point shapes) lands well under 150 KB;
+//  - a marker run (POST .../marker-runs) is the largest legitimate payload:
+//    its snapshot carries one polygon per DISTINCT pattern piece, but its
+//    result carries one full transformed-polygon copy per PLACED piece
+//    INSTANCE (i.e. scaled by cut quantity, not just piece count) — a
+//    large, many-piece, high-quantity marker can plausibly reach the high
+//    hundreds of KB, and a very large/complex one could approach low
+//    single-digit MB.
+// 5 MB gives that realistic large-marker case multiple times of headroom
+// while remaining a firm, finite ceiling that rejects runaway/pathological
+// bodies. It's one constant, easy to revisit if real usage ever needs more
+// — see the Stage 1A hardening report for the full sizing worksheet this
+// was derived from. ProjectsService additionally bounds PatternGeometry's
+// polygon by point COUNT (MAX_POLYGON_POINTS), independent of this
+// byte-size limit.
+const JSON_BODY_LIMIT = "5mb";
+
 async function bootstrap() {
   const env = validateEnv(process.env);
 
-  const app = await NestFactory.create(AppModule);
+  // bodyParser: false so we can register json/urlencoded parsers ourselves
+  // with an explicit limit via useBodyParser below. NestFactory.create()
+  // otherwise registers its own default-limit (100kb) parsers automatically
+  // during app creation — by the time any app.use(json(...)) added
+  // afterwards would run, the request body has already been consumed by
+  // that default parser, so a limit can't be overridden that way.
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, { bodyParser: false });
+  app.useBodyParser("json", { limit: JSON_BODY_LIMIT });
+  app.useBodyParser("urlencoded", { limit: JSON_BODY_LIMIT, extended: true });
 
   app.use(
     helmet({
