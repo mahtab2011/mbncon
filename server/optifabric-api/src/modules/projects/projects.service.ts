@@ -15,7 +15,44 @@ import { UpdateProjectDto } from "./update-project.dto";
 import { UpdatePatternPieceDto } from "./update-pattern-piece.dto";
 import { UpsertPatternGeometryDto } from "./upsert-pattern-geometry.dto";
 import { CreateMarkerRunDto } from "./create-marker-run.dto";
-import { MAX_CUT_QUANTITY, MAX_NAME_LENGTH, MAX_POLYGON_POINTS, MAX_SEQUENCE } from "./projects.constants";
+import { InitialPatternPieceDto } from "./initial-pattern-piece.dto";
+import {
+  MAX_CUT_QUANTITY,
+  MAX_FABRIC_WIDTH,
+  MAX_INITIAL_PATTERNS,
+  MAX_NAME_LENGTH,
+  MAX_ORDER_QUANTITY,
+  MAX_POLYGON_POINTS,
+  MAX_SCALE_LENGTH,
+  MAX_SEQUENCE,
+} from "./projects.constants";
+
+// The core fields shared between a PATCH .../patterns/:patternId body and
+// one entry of CreateProjectDto.patterns — patternId is deliberately
+// excluded here since the two callers obtain it differently (URL param vs.
+// array element), see validateInitialPatterns/upsertPatternPiece.
+interface ValidatedPatternPieceFields {
+  name: string;
+  sequence?: number;
+  cutQuantity?: number;
+  cutOnFold?: boolean;
+  required?: boolean;
+  custom?: boolean;
+}
+
+// Stage 1B core fields shared by create (all required) and update (all
+// optional, partial-update semantics) — kept as one type so both DTOs
+// validate identically.
+interface ProjectCoreFields {
+  customer: string;
+  styleNumber: string;
+  garmentCategory: string;
+  mainCategory?: string;
+  subcategory?: string;
+  fabricWidth: number;
+  orderQuantity: number;
+  scaleLength: number;
+}
 
 @Injectable()
 export class ProjectsService {
@@ -48,6 +85,126 @@ export class ProjectsService {
       throw new BadRequestException(`${field} must be between ${min} and ${max}.`);
     }
     return value;
+  }
+
+  // fabricWidth/scaleLength (Stage 1B) are user-entered decimals validated
+  // client-side as `Number.isFinite(x) && x > 0` (app/optifabric/project/
+  // new/page.tsx) — mirrored here exactly, plus an upper bound.
+  private validatePositiveNumber(value: unknown, field: string, max: number): number {
+    if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) {
+      throw new BadRequestException(`${field} must be greater than zero.`);
+    }
+    if (value > max) {
+      throw new BadRequestException(`${field} must be ${max} or less.`);
+    }
+    return value;
+  }
+
+  private validateOptionalName(value: unknown, field: string): string | undefined {
+    if (value === undefined || value === null) return undefined;
+    return this.validateName(value, field);
+  }
+
+  // Stage 1B core fields — see CreateProjectDto/UpdateProjectDto. `create`
+  // requires every field (mirrors EngineeringProject's required fields,
+  // mainCategory/subcategory excepted — see the DTO comment); `update`
+  // validates and returns only whatever fields were actually sent.
+  private validateCoreFieldsForCreate(dto: CreateProjectDto): ProjectCoreFields {
+    return {
+      customer: this.validateName(dto.customer, "customer"),
+      styleNumber: this.validateName(dto.styleNumber, "styleNumber"),
+      garmentCategory: this.validateName(dto.garmentCategory, "garmentCategory"),
+      mainCategory: this.validateOptionalName(dto.mainCategory, "mainCategory"),
+      subcategory: this.validateOptionalName(dto.subcategory, "subcategory"),
+      fabricWidth: this.validatePositiveNumber(dto.fabricWidth, "fabricWidth", MAX_FABRIC_WIDTH),
+      orderQuantity: this.validateBoundedInteger(dto.orderQuantity, "orderQuantity", 1, MAX_ORDER_QUANTITY),
+      scaleLength: this.validatePositiveNumber(dto.scaleLength, "scaleLength", MAX_SCALE_LENGTH),
+    };
+  }
+
+  private validateCoreFieldsForUpdate(dto: UpdateProjectDto): Partial<ProjectCoreFields> {
+    const fields: Partial<ProjectCoreFields> = {};
+    if (dto.customer !== undefined) fields.customer = this.validateName(dto.customer, "customer");
+    if (dto.styleNumber !== undefined) fields.styleNumber = this.validateName(dto.styleNumber, "styleNumber");
+    if (dto.garmentCategory !== undefined) {
+      fields.garmentCategory = this.validateName(dto.garmentCategory, "garmentCategory");
+    }
+    if (dto.mainCategory !== undefined) fields.mainCategory = this.validateName(dto.mainCategory, "mainCategory");
+    if (dto.subcategory !== undefined) fields.subcategory = this.validateName(dto.subcategory, "subcategory");
+    if (dto.fabricWidth !== undefined) {
+      fields.fabricWidth = this.validatePositiveNumber(dto.fabricWidth, "fabricWidth", MAX_FABRIC_WIDTH);
+    }
+    if (dto.orderQuantity !== undefined) {
+      fields.orderQuantity = this.validateBoundedInteger(dto.orderQuantity, "orderQuantity", 1, MAX_ORDER_QUANTITY);
+    }
+    if (dto.scaleLength !== undefined) {
+      fields.scaleLength = this.validatePositiveNumber(dto.scaleLength, "scaleLength", MAX_SCALE_LENGTH);
+    }
+    return fields;
+  }
+
+  // Shared by upsertPatternPiece (PATCH, one piece via URL patternId) and
+  // validateInitialPatterns (POST /projects, N pieces via array) — same
+  // validation rules, same partial-update semantics (only fields actually
+  // present are included), so neither caller can drift from the other.
+  private validatePatternPieceFields(dto: {
+    name: unknown;
+    sequence?: unknown;
+    cutQuantity?: unknown;
+    cutOnFold?: unknown;
+    required?: unknown;
+    custom?: unknown;
+  }): ValidatedPatternPieceFields {
+    const name = this.validateName(dto.name, "name");
+    const sequence =
+      dto.sequence !== undefined ? this.validateBoundedInteger(dto.sequence, "sequence", 0, MAX_SEQUENCE) : undefined;
+    const cutQuantity =
+      dto.cutQuantity !== undefined
+        ? this.validateBoundedInteger(dto.cutQuantity, "cutQuantity", 1, MAX_CUT_QUANTITY)
+        : undefined;
+
+    return {
+      name,
+      ...(sequence !== undefined ? { sequence } : {}),
+      ...(cutQuantity !== undefined ? { cutQuantity } : {}),
+      ...(dto.cutOnFold !== undefined ? { cutOnFold: dto.cutOnFold as boolean } : {}),
+      ...(dto.required !== undefined ? { required: dto.required as boolean } : {}),
+      ...(dto.custom !== undefined ? { custom: dto.custom as boolean } : {}),
+    };
+  }
+
+  // CreateProjectDto.patterns — the standard/initial pattern-piece set
+  // (lib/optifabric/projectMaster.ts's createEngineeringProject), validated
+  // with the exact same rules as a PATCH .../patterns/:patternId body (see
+  // validatePatternPieceFields) plus patternId itself and array-level
+  // bounds. Returns [] for an absent/omitted array — patterns remain
+  // optional, matching CreateProjectDto.
+  private validateInitialPatterns(
+    patterns: InitialPatternPieceDto[] | undefined,
+  ): Array<ValidatedPatternPieceFields & { patternId: string }> {
+    if (patterns === undefined || patterns === null) return [];
+    if (!Array.isArray(patterns)) {
+      throw new BadRequestException("patterns must be an array.");
+    }
+    if (patterns.length > MAX_INITIAL_PATTERNS) {
+      throw new BadRequestException(`patterns must not exceed ${MAX_INITIAL_PATTERNS} items.`);
+    }
+
+    const seenPatternIds = new Set<string>();
+
+    return patterns.map((item, index) => {
+      if (!item || typeof item !== "object") {
+        throw new BadRequestException(`patterns[${index}] must be an object.`);
+      }
+
+      const patternId = this.validateName(item.patternId, `patterns[${index}].patternId`);
+      if (seenPatternIds.has(patternId)) {
+        throw new BadRequestException(`patterns[${index}].patternId "${patternId}" is duplicated.`);
+      }
+      seenPatternIds.add(patternId);
+
+      return { patternId, ...this.validatePatternPieceFields(item) };
+    });
   }
 
   // Returns the point count of a polygon in either of the frontend's two
@@ -87,8 +244,14 @@ export class ProjectsService {
   }
 
   async getProject(user: AuthenticatedUser, projectId: string) {
+    // Includes patternPieces (Stage 2A) so a client with no local cache at
+    // all (a fresh browser/device) can rebuild a working project object
+    // from this single response — see lib/optifabric/projectApi.ts's
+    // mapServerProjectToCachedProject. Geometry is never included: it stays
+    // local-only until a later stage.
     const project = await this.prisma.project.findFirst({
       where: { id: projectId, factoryId: user.factoryId },
+      include: { patternPieces: { orderBy: { sequence: "asc" } } },
     });
     if (!project) {
       throw new NotFoundException(`No project found with id "${projectId}".`);
@@ -98,6 +261,8 @@ export class ProjectsService {
 
   async createProject(user: AuthenticatedUser, dto: CreateProjectDto) {
     const name = this.validateName(dto.name, "name");
+    const coreFields = this.validateCoreFieldsForCreate(dto);
+    const initialPatterns = this.validateInitialPatterns(dto.patterns);
 
     return this.prisma.$transaction(async (tx) => {
       const code = await this.generateProjectCode(tx);
@@ -107,8 +272,34 @@ export class ProjectsService {
           createdByUserId: user.userId,
           code,
           name,
+          ...coreFields,
         },
       });
+
+      // Individual creates (not createMany) so each row is returned for the
+      // response — see the mapper in lib/optifabric/projectApi.ts, which
+      // needs them to rebuild a project's patterns[] on a fresh device. The
+      // @@unique([projectId, patternId]) constraint means a duplicate
+      // patternId here (already rejected above, but defense-in-depth) would
+      // throw and roll back the whole transaction — Project included — so
+      // initial pattern pieces can never be created partially.
+      const patternPieces = [];
+      for (const piece of initialPatterns) {
+        const created = await tx.patternPiece.create({
+          data: {
+            id: `${project.id}-${piece.patternId}`,
+            projectId: project.id,
+            patternId: piece.patternId,
+            name: piece.name,
+            sequence: piece.sequence ?? 0,
+            cutQuantity: piece.cutQuantity ?? 1,
+            cutOnFold: piece.cutOnFold ?? false,
+            required: piece.required ?? false,
+            custom: piece.custom ?? false,
+          },
+        });
+        patternPieces.push(created);
+      }
 
       await tx.auditEvent.create({
         data: {
@@ -117,16 +308,17 @@ export class ProjectsService {
           entityId: project.id,
           actionType: "PROJECT_CREATED",
           performedBy: user.userId,
-          detailsJson: { code: project.code, name: project.name },
+          detailsJson: { code: project.code, name: project.name, initialPatternCount: patternPieces.length },
         },
       });
 
-      return project;
+      return { ...project, patternPieces };
     });
   }
 
   async updateProject(user: AuthenticatedUser, projectId: string, dto: UpdateProjectDto) {
     const name = dto.name !== undefined ? this.validateName(dto.name, "name") : undefined;
+    const coreFields = this.validateCoreFieldsForUpdate(dto);
 
     // Optional optimistic-concurrency token (see UpdateProjectDto). Parsed
     // up front, outside the transaction, same as the other validation —
@@ -157,7 +349,7 @@ export class ProjectsService {
         throw new BadRequestException("Cannot update an archived project. Restore it first.");
       }
 
-      const data = name !== undefined ? { name } : {};
+      const data = { ...(name !== undefined ? { name } : {}), ...coreFields };
       let updated;
 
       if (expectedUpdatedAt) {
@@ -278,13 +470,7 @@ export class ProjectsService {
     patternId: string,
     dto: UpdatePatternPieceDto,
   ) {
-    const name = this.validateName(dto.name, "name");
-    const sequence =
-      dto.sequence !== undefined ? this.validateBoundedInteger(dto.sequence, "sequence", 0, MAX_SEQUENCE) : undefined;
-    const cutQuantity =
-      dto.cutQuantity !== undefined
-        ? this.validateBoundedInteger(dto.cutQuantity, "cutQuantity", 1, MAX_CUT_QUANTITY)
-        : undefined;
+    const fields = this.validatePatternPieceFields(dto);
 
     return this.prisma.$transaction(async (tx) => {
       const project = await tx.project.findFirst({ where: { id: projectId, factoryId: user.factoryId } });
@@ -296,14 +482,6 @@ export class ProjectsService {
       }
 
       const id = `${projectId}-${patternId}`;
-      const updateData: Prisma.PatternPieceUpdateInput = {
-        name,
-        ...(sequence !== undefined ? { sequence } : {}),
-        ...(cutQuantity !== undefined ? { cutQuantity } : {}),
-        ...(dto.cutOnFold !== undefined ? { cutOnFold: dto.cutOnFold } : {}),
-        ...(dto.required !== undefined ? { required: dto.required } : {}),
-        ...(dto.custom !== undefined ? { custom: dto.custom } : {}),
-      };
 
       const piece = await tx.patternPiece.upsert({
         where: { id },
@@ -311,14 +489,14 @@ export class ProjectsService {
           id,
           projectId,
           patternId,
-          name,
-          sequence: sequence ?? 0,
-          cutQuantity: cutQuantity ?? 1,
-          cutOnFold: dto.cutOnFold ?? false,
-          required: dto.required ?? false,
-          custom: dto.custom ?? false,
+          name: fields.name,
+          sequence: fields.sequence ?? 0,
+          cutQuantity: fields.cutQuantity ?? 1,
+          cutOnFold: fields.cutOnFold ?? false,
+          required: fields.required ?? false,
+          custom: fields.custom ?? false,
         },
-        update: updateData,
+        update: fields as Prisma.PatternPieceUpdateInput,
       });
 
       await tx.auditEvent.create({

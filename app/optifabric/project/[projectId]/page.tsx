@@ -8,6 +8,12 @@ import {
   EngineeringProject,
   getGarmentDisplayName,
 } from "@/lib/optifabric/projectMaster";
+import {
+  extractStatusCode,
+  getProject as getServerProject,
+  mapServerProjectToCachedProject,
+  type CachedProject,
+} from "@/lib/optifabric/projectApi";
 
 type WorkflowStatus = "waiting" | "in-progress" | "completed";
 
@@ -78,44 +84,151 @@ export default function EngineeringCommandCentrePage() {
   const params = useParams<{ projectId: string }>();
   const projectId = params.projectId;
 
-  const [project, setProject] = useState<EngineeringProject | null>(null);
+  const [project, setProject] = useState<CachedProject | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
+  const [refreshWarning, setRefreshWarning] = useState("");
 
   useEffect(() => {
     if (!projectId) {
       return;
     }
 
-    try {
-      const storedProject = localStorage.getItem(
-        `optifabric-project-${projectId}`
-      );
+    let cancelled = false;
 
-      if (!storedProject) {
+    async function load() {
+      let parsedProject: CachedProject;
+
+      try {
+        const storedProject = localStorage.getItem(
+          `optifabric-project-${projectId}`
+        );
+
+        if (!storedProject) {
+          // No local cache — either a legacy local-only project this
+          // browser never had (nothing the server can help with), or a
+          // server-backed project being opened for the first time on this
+          // device/browser. Ask the server before concluding "not found":
+          // only its patterns/core fields are reconstructed here (never
+          // geometry/marker state, which stays local-only regardless).
+          try {
+            const serverProject = await getServerProject(projectId);
+            if (cancelled) return;
+
+            const cachedProject =
+              mapServerProjectToCachedProject(serverProject);
+
+            localStorage.setItem(
+              `optifabric-project-${projectId}`,
+              JSON.stringify(cachedProject)
+            );
+
+            setProject(cachedProject);
+            setLoadError("");
+          } catch (fetchError) {
+            if (cancelled) return;
+
+            const status = extractStatusCode(fetchError);
+
+            if (status === 404) {
+              setLoadError(
+                "This engineering project could not be found in this browser."
+              );
+            } else {
+              console.error(
+                "Unable to load OptiFabric project from the server:",
+                fetchError
+              );
+
+              setLoadError(
+                "This project is not saved in this browser, and the server could not be reached to load it. Please check your connection and try again."
+              );
+            }
+          } finally {
+            if (!cancelled) setLoading(false);
+          }
+
+          return;
+        }
+
+        parsedProject = JSON.parse(storedProject) as CachedProject;
+
+        setProject(parsedProject);
+        setLoadError("");
+      } catch (error) {
+        console.error("Unable to load OptiFabric project:", error);
+
         setLoadError(
-          "This engineering project could not be found in this browser."
+          "The engineering project could not be opened because its saved data is invalid."
         );
         setLoading(false);
         return;
       }
 
-      const parsedProject = JSON.parse(
-        storedProject
-      ) as EngineeringProject;
-
-      setProject(parsedProject);
-      
-      setLoadError("");
-    } catch (error) {
-      console.error("Unable to load OptiFabric project:", error);
-
-      setLoadError(
-        "The engineering project could not be opened because its saved data is invalid."
-      );
-    } finally {
       setLoading(false);
+
+      // Server-backed project (tagged by the create flow) — refresh the
+      // core/identity fields from the server, but never touch patterns/
+      // geometry, which stay local-only until a later stage migrates them.
+      if (parsedProject._server) {
+        try {
+          const serverProject = await getServerProject(projectId);
+          if (cancelled) return;
+
+          const refreshed: CachedProject = {
+            ...parsedProject,
+            projectName: serverProject.name,
+            customer: serverProject.customer,
+            styleNumber: serverProject.styleNumber,
+            garmentCategory:
+              serverProject.garmentCategory as EngineeringProject["garmentCategory"],
+            garmentMainCategory:
+              (serverProject.mainCategory as
+                | EngineeringProject["garmentMainCategory"]
+                | null) ?? undefined,
+            garmentSubcategory:
+              (serverProject.subcategory as
+                | EngineeringProject["garmentSubcategory"]
+                | null) ?? undefined,
+            fabricWidth: serverProject.fabricWidth,
+            orderQuantity: serverProject.orderQuantity,
+            scaleLength: serverProject.scaleLength,
+            _server: {
+              code: serverProject.code,
+              updatedAt: serverProject.updatedAt,
+              archivedAt: serverProject.archivedAt,
+            },
+          };
+
+          localStorage.setItem(
+            `optifabric-project-${projectId}`,
+            JSON.stringify(refreshed)
+          );
+
+          setProject(refreshed);
+          setRefreshWarning("");
+        } catch (refreshError) {
+          if (cancelled) return;
+
+          console.error(
+            "Unable to refresh OptiFabric project from the server:",
+            refreshError
+          );
+
+          setRefreshWarning(
+            extractStatusCode(refreshError) === 404
+              ? "This project could not be found on the server. Showing the last saved local copy."
+              : "Could not reach the server to refresh this project. Showing the last saved local copy."
+          );
+        }
+      }
     }
+
+    void load();
+
+    return () => {
+      cancelled = true;
+    };
   }, [projectId]);
 
   const projectMetrics = useMemo(() => {
@@ -402,6 +515,12 @@ export default function EngineeringCommandCentrePage() {
             </div>
           </div>
         </header>
+
+        {refreshWarning ? (
+          <section className="mt-6 rounded-2xl border border-amber-400/40 bg-amber-950/20 px-5 py-4 text-sm font-semibold text-amber-200">
+            {refreshWarning}
+          </section>
+        ) : null}
 
         <section className="mt-8">
           <div className="mb-4">

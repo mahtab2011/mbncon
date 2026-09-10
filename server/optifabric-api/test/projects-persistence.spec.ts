@@ -17,7 +17,7 @@ function buildPrismaMock() {
     updateMany: jest.fn(),
     findUniqueOrThrow: jest.fn(),
   };
-  const patternPiece = { upsert: jest.fn() };
+  const patternPiece = { upsert: jest.fn(), create: jest.fn() };
   const patternGeometry = { upsert: jest.fn() };
   const markerRun = { create: jest.fn(), findMany: jest.fn() };
   const auditEvent = { create: jest.fn().mockResolvedValue({}) };
@@ -43,6 +43,19 @@ function buildPrismaMock() {
 
 const userA: AuthenticatedUser = { userId: "user-a", factoryId: "factory-a", role: "ROLE_OPERATIVE", jti: "jti-a" };
 
+// Stage 1B core fields — valid values shared by every createProject() test
+// that doesn't specifically exercise one of these fields.
+const VALID_CORE_FIELDS = {
+  customer: "Acme Apparel",
+  styleNumber: "EDS-001",
+  garmentCategory: "shirt",
+  mainCategory: "woven",
+  subcategory: "tops",
+  fabricWidth: 60,
+  orderQuantity: 1200,
+  scaleLength: 12,
+};
+
 describe("ProjectsService.createProject", () => {
   it("creates a project scoped to the authenticated factory with a server-generated code", async () => {
     const { prisma, tx, queryRaw } = buildPrismaMock();
@@ -52,7 +65,7 @@ describe("ProjectsService.createProject", () => {
     );
     const service = new ProjectsService(prisma as never);
 
-    const result = await service.createProject(userA, { name: "Denim Jacket RC1" });
+    const result = await service.createProject(userA, { name: "Denim Jacket RC1", ...VALID_CORE_FIELDS });
 
     expect(tx.project.create).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -74,15 +87,197 @@ describe("ProjectsService.createProject", () => {
   it("rejects an empty name", async () => {
     const { prisma } = buildPrismaMock();
     const service = new ProjectsService(prisma as never);
-    await expect(service.createProject(userA, { name: "   " })).rejects.toBeInstanceOf(BadRequestException);
+    await expect(
+      service.createProject(userA, { name: "   ", ...VALID_CORE_FIELDS }),
+    ).rejects.toBeInstanceOf(BadRequestException);
   });
 
   it("rejects a name longer than MAX_NAME_LENGTH", async () => {
     const { prisma } = buildPrismaMock();
     const service = new ProjectsService(prisma as never);
     await expect(
-      service.createProject(userA, { name: "x".repeat(MAX_NAME_LENGTH + 1) }),
+      service.createProject(userA, { name: "x".repeat(MAX_NAME_LENGTH + 1), ...VALID_CORE_FIELDS }),
     ).rejects.toBeInstanceOf(BadRequestException);
+  });
+
+  it.each([
+    ["customer", { customer: "" }],
+    ["styleNumber", { styleNumber: "" }],
+    ["garmentCategory", { garmentCategory: "" }],
+  ])("rejects an empty required core field: %s", async (_label, override) => {
+    const { prisma } = buildPrismaMock();
+    const service = new ProjectsService(prisma as never);
+    await expect(
+      service.createProject(userA, { name: "Valid Name", ...VALID_CORE_FIELDS, ...override }),
+    ).rejects.toBeInstanceOf(BadRequestException);
+  });
+
+  it.each([
+    ["negative fabricWidth", { fabricWidth: -1 }],
+    ["zero fabricWidth", { fabricWidth: 0 }],
+    ["fabricWidth over MAX_FABRIC_WIDTH", { fabricWidth: 1_000_001 }],
+    ["fractional orderQuantity", { orderQuantity: 12.5 }],
+    ["negative orderQuantity", { orderQuantity: -5 }],
+    ["orderQuantity over MAX_ORDER_QUANTITY", { orderQuantity: 10_000_000_001 }],
+    ["zero scaleLength", { scaleLength: 0 }],
+    ["scaleLength over MAX_SCALE_LENGTH", { scaleLength: 1_000_001 }],
+  ])("rejects an invalid numeric core field: %s", async (_label, override) => {
+    const { prisma } = buildPrismaMock();
+    const service = new ProjectsService(prisma as never);
+    await expect(
+      service.createProject(userA, { name: "Valid Name", ...VALID_CORE_FIELDS, ...override }),
+    ).rejects.toBeInstanceOf(BadRequestException);
+  });
+
+  it("accepts omitted mainCategory/subcategory (optional, mirroring EngineeringProject)", async () => {
+    const { prisma, tx, queryRaw } = buildPrismaMock();
+    queryRaw.mockResolvedValue([{ nextval: 1n }]);
+    tx.project.create.mockImplementation(({ data }: { data: Record<string, unknown> }) =>
+      Promise.resolve({ id: "project-1", ...data }),
+    );
+    const service = new ProjectsService(prisma as never);
+
+    const { mainCategory, subcategory, ...rest } = VALID_CORE_FIELDS;
+    void mainCategory;
+    void subcategory;
+
+    await expect(service.createProject(userA, { name: "Valid Name", ...rest })).resolves.toBeDefined();
+    expect(tx.project.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ mainCategory: undefined, subcategory: undefined }),
+      }),
+    );
+  });
+
+  // Stage 1B+2A correction: initial pattern pieces must be persisted
+  // atomically with the project, not require N follow-up calls.
+  it("persists initial pattern pieces atomically with the project", async () => {
+    const { prisma, tx, queryRaw } = buildPrismaMock();
+    queryRaw.mockResolvedValue([{ nextval: 1n }]);
+    tx.project.create.mockImplementation(({ data }: { data: Record<string, unknown> }) =>
+      Promise.resolve({ id: "project-1", ...data }),
+    );
+    tx.patternPiece.create.mockImplementation(({ data }: { data: Record<string, unknown> }) =>
+      Promise.resolve({ ...data }),
+    );
+    const service = new ProjectsService(prisma as never);
+
+    const result = await service.createProject(userA, {
+      name: "Denim Jacket",
+      ...VALID_CORE_FIELDS,
+      patterns: [
+        { patternId: "front-body", name: "Front Body", sequence: 0, cutQuantity: 2, required: true },
+        { patternId: "back-body", name: "Back Body", sequence: 1 },
+      ],
+    });
+
+    expect(tx.patternPiece.create).toHaveBeenCalledTimes(2);
+    expect(tx.patternPiece.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          id: "project-1-front-body",
+          projectId: "project-1",
+          patternId: "front-body",
+          name: "Front Body",
+          cutQuantity: 2,
+          required: true,
+        }),
+      }),
+    );
+    expect(result.patternPieces).toHaveLength(2);
+    expect(tx.auditEvent.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ detailsJson: expect.objectContaining({ initialPatternCount: 2 }) }),
+      }),
+    );
+  });
+
+  it("rejects a duplicate patternId within the initial patterns array", async () => {
+    const { prisma } = buildPrismaMock();
+    const service = new ProjectsService(prisma as never);
+
+    await expect(
+      service.createProject(userA, {
+        name: "Denim Jacket",
+        ...VALID_CORE_FIELDS,
+        patterns: [
+          { patternId: "front-body", name: "Front Body" },
+          { patternId: "front-body", name: "Front Body Again" },
+        ],
+      }),
+    ).rejects.toBeInstanceOf(BadRequestException);
+  });
+
+  it("rejects more than MAX_INITIAL_PATTERNS initial pattern pieces", async () => {
+    const { prisma } = buildPrismaMock();
+    const service = new ProjectsService(prisma as never);
+
+    const patterns = Array.from({ length: 501 }, (_, i) => ({ patternId: `piece-${i}`, name: `Piece ${i}` }));
+
+    await expect(
+      service.createProject(userA, { name: "Denim Jacket", ...VALID_CORE_FIELDS, patterns }),
+    ).rejects.toBeInstanceOf(BadRequestException);
+  });
+
+  // Simulates a failure partway through persisting the initial pattern set
+  // (e.g. a DB-level constraint violation on the second piece). Since the
+  // whole loop runs inside the same Prisma $transaction as the Project
+  // insert, a thrown error here must reject createProject's own promise
+  // (proving the code never treats a partial pattern-piece write as
+  // success) — real all-or-nothing rollback of the Project row itself is a
+  // property of the underlying Postgres transaction (unchanged from Stage
+  // 1's design), which a mocked-Prisma unit test cannot independently
+  // exercise.
+  it("does not report success if pattern-piece creation fails partway through", async () => {
+    const { prisma, tx, queryRaw } = buildPrismaMock();
+    queryRaw.mockResolvedValue([{ nextval: 1n }]);
+    tx.project.create.mockImplementation(({ data }: { data: Record<string, unknown> }) =>
+      Promise.resolve({ id: "project-1", ...data }),
+    );
+    tx.patternPiece.create
+      .mockResolvedValueOnce({ id: "project-1-front-body" })
+      .mockRejectedValueOnce(new Error("simulated unique constraint violation"));
+    const service = new ProjectsService(prisma as never);
+
+    await expect(
+      service.createProject(userA, {
+        name: "Denim Jacket",
+        ...VALID_CORE_FIELDS,
+        patterns: [
+          { patternId: "front-body", name: "Front Body" },
+          { patternId: "back-body", name: "Back Body" },
+        ],
+      }),
+    ).rejects.toThrow("simulated unique constraint violation");
+
+    // The loop never reaches a third piece, and no audit event is written
+    // for a run that didn't complete.
+    expect(tx.patternPiece.create).toHaveBeenCalledTimes(2);
+    expect(tx.auditEvent.create).not.toHaveBeenCalled();
+  });
+});
+
+describe("ProjectsService.getProject", () => {
+  it("returns a project's persisted pattern pieces", async () => {
+    const { prisma } = buildPrismaMock();
+    prisma.project.findFirst.mockResolvedValue({
+      id: "project-1",
+      factoryId: "factory-a",
+      patternPieces: [{ id: "project-1-front-body", patternId: "front-body", name: "Front Body" }],
+    });
+    const service = new ProjectsService(prisma as never);
+
+    const result = await service.getProject(userA, "project-1");
+
+    expect(prisma.project.findFirst).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: "project-1", factoryId: "factory-a" },
+        include: { patternPieces: { orderBy: { sequence: "asc" } } },
+      }),
+    );
+    expect(result.patternPieces).toEqual([
+      { id: "project-1-front-body", patternId: "front-body", name: "Front Body" },
+    ]);
   });
 });
 
@@ -601,7 +796,7 @@ describe("ProjectsService project-code generation", () => {
     );
     const service = new ProjectsService(prisma as never);
 
-    const result = await service.createProject(userA, { name: "Project 42" });
+    const result = await service.createProject(userA, { name: "Project 42", ...VALID_CORE_FIELDS });
 
     expect(result.code).toBe(`OF-${new Date().getFullYear()}-000042`);
   });
@@ -619,9 +814,9 @@ describe("ProjectsService project-code generation", () => {
     const service = new ProjectsService(prisma as never);
 
     const [a, b, c] = await Promise.all([
-      service.createProject(userA, { name: "A" }),
-      service.createProject(userA, { name: "B" }),
-      service.createProject(userA, { name: "C" }),
+      service.createProject(userA, { name: "A", ...VALID_CORE_FIELDS }),
+      service.createProject(userA, { name: "B", ...VALID_CORE_FIELDS }),
+      service.createProject(userA, { name: "C", ...VALID_CORE_FIELDS }),
     ]);
 
     expect(new Set([a.code, b.code, c.code]).size).toBe(3);

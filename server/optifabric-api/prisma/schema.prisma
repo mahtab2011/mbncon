@@ -148,6 +148,20 @@ model Project {
   // record of it and will never do this automatically.
   code       String    @unique
   name       String
+  // Stage 1B: core fields required for the frontend's EngineeringProject
+  // (lib/optifabric/projectMaster.ts) to round-trip through this backend.
+  // mainCategory/subcategory are nullable, mirroring EngineeringProject's
+  // own garmentMainCategory?/garmentSubcategory? — optional there so older
+  // locally-stored projects (predating the category hierarchy) stay valid;
+  // preserved as optional here for the same reason.
+  customer        String
+  styleNumber     String
+  garmentCategory String
+  mainCategory    String?
+  subcategory     String?
+  fabricWidth     Float
+  orderQuantity   Int
+  scaleLength     Float
   // Soft delete / archive marker. Null = active. Set by DELETE /projects/:id,
   // cleared by POST /projects/:id/restore.
   archivedAt DateTime?

@@ -17,6 +17,11 @@ import {
   getGarmentsBySubcategory,
   getGarmentSubcategories,
 } from "@/lib/optifabric/projectMaster";
+import {
+  createProject as createServerProject,
+  mapPatternsToInitialPatterns,
+  type CachedProject,
+} from "@/lib/optifabric/projectApi";
 
 function formatHierarchyLabel(value: string): string {
   return value
@@ -53,6 +58,7 @@ export default function NewEngineeringProjectPage() {
   const [orderQuantity, setOrderQuantity] = useState("1200");
   const [scaleLength, setScaleLength] = useState("12");
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const availableSubcategories = useMemo(() => {
     return getGarmentSubcategories(mainCategory);
@@ -132,7 +138,7 @@ export default function NewEngineeringProjectPage() {
     setError("");
   }
 
-  function handleSubmit(
+  async function handleSubmit(
     event: FormEvent<HTMLFormElement>
   ) {
     event.preventDefault();
@@ -196,7 +202,10 @@ export default function NewEngineeringProjectPage() {
       return;
     }
 
-    const project = createEngineeringProject(
+    // Built locally first (pure, synchronous — unchanged logic) so its
+    // standard pattern set can be sent to the server in the same request
+    // that creates the project, rather than needing N follow-up calls.
+    const localProject = createEngineeringProject(
       projectName.trim(),
       customer.trim(),
       styleNumber.trim(),
@@ -206,18 +215,70 @@ export default function NewEngineeringProjectPage() {
       scale
     );
 
+    // Server-first: POST the complete basic project (plus its initial
+    // pattern set) before anything is written locally. The server's
+    // id/code/createdAt/updatedAt/archivedAt are authoritative — if this
+    // fails (network, validation, offline, auth), nothing is saved
+    // anywhere and the user is told plainly, rather than silently falling
+    // back to a local-only "saved" project.
+    setSubmitting(true);
+
+    let serverProject;
+
+    try {
+      serverProject = await createServerProject({
+        name: projectName.trim(),
+        customer: customer.trim(),
+        styleNumber: styleNumber.trim(),
+        garmentCategory,
+        mainCategory,
+        subcategory,
+        fabricWidth: width,
+        orderQuantity: quantity,
+        scaleLength: scale,
+        patterns: mapPatternsToInitialPatterns(localProject.patterns),
+      });
+    } catch (submitError) {
+      console.error(
+        "Unable to create OptiFabric project on the server:",
+        submitError
+      );
+
+      setError(
+        "The project could not be saved. Please check your connection and try again — nothing was saved."
+      );
+
+      setSubmitting(false);
+      return;
+    }
+
+    // The local working copy keeps its existing shape (patterns, hierarchy
+    // lookups, etc. — createEngineeringProject's own logic, unchanged) but
+    // adopts the server's authoritative id/createdAt, tagged with the
+    // server metadata so later pages know this project is server-backed.
+    const cachedProject: CachedProject = {
+      ...localProject,
+      id: serverProject.id,
+      createdAt: serverProject.createdAt,
+      _server: {
+        code: serverProject.code,
+        updatedAt: serverProject.updatedAt,
+        archivedAt: serverProject.archivedAt,
+      },
+    };
+
     localStorage.setItem(
-      `optifabric-project-${project.id}`,
-      JSON.stringify(project)
+      `optifabric-project-${serverProject.id}`,
+      JSON.stringify(cachedProject)
     );
 
     localStorage.setItem(
       "optifabric-active-project-id",
-      project.id
+      serverProject.id
     );
 
     router.push(
-      `/optifabric/project/${project.id}`
+      `/optifabric/project/${serverProject.id}`
     );
   }
 
@@ -530,11 +591,14 @@ export default function NewEngineeringProjectPage() {
 
           <button
             type="submit"
-            className="mt-8 w-full rounded-2xl bg-cyan-400 px-6 py-4 text-lg font-black text-slate-950 transition hover:bg-cyan-300"
+            disabled={submitting}
+            className="mt-8 w-full rounded-2xl bg-cyan-400 px-6 py-4 text-lg font-black text-slate-950 transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            Create {getGarmentDisplayName(
-              garmentCategory
-            )} Engineering Project
+            {submitting
+              ? "Saving Project..."
+              : `Create ${getGarmentDisplayName(
+                  garmentCategory
+                )} Engineering Project`}
           </button>
         </form>
       </div>

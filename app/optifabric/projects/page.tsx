@@ -19,6 +19,10 @@ import {
   type ProjectRegistryEntry,
   type ProjectRegistryStatus,
 } from "@/lib/optifabric/projectRegistry";
+import {
+  listProjects,
+  type ServerProject,
+} from "@/lib/optifabric/projectApi";
 
 type RegistryView = "active" | "archived" | "all";
 
@@ -164,6 +168,16 @@ export default function EngineeringProjectCentrePage() {
   const [registryView, setRegistryView] =
     useState<RegistryView>("active");
 
+  // Server-backed projects (Stage 2A) — kept entirely separate from the
+  // local registry above. A failure here never blocks the local list: this
+  // page must still show legacy local-only projects even if the server is
+  // unreachable (see loadServerProjects below).
+  const [serverProjects, setServerProjects] = useState<
+    ServerProject[]
+  >([]);
+  const [serverLoading, setServerLoading] = useState(true);
+  const [serverError, setServerError] = useState("");
+
   function refreshRegistry() {
     setRegistry(getProjectRegistry());
   }
@@ -197,6 +211,49 @@ export default function EngineeringProjectCentrePage() {
       setLoading(false);
     }
   }, []);
+
+  async function loadServerProjects() {
+    setServerLoading(true);
+    setServerError("");
+
+    try {
+      const [active, archived] = await Promise.all([
+        listProjects({ archived: false }),
+        listProjects({ archived: true }),
+      ]);
+
+      setServerProjects([...active, ...archived]);
+    } catch (error) {
+      console.error(
+        "Unable to load server-backed OptiFabric projects:",
+        error
+      );
+
+      setServerProjects([]);
+      setServerError(
+        "Server-backed projects could not be loaded. Showing local-only projects saved in this browser."
+      );
+    } finally {
+      setServerLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    void loadServerProjects();
+  }, []);
+
+  const visibleServerProjects = useMemo(() => {
+    if (registryView === "all") {
+      return serverProjects;
+    }
+
+    const wantArchived = registryView === "archived";
+
+    return serverProjects.filter(
+      (project) =>
+        Boolean(project.archivedAt) === wantArchived
+    );
+  }, [serverProjects, registryView]);
 
   const statistics = useMemo(() => {
     return getProjectRegistryStatistics();
@@ -310,6 +367,10 @@ export default function EngineeringProjectCentrePage() {
     router.push(
       `/optifabric/project/${entry.projectId}`
     );
+  }
+
+  function openServerProject(project: ServerProject) {
+    router.push(`/optifabric/project/${project.id}`);
   }
 
   function handleArchiveProject(
@@ -449,6 +510,65 @@ export default function EngineeringProjectCentrePage() {
             </button>
           </section>
         ) : null}
+
+        {serverError ? (
+          <section className="mt-6 flex flex-col gap-4 rounded-2xl border border-amber-400/30 bg-amber-950/20 px-5 py-4 font-bold text-amber-200 sm:flex-row sm:items-center sm:justify-between">
+            <p>{serverError}</p>
+
+            <button
+              type="button"
+              onClick={() => void loadServerProjects()}
+              className="self-start rounded-lg border border-amber-400/30 px-3 py-1 text-sm font-black transition hover:bg-amber-900/40 sm:self-auto"
+            >
+              Retry
+            </button>
+          </section>
+        ) : null}
+
+        <section className="mt-8">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.25em] text-cyan-300">
+              Server-backed database
+            </p>
+
+            <h2 className="mt-2 text-3xl font-black">
+              Server Projects
+            </h2>
+
+            <p className="mt-3 max-w-4xl leading-7 text-slate-400">
+              Projects saved to the OptiFabric server for this factory.
+              These are authoritative — visible from any browser or device
+              signed in to this account.
+            </p>
+          </div>
+
+          {serverLoading ? (
+            <div className="mt-7 rounded-3xl border border-slate-700 bg-slate-900 px-6 py-10 text-center">
+              <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-slate-700 border-t-cyan-400" />
+              <p className="mt-4 font-bold text-slate-300">
+                Loading server projects...
+              </p>
+            </div>
+          ) : visibleServerProjects.length === 0 ? (
+            <div className="mt-7 rounded-3xl border border-dashed border-slate-600 bg-slate-900 px-6 py-10 text-center">
+              <p className="text-slate-400">
+                {serverError
+                  ? "Server projects are unavailable right now."
+                  : "No server-backed projects yet for this view. Create a new project to save it to the server."}
+              </p>
+            </div>
+          ) : (
+            <div className="mt-7 grid gap-6 xl:grid-cols-2">
+              {visibleServerProjects.map((project) => (
+                <ServerProjectCard
+                  key={project.id}
+                  project={project}
+                  onOpen={() => openServerProject(project)}
+                />
+              ))}
+            </div>
+          )}
+        </section>
 
         <section className="mt-8">
           <div>
@@ -711,8 +831,13 @@ export default function EngineeringProjectCentrePage() {
               </p>
 
               <h2 className="mt-2 text-3xl font-black">
-                Saved Projects
+                Local-Only Projects
               </h2>
+
+              <p className="mt-3 max-w-4xl leading-7 text-slate-400">
+                Saved only in this browser — not yet uploaded to the
+                OptiFabric server. These are never uploaded automatically.
+              </p>
             </div>
 
             <div className="inline-flex flex-wrap rounded-2xl border border-slate-700 bg-slate-900 p-1">
@@ -895,6 +1020,92 @@ function ViewButton({
     >
       {label}
     </button>
+  );
+}
+
+function ServerProjectCard({
+  project,
+  onOpen,
+}: {
+  project: ServerProject;
+  onOpen: () => void;
+}) {
+  return (
+    <article className="overflow-hidden rounded-3xl border border-emerald-500/30 bg-slate-900 shadow-xl shadow-slate-950/30">
+      <div className="p-6 sm:p-7">
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-300">
+              {project.code}
+            </p>
+
+            <h3 className="mt-2 text-2xl font-black">
+              {project.name}
+            </h3>
+
+            <p className="mt-2 font-bold text-slate-400">
+              {project.customer}
+            </p>
+          </div>
+
+          <span className="self-start rounded-full border border-emerald-400/40 bg-emerald-500/10 px-3 py-1 text-xs font-black uppercase tracking-wider text-emerald-300">
+            Server-Backed
+          </span>
+        </div>
+
+        <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <ProjectDetail
+            label="Style Number"
+            value={project.styleNumber}
+          />
+
+          <ProjectDetail
+            label="Garment"
+            value={project.garmentCategory}
+          />
+
+          <ProjectDetail
+            label="Order Quantity"
+            value={`${project.orderQuantity.toLocaleString("en-GB")} pieces`}
+          />
+
+          <ProjectDetail
+            label="Created"
+            value={formatDate(project.createdAt)}
+          />
+
+          <ProjectDetail
+            label="Last Updated"
+            value={formatDate(project.updatedAt)}
+          />
+
+          <ProjectDetail
+            label="Status"
+            value={project.archivedAt ? "Archived" : "Active"}
+          />
+        </div>
+
+        <div className="mt-5 rounded-xl border border-slate-700 bg-slate-950 px-4 py-3">
+          <p className="text-xs font-black uppercase tracking-wider text-slate-500">
+            Server Project ID
+          </p>
+
+          <p className="mt-1 break-all font-mono text-sm text-slate-300">
+            {project.id}
+          </p>
+        </div>
+      </div>
+
+      <div className="border-t border-slate-700 bg-slate-950/60 p-5">
+        <button
+          type="button"
+          onClick={onOpen}
+          className="w-full rounded-xl bg-emerald-500 px-4 py-3 font-black text-slate-950 transition hover:bg-emerald-400"
+        >
+          Continue Project
+        </button>
+      </div>
+    </article>
   );
 }
 
