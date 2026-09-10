@@ -38,10 +38,7 @@ function formatCents(cents: number): string {
 export default function OptiFabricSubscriptionPage() {
   const [status, setStatus] = useState<SubscriptionStatus | null>(null);
   const [pricing, setPricing] = useState<Pricing | null>(null);
-  const [planType, setPlanType] = useState<"MONTHLY" | "ANNUAL">("MONTHLY");
-  const [extraSeats, setExtraSeats] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
 
   useEffect(() => {
     apiFetch<Pricing>("/subscription/pricing").then(setPricing).catch((err) => setError((err as Error).message));
@@ -51,23 +48,6 @@ export default function OptiFabricSubscriptionPage() {
   }, []);
 
   const isFreeRegional = status?.status === "FREE_REGIONAL";
-
-  async function handleActivate(event: React.FormEvent) {
-    event.preventDefault();
-    setError(null);
-    setMessage(null);
-    try {
-      await apiFetch("/subscription/activate", {
-        method: "POST",
-        body: JSON.stringify({ planType, extraSeats }),
-      });
-      setMessage("Subscription activated.");
-      const refreshed = await apiFetch<SubscriptionStatus>("/subscription/status");
-      setStatus(refreshed);
-    } catch (err) {
-      setError((err as Error).message);
-    }
-  }
 
   return (
     <main className="min-h-screen bg-slate-950 text-white">
@@ -82,19 +62,13 @@ export default function OptiFabricSubscriptionPage() {
         {error && (
           <p className="mb-4 rounded-xl border border-red-500/40 bg-red-950/30 p-4 text-red-300">{error}</p>
         )}
-        {message && (
-          <p className="mb-4 rounded-xl border border-emerald-500/40 bg-emerald-950/30 p-4 text-emerald-300">
-            {message}
-          </p>
-        )}
-
         {status && (
           <p className="mb-4 leading-7 text-slate-300">
             Current status: <strong className="text-white">{status.status}</strong>
             {status.daysUntilExpiry !== null && ` — ${status.daysUntilExpiry} day(s) remaining`}
             {!status.isAccessAllowed && (
               <span className="ml-2 text-red-300">
-                — access is currently blocked. Activate a plan below.
+                — access is currently blocked. Contact OptiFabric to activate a plan below.
               </span>
             )}
           </p>
@@ -162,41 +136,16 @@ export default function OptiFabricSubscriptionPage() {
         {!isFreeRegional && (
           <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-6">
             <h3 className="text-xl font-black text-white">Activate a Plan</h3>
-            <p className="mt-2 text-slate-400">
-              Activation is administered directly by MBNCON — contact {pricing?.contact ?? "us"}.
-            </p>
-
-            <form onSubmit={handleActivate} className="mt-5 grid max-w-md gap-4">
-              <label className="grid gap-1.5">
-                <span className="text-sm font-bold text-slate-300">Plan</span>
-                <select
-                  value={planType}
-                  onChange={(e) => setPlanType(e.target.value as typeof planType)}
-                  className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-emerald-400"
-                >
-                  <option value="MONTHLY">Monthly</option>
-                  <option value="ANNUAL">Annual</option>
-                </select>
-              </label>
-
-              <label className="grid gap-1.5">
-                <span className="text-sm font-bold text-slate-300">Extra users</span>
-                <input
-                  type="number"
-                  min={0}
-                  value={extraSeats}
-                  onChange={(e) => setExtraSeats(Number(e.target.value))}
-                  className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-emerald-400"
-                />
-              </label>
-
-              <button
-                type="submit"
-                className="mt-2 rounded-2xl bg-red-600 px-6 py-4 text-center font-black text-white transition hover:bg-red-500"
+            <p className="mt-2 leading-7 text-slate-300">
+              Online activation isn&apos;t available yet. To activate a monthly or annual plan, contact{" "}
+              <a
+                href={`mailto:${pricing?.contact ?? "contact@bangladeshapparel.com"}`}
+                className="font-bold text-emerald-300 underline underline-offset-2 hover:text-emerald-200"
               >
-                Activate
-              </button>
-            </form>
+                {pricing?.contact ?? "contact@bangladeshapparel.com"}
+              </a>{" "}
+              and an OptiFabric representative will activate your subscription after confirming payment.
+            </p>
           </div>
         )}
       </section>

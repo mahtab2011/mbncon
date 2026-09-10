@@ -58,6 +58,15 @@ export class SubscriptionService {
     });
   }
 
+  // SECURITY: kept for now but deliberately unreachable — no controller
+  // route calls this. SubscriptionController.activate() (POST
+  // /subscription/activate) was found to let an authenticated factory user
+  // set their own legacy status to ACTIVE and extraSeats to any value from
+  // client-supplied input, which auth.service.ts's signup approval gate
+  // then read to silently bypass the only payment-enforcement checkpoint
+  // that exists before a real payment gateway is built. Do not wire this
+  // back to an endpoint reachable by an ordinary factory JWT without a real
+  // payment verification step first.
   async activateSubscription(
     factoryId: string,
     planType: "MONTHLY" | "ANNUAL",

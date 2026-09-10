@@ -1,4 +1,13 @@
-import { BadRequestException, Body, Controller, Get, Post, Req, UseGuards } from "@nestjs/common";
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  NotImplementedException,
+  Post,
+  Req,
+  UseGuards,
+} from "@nestjs/common";
 import type { Request } from "express";
 import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { SkipSubscriptionCheck } from "../../common/guards/subscription.guard";
@@ -64,18 +73,22 @@ export class SubscriptionController {
     return this.subscriptionService.getEffectiveState(user.factoryId);
   }
 
+  // SECURITY: deliberately fails closed for every caller. There is no
+  // payment gateway yet, so nothing here may derive a paid subscription or
+  // extraSeats from client-supplied data — see subscription.service.ts's
+  // activateSubscription() doc comment and the incident this patch
+  // addresses. Online activation is not implemented; a factory activates a
+  // paid plan only through the rep-gated POST /subscription/grant-seats
+  // (PlatformRepGuard), after payment is confirmed offline. JwtAuthGuard is
+  // kept so an unauthenticated caller still gets a normal 401 rather than
+  // this message.
   @SkipSubscriptionCheck()
   @UseGuards(JwtAuthGuard)
   @Post("activate")
-  async activate(
-    @Req() request: Request,
-    @Body() body: { planType: "MONTHLY" | "ANNUAL"; extraSeats: number },
-  ) {
-    const user = request.user as AuthenticatedUser;
-    if (!isAtLeastManager(user.role)) {
-      throw new BadRequestException("Activating a subscription requires a manager or executive role.");
-    }
-    return this.subscriptionService.activateSubscription(user.factoryId, body.planType, body.extraSeats ?? 0);
+  activate(): never {
+    throw new NotImplementedException(
+      "Online subscription activation is not available yet. Please contact OptiFabric to activate a paid plan.",
+    );
   }
 
   @SkipSubscriptionCheck()
