@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { RequireOptiFabricAuth } from "@/components/optifabric/RequireOptiFabricAuth";
 
 type Language = "en" | "bn";
 type RouteStatus = "checking" | "working" | "missing" | "error";
@@ -345,6 +346,7 @@ export default function RouteAuditPage() {
       : 0;
 
   return (
+    <RequireOptiFabricAuth>
     <main className="min-h-screen bg-slate-950 px-4 py-6 text-white sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         <header className="rounded-3xl border border-cyan-500/20 bg-gradient-to-r from-cyan-950 via-blue-950 to-slate-900 p-6 shadow-2xl sm:p-10">
@@ -573,6 +575,7 @@ export default function RouteAuditPage() {
         </section>
       </div>
     </main>
+    </RequireOptiFabricAuth>
   );
 }
 
