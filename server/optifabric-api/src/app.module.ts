@@ -4,6 +4,7 @@ import { ThrottlerModule, ThrottlerGuard } from "@nestjs/throttler";
 import { AuthModule } from "./modules/auth/auth.module";
 import { SubscriptionModule } from "./modules/subscription/subscription.module";
 import { HealthModule } from "./modules/health/health.module";
+import { ProjectsModule } from "./modules/projects/projects.module";
 import { SubscriptionGuard } from "./common/guards/subscription.guard";
 import { EntitlementIntegrationModule } from "./entitlement/entitlement.module";
 
@@ -19,6 +20,7 @@ import { EntitlementIntegrationModule } from "./entitlement/entitlement.module";
     HealthModule,
     AuthModule,
     SubscriptionModule,
+    ProjectsModule,
     // Phase 2: central entitlement — provides the SubscriptionGuard's new
     // decision dependencies (OrganisationResolverService,
     // EntitlementOnboardingService, the entitlement Prisma/service tokens).

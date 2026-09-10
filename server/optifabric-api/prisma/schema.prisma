@@ -26,6 +26,7 @@ model Factory {
   users        User[]
   subscription Subscription?
   auditEvents  AuditEvent[]
+  projects     Project[]
 }
 
 model User {
@@ -38,7 +39,9 @@ model User {
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
-  factory Factory @relation(fields: [factoryId], references: [id], onDelete: Restrict)
+  factory         Factory     @relation(fields: [factoryId], references: [id], onDelete: Restrict)
+  createdProjects Project[]
+  markerRuns      MarkerRun[]
 
   @@unique([factoryId, email])
 }
@@ -106,4 +109,163 @@ model RevokedTokenRecord {
   expiresAt DateTime
 
   @@index([tokenJti])
+}
+
+// ---------------------------------------------------------------------------
+// Stage 1 engineering-data persistence layer (Project / PatternPiece /
+// PatternGeometry / FabricProfile / MarkerRun). Backend-only: the OptiFabric
+// frontend still persists this data in browser localStorage today (see
+// lib/optifabric/projectMaster.ts, geometry/patternGeometry.ts,
+// geometrySaveTypes.ts, markerTypes.ts) — nothing here is wired up to it yet.
+//
+// Tenant boundary is Factory.id (Project.factoryId), never the central
+// entitlement system's organisationId — organisationId is a
+// billing/entitlement-only mapping (see FactoryOrganisationMappingService /
+// docs/PHASE-2-ENTITLEMENT-CUTOVER.md) and must never be used to scope or
+// authorize access to engineering data.
+//
+// PatternPiece/PatternGeometry ids are deterministic composites derived from
+// (projectId, the client's own patternId), not random uuids — this mirrors
+// the frontend's own id scheme exactly (e.g. SavedGeometryRecord.id ===
+// `${projectId}-${patternId}-geometry` in lib/optifabric/geometrySaveEngine.ts)
+// so a future bulk-import of existing browser-stored projects can compute the
+// same primary keys instead of needing a separate id-remapping table.
+// ---------------------------------------------------------------------------
+
+model Project {
+  id              String    @id @default(uuid())
+  factoryId       String
+  createdByUserId String
+  // Server-generated, concurrency-safe (Postgres sequence "ProjectCodeSeq" —
+  // see the init-persistence-layer migration.sql). Format mirrors the
+  // frontend's own OF-{year}-{seq} display format (projectRegistry.ts), but
+  // the numeric part is a single global monotonic sequence rather than a
+  // per-year counter — simplest construction that is still trivially
+  // race-free under concurrent POST /projects calls.
+  code       String    @unique
+  name       String
+  // Soft delete / archive marker. Null = active. Set by DELETE /projects/:id,
+  // cleared by POST /projects/:id/restore.
+  archivedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  factory       Factory        @relation(fields: [factoryId], references: [id], onDelete: Restrict)
+  createdByUser User           @relation(fields: [createdByUserId], references: [id], onDelete: Restrict)
+  patternPieces PatternPiece[]
+  fabricProfile FabricProfile?
+  markerRuns    MarkerRun[]
+
+  @@index([factoryId])
+}
+
+model PatternPiece {
+  // `${projectId}-${patternId}` — see the file-level comment above.
+  id          String   @id
+  projectId   String
+  // The client's own piece identifier: a stable garment-master slug (e.g.
+  // "front-body") or a custom-piece id (e.g. "custom-pocket-<timestamp>").
+  // Not globally unique on its own — only unique per project (see the
+  // @@unique below) — so it is kept as its own column rather than reused as
+  // the row's primary key.
+  patternId   String
+  name        String
+  sequence    Int      @default(0)
+  cutQuantity Int      @default(1)
+  cutOnFold   Boolean  @default(false)
+  required    Boolean  @default(false)
+  custom      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  project  Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  geometry PatternGeometry?
+
+  @@unique([projectId, patternId])
+  @@index([projectId])
+}
+
+model PatternGeometry {
+  // `${projectId}-${patternId}-geometry` — identical formula to the
+  // frontend's SavedGeometryRecord.id / PatternGeometry.id (see file-level
+  // comment above), so migrating an existing browser project's saved
+  // geometry can reuse the exact same id.
+  id             String @id
+  patternPieceId String @unique
+
+  // The frontend currently has two non-interchangeable in-flight geometry
+  // shapes (a flat SavedGeometryRecord consumed by the marker/nesting
+  // pipeline, and a richer PatternGeometry model with per-point ids/sequence
+  // numbers). Stored as opaque Json rather than modeled relationally so
+  // Stage 1 does not have to pick a winner between them; whichever shape a
+  // future sync step sends is preserved as-is.
+  polygonJson     Json
+  calibrationJson Json?
+  grainLineJson   Json?
+  measurementJson Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  patternPiece PatternPiece @relation(fields: [patternPieceId], references: [id], onDelete: Cascade)
+}
+
+// Mirrors lib/optifabric/marker/fabricProfileTypes.ts's FabricProfile
+// interface field-for-field (a small, stable value object, unlike geometry —
+// no Json needed). Not yet wired to any Stage 1 API endpoint (none was
+// specified); the model/relation exists so the schema matches the approved
+// "Project -> one optional FabricProfile" relationship.
+model FabricProfile {
+  id        String @id @default(uuid())
+  projectId String @unique
+
+  fabricType        String
+  construction      String
+  grainControl      String
+  faceDirection     String
+  nap               String
+  allowableRotation String
+  stretch           String
+  knitOrientation   String?
+
+  lengthWarpShrinkagePercent Float?
+  widthWeftShrinkagePercent  Float?
+
+  matchingRequirement String
+  horizontalRepeat    Float?
+  verticalRepeat      Float?
+  repeatUnit          String?
+
+  directionalFabric String
+
+  nominalFabricWidthCm Float?
+  usableFabricWidthCm  Float
+  fabricWidthUnit      String
+
+  maximumMarkerLengthOption String
+  maximumMarkerLengthCm     Float?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+// A single saved marker/nesting-layout run. The backend never computes a
+// layout itself (no nesting/algorithm changes in Stage 1) — it only records
+// what the client's existing markerLayoutProjectEngine already computed:
+// the input snapshot it ran with, and the result it produced.
+model MarkerRun {
+  id              String @id @default(uuid())
+  projectId       String
+  createdByUserId String
+  // Roughly MarkerGenerationInput shape (pieces/quantities/fabric width/settings).
+  snapshotJson Json
+  // Roughly MarkerGenerationResult shape (placed pieces, statistics, warnings).
+  resultJson Json
+  createdAt  DateTime @default(now())
+
+  project       Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdByUser User    @relation(fields: [createdByUserId], references: [id], onDelete: Restrict)
+
+  @@index([projectId])
 }
