@@ -11,6 +11,7 @@ import {
 } from "@/lib/optifabric/patternGeometryTypes";
 
 import {
+  PatternGrainLine,
   PatternScaleCalibration,
   PatternTracingBoundary,
   PatternTracingTool,
@@ -59,6 +60,9 @@ interface BoundaryCanvasProps {
   calibration:
     PatternScaleCalibration;
 
+  grainLine:
+    PatternGrainLine;
+
   onImageFileChange:
     (
       event:
@@ -104,7 +108,8 @@ function getWorkspaceCursor(
 ): string {
   if (
     activeTool === "trace" ||
-    activeTool === "calibrate"
+    activeTool === "calibrate" ||
+    activeTool === "grain-line"
   ) {
     return "cursor-crosshair";
   }
@@ -134,6 +139,8 @@ export default function BoundaryCanvas({
   boundary,
 
   calibration,
+
+  grainLine,
 
   onImageFileChange,
 
@@ -270,6 +277,12 @@ export default function BoundaryCanvas({
               <CalibrationOverlay
                 calibration={
                   calibration
+                }
+              />
+
+              <GrainLineOverlay
+                grainLine={
+                  grainLine
                 }
               />
             </svg>
@@ -428,6 +441,61 @@ function CalibrationOverlay({
             cy={secondPoint.y}
             r="8"
             fill="rgb(251, 191, 36)"
+            stroke="white"
+            strokeWidth="2"
+            vectorEffect="non-scaling-stroke"
+          />
+        </>
+      ) : null}
+    </>
+  );
+}
+
+function GrainLineOverlay({
+  grainLine,
+}: {
+  grainLine:
+    PatternGrainLine;
+}) {
+  const firstPoint =
+    grainLine.firstPoint;
+
+  const secondPoint =
+    grainLine.secondPoint;
+
+  if (!firstPoint) {
+    return null;
+  }
+
+  return (
+    <>
+      <circle
+        cx={firstPoint.x}
+        cy={firstPoint.y}
+        r="8"
+        fill="rgb(52, 211, 153)"
+        stroke="white"
+        strokeWidth="2"
+        vectorEffect="non-scaling-stroke"
+      />
+
+      {secondPoint ? (
+        <>
+          <line
+            x1={firstPoint.x}
+            y1={firstPoint.y}
+            x2={secondPoint.x}
+            y2={secondPoint.y}
+            stroke="rgb(52, 211, 153)"
+            strokeWidth="4"
+            vectorEffect="non-scaling-stroke"
+          />
+
+          <circle
+            cx={secondPoint.x}
+            cy={secondPoint.y}
+            r="8"
+            fill="rgb(52, 211, 153)"
             stroke="white"
             strokeWidth="2"
             vectorEffect="non-scaling-stroke"

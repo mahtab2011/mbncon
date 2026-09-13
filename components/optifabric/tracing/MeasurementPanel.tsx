@@ -6,6 +6,7 @@ interface MeasurementPanelProps {
   areaSquareCm?: number;
   perimeterCm?: number;
   areaSquarePixels?: number;
+  grainLineLengthCm?: number;
 }
 
 function formatNumber(
@@ -28,6 +29,7 @@ export default function MeasurementPanel({
   areaSquareCm,
   perimeterCm,
   areaSquarePixels,
+  grainLineLengthCm,
 }: MeasurementPanelProps) {
   return (
     <section className="rounded-3xl border border-violet-400/20 bg-violet-950/10 p-6">
@@ -74,6 +76,18 @@ export default function MeasurementPanel({
             areaSquarePixels,
             0
           )}
+        />
+
+        <MeasurementRow
+          label="Grain Line"
+          value={
+            typeof grainLineLengthCm ===
+            "number"
+              ? `${formatNumber(
+                  grainLineLengthCm
+                )} cm`
+              : "Not marked"
+          }
         />
       </div>
     </section>

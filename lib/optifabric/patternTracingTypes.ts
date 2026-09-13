@@ -14,6 +14,7 @@ export type PatternTracingTool =
   | "select"
   | "trace"
   | "calibrate"
+  | "grain-line"
   | "pan";
 
 export type PatternImageFileType =
@@ -52,6 +53,21 @@ export interface PatternScaleCalibration {
 
   calibrated: boolean;
   calibratedAt?: string;
+}
+
+// Stage 2B-3: a pattern piece's grain line, marked with the same two-point
+// click interaction as PatternScaleCalibration's firstPoint/secondPoint
+// above (activate the tool, click twice). Deliberately does NOT carry a
+// computed length — like the boundary's own width/height/area/perimeter,
+// physical length depends on calibration.pixelsPerCm, which can change
+// after the points are placed, so it is derived live (see the trace page's
+// own grainLineLengthCm) and only frozen into a flat field at save time,
+// same treatment as calibratedWidthCm etc. below.
+export interface PatternGrainLine {
+  firstPoint?: GeometryPoint;
+  secondPoint?: GeometryPoint;
+
+  marked: boolean;
 }
 
 export interface PatternTracingViewport {
@@ -162,6 +178,15 @@ export interface PatternTracingProjectFields {
   calibratedAreaSqCm?: number;
   calibratedPerimeterCm?: number;
 
+  // Stage 2B-3 — flat like polygonVertices/geometryVertices above (not
+  // nested under patternTracing), so a grain line survives fresh-device
+  // reconstruction and Stage 2B-2 cached-device reconciliation the same way
+  // the traced polygon does, without needing local image metadata. Optional
+  // and additive: absent on every pattern piece saved before this stage.
+  grainLineFirstPoint?: GeometryPoint;
+  grainLineSecondPoint?: GeometryPoint;
+  grainLineLengthCm?: number;
+
   geometryTracingCompleted?: boolean;
   geometryTracingCompletedAt?: string;
 
@@ -197,6 +222,13 @@ export function createEmptyScaleCalibration():
       DEFAULT_REFERENCE_LENGTH_CM,
 
     calibrated: false,
+  };
+}
+
+export function createEmptyGrainLine():
+  PatternGrainLine {
+  return {
+    marked: false,
   };
 }
 

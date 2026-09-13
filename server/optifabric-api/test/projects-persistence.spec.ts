@@ -316,6 +316,42 @@ describe("ProjectsService.getProject", () => {
     expect(result.patternPieces[1].geometry).toBeNull();
   });
 
+  // Stage 2B-3: grainLineJson is opaque on the backend (same as
+  // calibrationJson/measurementJson above) — this just confirms a populated
+  // value round-trips through GET unchanged, the same way the null case
+  // above already does. The frontend shape it happens to hold today
+  // (lib/optifabric/projectApi.ts's readGrainLine) is a frontend concern.
+  it("returns a populated grainLineJson unchanged", async () => {
+    const { prisma } = buildPrismaMock();
+    const grainLineJson = { firstPoint: { x: 2, y: 2 }, secondPoint: { x: 2, y: 30 }, lengthCm: 25.4 };
+    prisma.project.findFirst.mockResolvedValue({
+      id: "project-1",
+      factoryId: "factory-a",
+      patternPieces: [
+        {
+          id: "project-1-front-body",
+          patternId: "front-body",
+          name: "Front Body",
+          geometry: {
+            id: "project-1-front-body-geometry",
+            patternPieceId: "project-1-front-body",
+            polygonJson: [{ x: 0, y: 0 }, { x: 10, y: 0 }, { x: 10, y: 10 }],
+            calibrationJson: { pixelsPerCm: 12.5 },
+            grainLineJson,
+            measurementJson: { widthCm: 20, heightCm: 15 },
+          },
+        },
+      ],
+    });
+    const service = new ProjectsService(prisma as never);
+
+    const result = await service.getProject(userA, "project-1");
+
+    expect(result.patternPieces[0].geometry).toEqual(
+      expect.objectContaining({ grainLineJson }),
+    );
+  });
+
   it("denies reading a project (with geometry) belonging to another factory", async () => {
     const { prisma } = buildPrismaMock();
     prisma.project.findFirst.mockResolvedValue(null);
@@ -642,6 +678,27 @@ describe("ProjectsService.upsertPatternGeometry", () => {
     // sentinel), not be silently dropped from the update — Prisma throws if
     // you pass a plain JS `null` for a nullable Json column directly.
     expect(call.update.calibrationJson).toBeDefined();
+  });
+
+  // Stage 2B-3: grainLine follows the exact same passthrough as
+  // calibration/measurements above — this was already true before this
+  // stage (the DTO/service were Stage 1 groundwork with no frontend writer
+  // yet), this just adds coverage now that the trace page actually sends it.
+  it("persists a provided grainLine payload", async () => {
+    const { prisma, tx } = buildPrismaMock();
+    tx.project.findFirst.mockResolvedValue({ id: "project-1", factoryId: "factory-a", archivedAt: null });
+    tx.patternGeometry.upsert.mockResolvedValue({ id: "project-1-front-body-geometry" });
+    const service = new ProjectsService(prisma as never);
+    const grainLine = { firstPoint: { x: 2, y: 2 }, secondPoint: { x: 2, y: 30 }, lengthCm: 25.4 };
+
+    await service.upsertPatternGeometry(userA, "project-1", "front-body", {
+      polygon: [{ x: 1, y: 1 }],
+      grainLine,
+    });
+
+    const call = tx.patternGeometry.upsert.mock.calls[0][0];
+    expect(call.update.grainLineJson).toEqual(grainLine);
+    expect(call.create.grainLineJson).toEqual(grainLine);
   });
 
   it("rejects a missing polygon", async () => {

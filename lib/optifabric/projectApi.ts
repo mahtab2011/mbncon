@@ -223,6 +223,41 @@ function readPolygonPoints(polygon: unknown): GeometryPoint[] {
   return candidate.filter(isPoint).map((point) => ({ x: point.x, y: point.y }));
 }
 
+// Stage 2B-3: grainLineJson's shape, mirroring the trace page's own
+// savePatternGeometry() payload ({ firstPoint, secondPoint, lengthCm }) —
+// see saveGeometry() in the trace page for the writer. Every pattern piece
+// saved before this stage has grainLineJson: null, and any future
+// unrecognised shape must be just as harmless, so this returns undefined
+// (never throws) unless BOTH points are present and well-formed; lengthCm
+// alone, without two valid points, is not a reconstructable grain line.
+function readGeometryPointField(source: unknown, key: string): GeometryPoint | undefined {
+  if (!source || typeof source !== "object") return undefined;
+  const value = (source as Record<string, unknown>)[key];
+  if (
+    value &&
+    typeof value === "object" &&
+    typeof (value as { x?: unknown }).x === "number" &&
+    typeof (value as { y?: unknown }).y === "number"
+  ) {
+    return { x: (value as GeometryPoint).x, y: (value as GeometryPoint).y };
+  }
+  return undefined;
+}
+
+function readGrainLine(
+  grainLineJson: unknown,
+): { firstPoint: GeometryPoint; secondPoint: GeometryPoint; lengthCm?: number } | undefined {
+  const firstPoint = readGeometryPointField(grainLineJson, "firstPoint");
+  const secondPoint = readGeometryPointField(grainLineJson, "secondPoint");
+  if (!firstPoint || !secondPoint) return undefined;
+
+  return {
+    firstPoint,
+    secondPoint,
+    lengthCm: readNumberField(grainLineJson, "lengthCm"),
+  };
+}
+
 // One ServerPatternPiece's geometry -> the flat local fallback fields the
 // pattern-tracing page (app/optifabric/project/[projectId]/patterns/
 // [patternId]/trace/page.tsx) already reads as first-priority fields on a
@@ -244,6 +279,7 @@ function mapGeometryToTracingProjectFields(
     readNumberField(geometry.measurementJson, "pixelsPerCm") ??
     readNumberField(geometry.calibrationJson, "pixelsPerCm");
   const pixelsPerInch = readNumberField(geometry.calibrationJson, "pixelsPerInch");
+  const grainLine = readGrainLine(geometry.grainLineJson);
 
   return {
     polygonVertices: polygon,
@@ -254,6 +290,13 @@ function mapGeometryToTracingProjectFields(
     calibratedHeightCm: readNumberField(geometry.measurementJson, "heightCm"),
     calibratedAreaSqCm: readNumberField(geometry.measurementJson, "areaSqCm"),
     calibratedPerimeterCm: readNumberField(geometry.measurementJson, "perimeterCm"),
+    ...(grainLine
+      ? {
+          grainLineFirstPoint: grainLine.firstPoint,
+          grainLineSecondPoint: grainLine.secondPoint,
+          ...(grainLine.lengthCm !== undefined ? { grainLineLengthCm: grainLine.lengthCm } : {}),
+        }
+      : {}),
     geometryTracingCompleted: true,
     geometryTracingCompletedAt: geometry.updatedAt,
   };
@@ -283,6 +326,7 @@ function mapPieceGeometryToSavedGeometryRecord(
     readNumberField(piece.geometry.measurementJson, "pixelsPerCm") ??
     readNumberField(piece.geometry.calibrationJson, "pixelsPerCm") ??
     0;
+  const grainLine = readGrainLine(piece.geometry.grainLineJson);
 
   return {
     id: `${serverProject.id}-${piece.patternId}-geometry`,
@@ -311,6 +355,11 @@ function mapPieceGeometryToSavedGeometryRecord(
     geometryVersion: "server-reconstructed",
     savedAt: piece.geometry.updatedAt,
     polygon,
+    // Stage 2B-3: populates the SavedGeometryRecord field of the same name,
+    // which existed before this stage but had no writer (see the grep audit
+    // in the trace page's saveGeometry()) — additive, so records without a
+    // grain line are unaffected.
+    ...(grainLine?.lengthCm !== undefined ? { grainLineLengthCm: grainLine.lengthCm } : {}),
   };
 }
 

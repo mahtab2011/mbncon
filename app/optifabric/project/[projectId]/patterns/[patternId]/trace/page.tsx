@@ -24,9 +24,11 @@ import {
 } from "@/lib/optifabric/patternGeometryTypes";
 
 import {
+  createEmptyGrainLine,
   createEmptyPatternBoundary,
   createEmptyScaleCalibration,
   DEFAULT_REFERENCE_LENGTH_CM,
+  PatternGrainLine,
   PatternScaleCalibration,
   PatternTracingBoundary,
   PatternTracingProjectFields,
@@ -400,6 +402,11 @@ export default function PatternTracingPage() {
       createEmptyScaleCalibration()
     );
 
+  const [grainLine, setGrainLine] =
+    useState<PatternGrainLine>(
+      createEmptyGrainLine()
+    );
+
   const [viewport, setViewport] =
     useState<ViewportState>({
       zoom: 1,
@@ -563,6 +570,17 @@ const [
             ?.calibration.calibratedAt,
       });
 
+      setGrainLine({
+        firstPoint:
+          selectedPattern.grainLineFirstPoint,
+        secondPoint:
+          selectedPattern.grainLineSecondPoint,
+        marked: Boolean(
+          selectedPattern.grainLineFirstPoint &&
+            selectedPattern.grainLineSecondPoint
+        ),
+      });
+
       if (selectedPattern.imageUrl) {
         setImageSource(
           selectedPattern.imageUrl
@@ -678,6 +696,32 @@ const [
     boundingBox.height,
     calibration.pixelsPerCm,
   ]);
+
+  // Stage 2B-3: derived the same way as widthCm/heightCm/perimeterCm above
+  // — a fixed pixel distance between the two marked points, converted using
+  // whatever calibration.pixelsPerCm currently is, so marking the grain
+  // line before or after calibrating both end up correct.
+  const grainLineLengthCm =
+    useMemo(() => {
+      if (
+        !grainLine.firstPoint ||
+        !grainLine.secondPoint
+      ) {
+        return undefined;
+      }
+
+      return convertPixelLengthToCm(
+        distanceBetweenPoints(
+          grainLine.firstPoint,
+          grainLine.secondPoint
+        ),
+        calibration.pixelsPerCm
+      );
+    }, [
+      grainLine.firstPoint,
+      grainLine.secondPoint,
+      calibration.pixelsPerCm,
+    ]);
 
   const tracingStatus =
     calculateTracingStatus(
@@ -1054,6 +1098,39 @@ const viewBox = useMemo(() => {
 
       setHasUnsavedChanges(true);
       setMessage("");
+      return;
+    }
+
+    if (activeTool === "grain-line") {
+      setGrainLine((current) => {
+        if (!current.firstPoint) {
+          return {
+            firstPoint: point,
+            secondPoint: undefined,
+            marked: false,
+          };
+        }
+
+        if (!current.secondPoint) {
+          return {
+            firstPoint: current.firstPoint,
+            secondPoint: point,
+            marked: true,
+          };
+        }
+
+        // A third click re-marks the grain line from scratch, same as
+        // calibration's own re-mark behaviour above — the previous grain
+        // line is simply replaced, the polygon trace is untouched.
+        return {
+          firstPoint: point,
+          secondPoint: undefined,
+          marked: false,
+        };
+      });
+
+      setHasUnsavedChanges(true);
+      setMessage("");
     }
   }
 
@@ -1150,6 +1227,18 @@ const viewBox = useMemo(() => {
 
   setMessage(
     "Scale calibration was cleared."
+  );
+}
+
+function resetGrainLine() {
+  setGrainLine(
+    createEmptyGrainLine()
+  );
+
+  setHasUnsavedChanges(true);
+
+  setMessage(
+    "The grain line was cleared."
   );
 }
 
@@ -1404,6 +1493,8 @@ try {
             y: point.y,
           })
         ),
+
+      grainLineLengthCm,
     });
 } catch (error) {
   const errorMessage =
@@ -1440,6 +1531,21 @@ if (project._server) {
       {
         polygon: geometryRecord.polygon,
         calibration,
+        // Stage 2B-3: only sent once both points are marked — omitting the
+        // key (rather than sending a half-marked state) leaves the
+        // backend's existing grainLineJson untouched-to-null behaviour
+        // (UpsertPatternGeometryDto.grainLine undefined -> Prisma.DbNull)
+        // exactly as it already is for every pattern piece with no grain
+        // line.
+        grainLine:
+          grainLine.firstPoint &&
+          grainLine.secondPoint
+            ? {
+                firstPoint: grainLine.firstPoint,
+                secondPoint: grainLine.secondPoint,
+                lengthCm: grainLineLengthCm,
+              }
+            : undefined,
         measurements: {
           widthCm: widthCm ?? 0,
           heightCm: heightCm ?? 0,
@@ -1632,6 +1738,15 @@ setSavedGeometry(
 
             calibratedPerimeterCm:
               perimeterCm,
+
+            grainLineFirstPoint:
+              grainLine.firstPoint,
+
+            grainLineSecondPoint:
+              grainLine.secondPoint,
+
+            grainLineLengthCm:
+              grainLineLengthCm,
 
             geometryTracingCompleted:
               true,
@@ -2007,6 +2122,10 @@ async function handleAutomaticScaleDetection() {
     setActiveTool("calibrate")
   }
 
+  onSelectGrainLineTool={() =>
+    setActiveTool("grain-line")
+  }
+
   onSelectTool={() =>
     setActiveTool("select")
   }
@@ -2031,6 +2150,10 @@ async function handleAutomaticScaleDetection() {
 
   onResetScale={
     resetCalibration
+  }
+
+  onResetGrainLine={
+    resetGrainLine
   }
 
   onZoomIn={zoomIn}
@@ -2062,9 +2185,10 @@ async function handleAutomaticScaleDetection() {
   onResetWorkspace={() => {
     clearBoundary();
     resetCalibration();
+    resetGrainLine();
 
     setMessage(
-      "The tracing boundary and scale calibration were reset."
+      "The tracing boundary, scale calibration and grain line were reset."
     );
   }}
 
@@ -2080,6 +2204,10 @@ async function handleAutomaticScaleDetection() {
 
   calibrationComplete={
     calibration.calibrated
+  }
+
+  grainLineMarked={
+    grainLine.marked
   }
 
   boundaryEnabled={
@@ -2114,6 +2242,13 @@ async function handleAutomaticScaleDetection() {
       calibration.firstPoint ||
         calibration.secondPoint ||
         calibration.calibrated
+    )
+  }
+
+  canResetGrainLine={
+    Boolean(
+      grainLine.firstPoint ||
+        grainLine.secondPoint
     )
   }
 
@@ -2214,6 +2349,7 @@ async function handleAutomaticScaleDetection() {
     activeTool={activeTool}
     boundary={boundary}
     calibration={calibration}
+    grainLine={grainLine}
     onImageFileChange={
   loadTracingImage
 }
@@ -2265,6 +2401,9 @@ async function handleAutomaticScaleDetection() {
       }
       areaSquarePixels={
         areaSquarePixels
+      }
+      grainLineLengthCm={
+        grainLineLengthCm
       }
     />
 <EngineeringSummaryPanel

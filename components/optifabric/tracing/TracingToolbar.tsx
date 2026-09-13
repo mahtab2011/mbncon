@@ -3,6 +3,7 @@
 export type TracingToolMode =
   | "trace"
   | "calibrate"
+  | "grain-line"
   | "select"
   | "pan";
 
@@ -12,6 +13,7 @@ interface TracingToolbarProps {
   onLoadImage?: () => void;
   onSelectTraceTool?: () => void;
   onSelectCalibrationTool?: () => void;
+  onSelectGrainLineTool?: () => void;
   onSelectTool?: () => void;
   onSelectPanTool?: () => void;
 
@@ -22,6 +24,7 @@ interface TracingToolbarProps {
   onDetectBoundary?: () => void;
   onDetectScale?: () => void;
   onResetScale?: () => void;
+  onResetGrainLine?: () => void;
 
   onZoomIn?: () => void;
   onZoomOut?: () => void;
@@ -40,6 +43,7 @@ interface TracingToolbarProps {
   boundaryDetected?: boolean;
   boundaryClosed?: boolean;
   calibrationComplete?: boolean;
+  grainLineMarked?: boolean;
 
   boundaryEnabled?: boolean;
   scaleEnabled?: boolean;
@@ -49,6 +53,7 @@ interface TracingToolbarProps {
   canClosePolygon?: boolean;
   canClearTrace?: boolean;
   canResetScale?: boolean;
+  canResetGrainLine?: boolean;
   canZoom?: boolean;
   canPan?: boolean;
 
@@ -166,6 +171,7 @@ export default function TracingToolbar({
   onLoadImage,
   onSelectTraceTool,
   onSelectCalibrationTool,
+  onSelectGrainLineTool,
   onSelectTool,
   onSelectPanTool,
 
@@ -176,6 +182,7 @@ export default function TracingToolbar({
   onDetectBoundary,
   onDetectScale,
   onResetScale,
+  onResetGrainLine,
 
   onZoomIn,
   onZoomOut,
@@ -194,6 +201,7 @@ export default function TracingToolbar({
   boundaryDetected = false,
   boundaryClosed = false,
   calibrationComplete = false,
+  grainLineMarked = false,
 
   boundaryEnabled = true,
   scaleEnabled = true,
@@ -203,6 +211,7 @@ export default function TracingToolbar({
   canClosePolygon = false,
   canClearTrace = false,
   canResetScale = false,
+  canResetGrainLine = false,
   canZoom = false,
   canPan = false,
 
@@ -307,6 +316,18 @@ export default function TracingToolbar({
             <button
               type="button"
               className={getToolButtonClass(
+                activeTool === "grain-line"
+              )}
+              onClick={onSelectGrainLineTool}
+            >
+              {grainLineMarked
+                ? "Re-Mark Grain Line"
+                : "Mark Grain Line"}
+            </button>
+
+            <button
+              type="button"
+              className={getToolButtonClass(
                 activeTool === "select"
               )}
               onClick={onSelectTool}
@@ -362,6 +383,23 @@ export default function TracingToolbar({
               onClick={onClearTrace}
             >
               Clear Trace
+            </button>
+          </div>
+        </div>
+
+        <div className="border-t border-slate-700 pt-5">
+          <p className="mb-3 text-xs font-black uppercase tracking-[0.2em] text-slate-400">
+            Grain Line Controls
+          </p>
+
+          <div className="flex flex-wrap gap-3">
+            <button
+              type="button"
+              className={secondaryButtonClass}
+              disabled={!canResetGrainLine}
+              onClick={onResetGrainLine}
+            >
+              Reset Grain Line
             </button>
           </div>
         </div>
