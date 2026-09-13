@@ -85,7 +85,10 @@ import type {
 } from "@/lib/optifabric/geometrySaveTypes";
 
 import {
+  getProject as getServerProject,
+  reconcileCachedPatternsWithServer,
   savePatternGeometry,
+  type ServerProject,
   type ServerProjectMeta,
 } from "@/lib/optifabric/projectApi";
 
@@ -416,6 +419,19 @@ export default function PatternTracingPage() {
 
   const [hasUnsavedChanges, setHasUnsavedChanges] =
     useState(false);
+
+  // Stage 2B-4: read from the async direct-open reconciliation below, which
+  // must see the CURRENT value at the moment its server response resolves,
+  // not whatever was captured when the effect started — a plain state read
+  // in that closure would be stale.
+  const hasUnsavedChangesRef =
+    useRef(hasUnsavedChanges);
+
+  useEffect(() => {
+    hasUnsavedChangesRef.current =
+      hasUnsavedChanges;
+  }, [hasUnsavedChanges]);
+
 const [aiBusy, setAiBusy] = useState(false);
 
 const [aiConfidence, setAiConfidence] =
@@ -466,42 +482,17 @@ const [
       return;
     }
 
-    try {
-      const storedProject =
-        localStorage.getItem(
-          projectStorageKey
-        );
+    let cancelled = false;
 
-      if (!storedProject) {
-        setLoadError(
-          "The engineering project could not be found in this browser."
-        );
-
-        return;
-      }
-
-      const parsedProject =
-        JSON.parse(
-          storedProject
-        ) as TracingProject;
-
-      const selectedPattern =
-        parsedProject.patterns.find(
-          (item) =>
-            item.id === patternId
-        );
-
-      if (!selectedPattern) {
-        setLoadError(
-          "The selected pattern piece could not be found in this project."
-        );
-
-        return;
-      }
-
-      setProject(parsedProject);
-      setPattern(selectedPattern);
-
+    // Stage 2B-4: the boundary/calibration/grain-line hydration a pattern's
+    // stored fields produce — factored out so the direct-open reconciliation
+    // below can re-apply it after refreshing from the server, without
+    // duplicating this logic. Never touches imageSource: nothing server-side
+    // can change which local image this browser has loaded (see
+    // mapGeometryToTracingProjectFields's own comment on patternTracing).
+    function hydrateTracingStateFromPattern(
+      selectedPattern: TraceablePatternStatus
+    ) {
       const storedVertices =
         selectedPattern.polygonVertices ??
         selectedPattern.geometryVertices ??
@@ -514,7 +505,6 @@ const [
           ?.boundary.closed ??
         storedVertices.length >=
           MINIMUM_VERTICES;
-
 
       setBoundary({
         vertices: storedVertices,
@@ -580,6 +570,143 @@ const [
             selectedPattern.grainLineSecondPoint
         ),
       });
+    }
+
+    // Stage 2B-4: a server-backed project opened directly on this pattern's
+    // URL (skipping the project overview page, where Stage 2B-2 already
+    // reconciles every pattern) — reuses the exact same
+    // reconcileCachedPatternsWithServer merge policy, scoped to just this
+    // one pattern piece so opening a trace page never rewrites unrelated
+    // pieces this view has no business touching. Best-effort: any failure
+    // here leaves the page exactly as it already opened from local state.
+    async function reconcileFromServer(
+      localProject: TracingProject,
+      localPattern: TraceablePatternStatus
+    ) {
+      let serverProject: ServerProject;
+
+      try {
+        serverProject =
+          await getServerProject(
+            projectId
+          );
+      } catch (error) {
+        console.error(
+          "Unable to reconcile OptiFabric trace geometry from the server:",
+          error
+        );
+
+        return;
+      }
+
+      // Checked only once, right before writing anything — nothing
+      // asynchronous happens between here and the writes below, so one
+      // check covers both: a stale response after navigating away/unmount
+      // (cancelled), and the user having started an in-progress edit while
+      // this request was in flight (hasUnsavedChangesRef).
+      if (
+        cancelled ||
+        hasUnsavedChangesRef.current
+      ) {
+        return;
+      }
+
+      const {
+        patterns: reconciledPatterns,
+        geometryRecordsToPersist,
+      } = reconcileCachedPatternsWithServer(
+        serverProject,
+        localProject.patterns
+      );
+
+      const reconciledPattern =
+        reconciledPatterns.find(
+          (item) =>
+            item.id === localPattern.id
+        ) as
+          | TraceablePatternStatus
+          | undefined;
+
+      if (!reconciledPattern) {
+        return;
+      }
+
+      const updatedProject: TracingProject = {
+        ...localProject,
+        patterns:
+          localProject.patterns.map(
+            (item) =>
+              item.id ===
+              reconciledPattern.id
+                ? reconciledPattern
+                : item
+          ),
+      };
+
+      localStorage.setItem(
+        projectStorageKey,
+        JSON.stringify(updatedProject)
+      );
+
+      setProject(updatedProject);
+      setPattern(reconciledPattern);
+      hydrateTracingStateFromPattern(
+        reconciledPattern
+      );
+
+      const geometryRecord =
+        geometryRecordsToPersist.find(
+          (record) =>
+            record.patternId ===
+            patternId
+        );
+
+      if (geometryRecord) {
+        saveGeometryRecord(
+          geometryRecord
+        );
+      }
+    }
+
+    try {
+      const storedProject =
+        localStorage.getItem(
+          projectStorageKey
+        );
+
+      if (!storedProject) {
+        setLoadError(
+          "The engineering project could not be found in this browser."
+        );
+
+        return;
+      }
+
+      const parsedProject =
+        JSON.parse(
+          storedProject
+        ) as TracingProject;
+
+      const selectedPattern =
+        parsedProject.patterns.find(
+          (item) =>
+            item.id === patternId
+        );
+
+      if (!selectedPattern) {
+        setLoadError(
+          "The selected pattern piece could not be found in this project."
+        );
+
+        return;
+      }
+
+      setProject(parsedProject);
+      setPattern(selectedPattern);
+
+      hydrateTracingStateFromPattern(
+        selectedPattern
+      );
 
       if (selectedPattern.imageUrl) {
         setImageSource(
@@ -588,6 +715,15 @@ const [
       }
 
       setLoadError("");
+
+      // Legacy local-only projects (no _server) make no server request at
+      // all here, same as everywhere else this codebase makes this check.
+      if (parsedProject._server) {
+        void reconcileFromServer(
+          parsedProject,
+          selectedPattern
+        );
+      }
     } catch (error) {
       console.error(
         "Unable to load pattern tracing project:",
@@ -600,6 +736,10 @@ const [
     } finally {
       setLoading(false);
     }
+
+    return () => {
+      cancelled = true;
+    };
   }, [
     patternId,
     projectId,
