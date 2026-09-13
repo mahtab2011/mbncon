@@ -140,6 +140,39 @@ export function savePatternGeometry(
   );
 }
 
+// Stage 2C-1: mirrors the backend's MarkerRun model exactly (server/
+// optifabric-api's prisma/schema.prisma) — POST/GET /projects/:id/marker-runs
+// (CreateMarkerRunDto only requires snapshot/result; the backend never
+// computes or validates a layout itself, see that DTO's own comment).
+// snapshotJson/resultJson are deliberately opaque Json server-side and stay
+// that way here too — callers pass/receive whatever shape the client's own
+// marker optimisation orchestrator produces (currently
+// MarkerOptimisationInput/MarkerOptimisationResult), never a second,
+// narrower model invented on the frontend.
+export interface ServerMarkerRun {
+  id: string;
+  projectId: string;
+  createdByUserId: string;
+  snapshotJson: unknown;
+  resultJson: unknown;
+  createdAt: string;
+}
+
+export function createMarkerRun(
+  projectId: string,
+  snapshot: unknown,
+  result: unknown,
+): Promise<ServerMarkerRun> {
+  return apiFetch<ServerMarkerRun>(`/projects/${projectId}/marker-runs`, {
+    method: "POST",
+    body: JSON.stringify({ snapshot, result }),
+  });
+}
+
+export function listMarkerRuns(projectId: string): Promise<ServerMarkerRun[]> {
+  return apiFetch<ServerMarkerRun[]>(`/projects/${projectId}/marker-runs`);
+}
+
 // The server-authoritative fields carried alongside a cached
 // EngineeringProject once a project is backed by the server — presence of
 // this key is how the frontend distinguishes a server-backed project from a

@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 
@@ -103,8 +104,16 @@ import {
 import {
   runMarkerOptimisation,
   type MarkerOptimisationInput,
+  type MarkerOptimisationResult,
   type MarkerOptimisationSourcePiece,
 } from "@/lib/optifabric/markerOptimization/markerOptimisationOrchestrator";
+
+import {
+  createMarkerRun,
+  listMarkerRuns,
+  type ServerMarkerRun,
+  type ServerProjectMeta,
+} from "@/lib/optifabric/projectApi";
 
 import {
   FABRIC_TYPES,
@@ -242,6 +251,13 @@ interface MarkerProject {
 
   updatedAt?: string;
 
+  // Stage 2C-1: presence is how this page tells a server-backed project
+  // (created via the server-first flow — see lib/optifabric/projectApi.ts)
+  // from a legacy local-only one, same signal the trace/project-overview
+  // pages already key off. Marker-run persistence is gated on this; a
+  // legacy project never attempts a server request here.
+  _server?: ServerProjectMeta;
+
   [key: string]: unknown;
 }
 
@@ -345,6 +361,11 @@ interface ProductionMarkerResult {
     | "notIndependentlyGated";
   readonly decisionLabel: string;
   readonly safetyGate: ProductionSafetyGateResult | null;
+  // Stage 2C-1: the orchestrator's own MarkerOptimisationResult this summary
+  // was derived from — null only when runMarkerOptimisation never ran (no
+  // productionOptimisationInput yet, or it threw). Save Marker Run persists
+  // this directly; nothing here is reconstructed from the summary fields.
+  readonly rawResult: MarkerOptimisationResult | null;
 }
 
 /* ============================================================================
@@ -474,6 +495,69 @@ function parseNonNegative(value: string): number {
   const parsed = Number(value);
 
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
+}
+
+/* ============================================================================
+ * Stage 2C-1 — defensive readers for a saved MarkerRun's opaque
+ * snapshotJson/resultJson. Mirrors the same "never throw, undefined for
+ * anything absent/malformed" convention lib/optifabric/projectApi.ts already
+ * uses for PatternGeometry's own opaque Json fields — these only ever
+ * display a summary, they never feed back into live marker state.
+ * ========================================================================== */
+
+function readOpaqueNumber(source: unknown, key: string): number | undefined {
+  if (!source || typeof source !== "object") return undefined;
+
+  const value = (source as Record<string, unknown>)[key];
+
+  return typeof value === "number" && Number.isFinite(value) ? value : undefined;
+}
+
+function readOpaqueArrayLength(source: unknown, key: string): number | undefined {
+  if (!source || typeof source !== "object") return undefined;
+
+  const value = (source as Record<string, unknown>)[key];
+
+  return Array.isArray(value) ? value.length : undefined;
+}
+
+function summariseMarkerRunSnapshot(snapshotJson: unknown): {
+  fabricWidth?: number;
+  pieceCount?: number;
+} {
+  return {
+    fabricWidth: readOpaqueNumber(snapshotJson, "fabricWidth"),
+    pieceCount: readOpaqueArrayLength(snapshotJson, "pieces"),
+  };
+}
+
+function summariseMarkerRunResult(resultJson: unknown): {
+  utilisationPercent?: number;
+  wastePercent?: number;
+  markerLengthCm?: number;
+} {
+  if (!resultJson || typeof resultJson !== "object") return {};
+
+  const bestCandidate = (resultJson as Record<string, unknown>).bestCandidate;
+
+  return {
+    utilisationPercent: readOpaqueNumber(bestCandidate, "utilisationPercent"),
+    wastePercent: readOpaqueNumber(bestCandidate, "wastePercent"),
+    markerLengthCm: readOpaqueNumber(bestCandidate, "markerLengthCm"),
+  };
+}
+
+function formatMarkerRunTimestamp(createdAt: string): string {
+  const parsed = new Date(createdAt);
+
+  if (Number.isNaN(parsed.getTime())) {
+    return createdAt;
+  }
+
+  return parsed.toLocaleString("en-GB", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
 }
 
 function widthToCentimetres(
@@ -852,6 +936,77 @@ export default function MarkerEngineeringPage() {
       setProjectLoading(false);
     }
   }, [projectId, projectStorageKey]);
+
+  /* ============================================================================
+   * Stage 2C-1 — Marker run save & history
+   *
+   * Persists exactly the canonical productionOptimisationInput /
+   * productionMarkerResult.rawResult pair (MarkerOptimisationInput /
+   * MarkerOptimisationResult, computed further below) via the
+   * already-existing server/optifabric-api MarkerRun endpoints. Gated on
+   * project._server — a legacy local-only project never makes a request
+   * here, same signal
+   * the trace/project-overview pages already key off.
+   * ========================================================================== */
+
+  const isServerBackedProject = Boolean(project?._server);
+
+  const [savedMarkerRuns, setSavedMarkerRuns] = useState<ServerMarkerRun[]>([]);
+  const [markerRunsLoading, setMarkerRunsLoading] = useState(false);
+  const [markerRunsLoadError, setMarkerRunsLoadError] = useState("");
+
+  const [markerRunSaving, setMarkerRunSaving] = useState(false);
+  const [markerRunSaveError, setMarkerRunSaveError] = useState("");
+  const [markerRunSaveMessage, setMarkerRunSaveMessage] = useState("");
+
+  const [selectedMarkerRun, setSelectedMarkerRun] =
+    useState<ServerMarkerRun | null>(null);
+
+  // Synchronous guard against a rapid double-click submitting two save
+  // requests — state alone can't guarantee this (two clicks in the same
+  // tick would both see the pre-update value), a ref always reads current.
+  const markerRunSavingRef = useRef(false);
+
+  useEffect(() => {
+    if (!projectId || !isServerBackedProject) {
+      return;
+    }
+
+    let cancelled = false;
+
+    setMarkerRunsLoading(true);
+    setMarkerRunsLoadError("");
+
+    listMarkerRuns(projectId)
+      .then((runs) => {
+        if (cancelled) return;
+
+        setSavedMarkerRuns(runs);
+      })
+      .catch((error) => {
+        if (cancelled) return;
+
+        console.error("Unable to load saved OptiFabric marker runs:", error);
+
+        // Non-blocking: the marker-generation workflow above is entirely
+        // unaffected by this failing — only the history list shows an error.
+        setMarkerRunsLoadError(
+          error instanceof Error
+            ? error.message
+            : "Saved marker runs could not be loaded."
+        );
+      })
+      .finally(() => {
+        if (!cancelled) setMarkerRunsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [projectId, isServerBackedProject]);
+
+  // saveMarkerRun itself is defined further below, right after
+  // productionMarkerResult (whose .rawResult it persists) is declared.
 
   /* ============================================================================
    * Step 18 — Production interface language (English / বাংলা)
@@ -1697,6 +1852,12 @@ export default function MarkerEngineeringPage() {
       decision: "notIndependentlyGated",
       decisionLabel: "Not Independently Gated",
       safetyGate: null,
+      // Stage 2C-1: the orchestrator's own raw result, carried alongside the
+      // derived summary fields above rather than discarded — this is the
+      // exact canonical MarkerOptimisationResult Save Marker Run persists,
+      // computed here once (this memo already ran runMarkerOptimisation
+      // before this stage too) and never re-run at save time.
+      rawResult: null,
     };
 
     if (!productionOptimisationInput) {
@@ -1740,8 +1901,9 @@ export default function MarkerEngineeringPage() {
             decision: baselineCandidate.safetyGate.decision,
             decisionLabel: baselineCandidate.safetyGate.decisionLabel,
             safetyGate: baselineCandidate.safetyGate,
+            rawResult: result,
           }
-        : notGatedResult;
+        : { ...notGatedResult, rawResult: result };
 
       const GEOMETRY_TOLERANCE = 1e-6;
       const candidate = result.bestCandidate;
@@ -1771,6 +1933,7 @@ export default function MarkerEngineeringPage() {
           decision: candidate.safetyGate.decision,
           decisionLabel: candidate.safetyGate.decisionLabel,
           safetyGate: candidate.safetyGate,
+          rawResult: result,
         };
       }
 
@@ -1792,6 +1955,53 @@ export default function MarkerEngineeringPage() {
     totalInstances,
     markerIsComplete,
   ]);
+
+  // Stage 2C-1: persists productionOptimisationInput and
+  // productionMarkerResult.rawResult exactly as the orchestrator produced
+  // them above — never recomputed, never approximated from page UI state.
+  async function saveMarkerRun() {
+    const rawResult = productionMarkerResult.rawResult;
+
+    if (
+      !projectId ||
+      !isServerBackedProject ||
+      !productionOptimisationInput ||
+      !rawResult
+    ) {
+      return;
+    }
+
+    if (markerRunSavingRef.current) {
+      return;
+    }
+
+    markerRunSavingRef.current = true;
+    setMarkerRunSaving(true);
+    setMarkerRunSaveError("");
+    setMarkerRunSaveMessage("");
+
+    try {
+      const saved = await createMarkerRun(
+        projectId,
+        productionOptimisationInput,
+        rawResult
+      );
+
+      setSavedMarkerRuns((current) => [saved, ...current]);
+      setMarkerRunSaveMessage("Marker run saved.");
+    } catch (error) {
+      // The current generated marker/result is untouched — only the save
+      // status changes on failure.
+      setMarkerRunSaveError(
+        error instanceof Error
+          ? error.message
+          : "The marker run could not be saved."
+      );
+    } finally {
+      markerRunSavingRef.current = false;
+      setMarkerRunSaving(false);
+    }
+  }
 
       /* --------------------- RC5-004 geometry adapter ---------------------- */
 
@@ -6420,6 +6630,224 @@ export default function MarkerEngineeringPage() {
                   ? lang.message("resultOptimised", MARKER_PRODUCTION_MESSAGES)
                   : lang.message("resultBaseline", MARKER_PRODUCTION_MESSAGES)}
               </p>
+            </section>
+
+            {/* Stage 2C-1 — Marker Run Save & History. A compact addition
+                to the existing sidebar, not a page redesign: persists the
+                exact productionOptimisationInput/productionMarkerResult.rawResult
+                pair above via the already-existing MarkerRun endpoints. */}
+            <section className="rounded-3xl border border-fuchsia-500/20 bg-fuchsia-950/10 p-5">
+              <p className="text-xs font-black uppercase tracking-[0.22em] text-fuchsia-300">
+                Marker Run History
+              </p>
+
+              <h2 className="mt-2 text-xl font-black">
+                Save &amp; Reopen Runs
+              </h2>
+
+              {!isServerBackedProject ? (
+                <p className="mt-3 text-sm leading-6 text-slate-400">
+                  Saving marker runs requires a server-synced engineering
+                  project. This project is local-only — the marker workflow
+                  above is unaffected, but generated results here won&apos;t
+                  be saved to your account.
+                </p>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    onClick={saveMarkerRun}
+                    disabled={
+                      !productionMarkerResult.rawResult || markerRunSaving
+                    }
+                    className="mt-4 w-full rounded-xl border border-emerald-400/40 bg-emerald-950/40 px-4 py-3 text-center font-black text-emerald-200 transition hover:border-emerald-300 hover:bg-emerald-900/50 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    {markerRunSaving
+                      ? "Saving Marker Run..."
+                      : "Save Marker Run"}
+                  </button>
+
+                  {!productionMarkerResult.rawResult ? (
+                    <p className="mt-2 text-xs text-slate-500">
+                      Generate a complete marker (loaded geometry and a
+                      confirmed fabric width) before a run can be saved.
+                    </p>
+                  ) : null}
+
+                  {markerRunSaveMessage ? (
+                    <p className="mt-2 text-xs font-bold text-emerald-300">
+                      {markerRunSaveMessage}
+                    </p>
+                  ) : null}
+
+                  {markerRunSaveError ? (
+                    <p className="mt-2 text-xs font-bold text-red-300">
+                      Save failed: {markerRunSaveError}
+                    </p>
+                  ) : null}
+
+                  <div className="mt-5 border-t border-slate-700 pt-4">
+                    <p className="text-xs font-black uppercase tracking-wide text-slate-500">
+                      Saved Runs
+                    </p>
+
+                    {markerRunsLoading ? (
+                      <p className="mt-2 text-sm text-slate-400">
+                        Loading saved marker runs...
+                      </p>
+                    ) : markerRunsLoadError ? (
+                      <p className="mt-2 text-sm text-amber-300">
+                        Could not load saved marker runs:{" "}
+                        {markerRunsLoadError}
+                      </p>
+                    ) : savedMarkerRuns.length === 0 ? (
+                      <p className="mt-2 text-sm text-slate-400">
+                        No marker runs saved yet for this project.
+                      </p>
+                    ) : (
+                      <ul className="mt-3 space-y-2">
+                        {savedMarkerRuns.map((run) => {
+                          const rowSummary = summariseMarkerRunResult(
+                            run.resultJson
+                          );
+
+                          return (
+                            <li key={run.id}>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setSelectedMarkerRun((current) =>
+                                    current?.id === run.id ? null : run
+                                  )
+                                }
+                                className={`w-full rounded-xl border px-3 py-2 text-left transition ${
+                                  selectedMarkerRun?.id === run.id
+                                    ? "border-cyan-300 bg-cyan-950/40"
+                                    : "border-slate-700 bg-slate-950/60 hover:border-slate-500"
+                                }`}
+                              >
+                                <p className="text-sm font-bold text-white">
+                                  {formatMarkerRunTimestamp(run.createdAt)}
+                                </p>
+
+                                <p className="mt-0.5 text-xs text-slate-400">
+                                  Run {run.id.slice(0, 8)}
+                                  {typeof rowSummary.utilisationPercent ===
+                                  "number"
+                                    ? ` · ${formatNumber(rowSummary.utilisationPercent, 1)}% utilisation`
+                                    : ""}
+                                </p>
+                              </button>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
+                  </div>
+
+                  {selectedMarkerRun ? (
+                    <div className="mt-5 border-t border-slate-700 pt-4">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-xs font-black uppercase tracking-wide text-slate-500">
+                          Inspecting Saved Run
+                        </p>
+
+                        <button
+                          type="button"
+                          onClick={() => setSelectedMarkerRun(null)}
+                          className="text-xs font-bold text-slate-400 hover:text-white"
+                        >
+                          Close
+                        </button>
+                      </div>
+
+                      <p className="mt-2 text-xs leading-5 text-slate-500">
+                        Read-only — selecting a saved run never changes your
+                        current unsaved marker configuration or result above.
+                      </p>
+
+                      <div className="mt-3 space-y-2">
+                        <MarkerMetric
+                          label="Saved"
+                          value={formatMarkerRunTimestamp(
+                            selectedMarkerRun.createdAt
+                          )}
+                        />
+
+                        <MarkerMetric
+                          label="Run ID"
+                          value={selectedMarkerRun.id}
+                        />
+
+                        {(() => {
+                          const snapshotSummary =
+                            summariseMarkerRunSnapshot(
+                              selectedMarkerRun.snapshotJson
+                            );
+
+                          const resultSummary = summariseMarkerRunResult(
+                            selectedMarkerRun.resultJson
+                          );
+
+                          return (
+                            <>
+                              <MarkerMetric
+                                label="Fabric Width"
+                                value={
+                                  typeof snapshotSummary.fabricWidth ===
+                                  "number"
+                                    ? `${formatNumber(snapshotSummary.fabricWidth, 1)} cm`
+                                    : "—"
+                                }
+                              />
+
+                              <MarkerMetric
+                                label="Pieces"
+                                value={
+                                  typeof snapshotSummary.pieceCount ===
+                                  "number"
+                                    ? String(snapshotSummary.pieceCount)
+                                    : "—"
+                                }
+                              />
+
+                              <MarkerMetric
+                                label="Utilisation"
+                                value={
+                                  typeof resultSummary.utilisationPercent ===
+                                  "number"
+                                    ? `${formatNumber(resultSummary.utilisationPercent, 2)}%`
+                                    : "—"
+                                }
+                              />
+
+                              <MarkerMetric
+                                label="Waste"
+                                value={
+                                  typeof resultSummary.wastePercent ===
+                                  "number"
+                                    ? `${formatNumber(resultSummary.wastePercent, 2)}%`
+                                    : "—"
+                                }
+                              />
+
+                              <MarkerMetric
+                                label="Marker Length"
+                                value={
+                                  typeof resultSummary.markerLengthCm ===
+                                  "number"
+                                    ? `${formatNumber(resultSummary.markerLengthCm, 1)} cm`
+                                    : "—"
+                                }
+                              />
+                            </>
+                          );
+                        })()}
+                      </div>
+                    </div>
+                  ) : null}
+                </>
+              )}
             </section>
 
             <section className="rounded-3xl border border-cyan-500/20 bg-cyan-950/10 p-5">
