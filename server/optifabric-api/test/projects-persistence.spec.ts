@@ -20,21 +20,23 @@ function buildPrismaMock() {
   const patternPiece = { upsert: jest.fn(), create: jest.fn() };
   const patternGeometry = { upsert: jest.fn() };
   const markerRun = { create: jest.fn(), findMany: jest.fn() };
+  const fabricProfile = { upsert: jest.fn(), findUnique: jest.fn() };
   const auditEvent = { create: jest.fn().mockResolvedValue({}) };
   const queryRaw = jest.fn().mockResolvedValue([{ nextval: 1n }]);
 
-  // project/patternPiece/patternGeometry/markerRun/auditEvent are the SAME
-  // objects on both `prisma` and `tx` — ProjectsService reads some models
-  // (project.findMany, project.findFirst for plain reads) directly off
-  // PrismaService, and others only inside $transaction(tx => ...); sharing
-  // the mock objects means a test can set expectations without caring which
-  // path a given method takes.
-  const tx = { project, patternPiece, patternGeometry, markerRun, auditEvent, $queryRaw: queryRaw };
+  // project/patternPiece/patternGeometry/markerRun/fabricProfile/auditEvent
+  // are the SAME objects on both `prisma` and `tx` — ProjectsService reads
+  // some models (project.findMany, project.findFirst for plain reads)
+  // directly off PrismaService, and others only inside $transaction(tx =>
+  // ...); sharing the mock objects means a test can set expectations
+  // without caring which path a given method takes.
+  const tx = { project, patternPiece, patternGeometry, markerRun, fabricProfile, auditEvent, $queryRaw: queryRaw };
   const prisma = {
     project,
     patternPiece,
     patternGeometry,
     markerRun,
+    fabricProfile,
     auditEvent,
     $transaction: jest.fn((fn: (tx: unknown) => unknown) => fn(tx)),
   };
@@ -54,6 +56,25 @@ const VALID_CORE_FIELDS = {
   fabricWidth: 60,
   orderQuantity: 1200,
   scaleLength: 12,
+};
+
+// Stage 2C-2 — a complete, valid UpsertFabricProfileDto payload (every
+// required field set), shared by every upsertFabricProfile() test that
+// doesn't specifically exercise one field's own validation.
+const VALID_FABRIC_PROFILE = {
+  fabricType: "cottonWoven",
+  construction: "woven",
+  grainControl: "required",
+  faceDirection: "any",
+  nap: "none",
+  allowableRotation: "allAngles",
+  stretch: "none",
+  matchingRequirement: "none",
+  directionalFabric: "no",
+  usableFabricWidthCm: 150,
+  fabricWidthUnit: "cm",
+  maximumMarkerLengthOption: "notSpecified",
+  maximumMarkerLengthCm: null,
 };
 
 describe("ProjectsService.createProject", () => {
@@ -458,6 +479,26 @@ describe("ProjectsService cross-factory access", () => {
     expect(prisma.markerRun.findMany).not.toHaveBeenCalled();
   });
 
+  it("denies reading a fabric profile on a project belonging to another factory", async () => {
+    const { prisma } = buildPrismaMock();
+    prisma.project.findFirst.mockResolvedValue(null);
+    const service = new ProjectsService(prisma as never);
+
+    await expect(service.getFabricProfile(userA, "project-b")).rejects.toBeInstanceOf(NotFoundException);
+    expect(prisma.fabricProfile.findUnique).not.toHaveBeenCalled();
+  });
+
+  it("denies saving a fabric profile on a project belonging to another factory", async () => {
+    const { prisma, tx } = buildPrismaMock();
+    tx.project.findFirst.mockResolvedValue(null);
+    const service = new ProjectsService(prisma as never);
+
+    await expect(
+      service.upsertFabricProfile(userA, "project-b", VALID_FABRIC_PROFILE),
+    ).rejects.toBeInstanceOf(NotFoundException);
+    expect(tx.fabricProfile.upsert).not.toHaveBeenCalled();
+  });
+
   // Stage 1A: a stale-version update attempt on another factory's project
   // must still surface as 404, never 409 — a 409 would disclose that a
   // project with that id exists (just with a different version) even
@@ -835,6 +876,195 @@ describe("ProjectsService.createMarkerRun", () => {
     await expect(
       service.createMarkerRun(userA, "project-1", { snapshot: [], result: { success: true } }),
     ).rejects.toBeInstanceOf(BadRequestException);
+  });
+});
+
+describe("ProjectsService.getFabricProfile", () => {
+  it("returns the project's saved fabric profile", async () => {
+    const { prisma } = buildPrismaMock();
+    prisma.project.findFirst.mockResolvedValue({ id: "project-1", factoryId: "factory-a" });
+    const savedProfile = { id: "profile-1", projectId: "project-1", ...VALID_FABRIC_PROFILE };
+    prisma.fabricProfile.findUnique.mockResolvedValue(savedProfile);
+    const service = new ProjectsService(prisma as never);
+
+    const result = await service.getFabricProfile(userA, "project-1");
+
+    expect(prisma.fabricProfile.findUnique).toHaveBeenCalledWith({ where: { projectId: "project-1" } });
+    expect(result).toEqual(savedProfile);
+  });
+
+  // No profile yet is a normal state for a valid project, not an error —
+  // this must come back as null, never a 404 (see getFabricProfile's own
+  // comment for why this mirrors PatternGeometry's null-when-absent
+  // convention rather than NotFoundException).
+  it("returns null when the project has no saved fabric profile yet", async () => {
+    const { prisma } = buildPrismaMock();
+    prisma.project.findFirst.mockResolvedValue({ id: "project-1", factoryId: "factory-a" });
+    prisma.fabricProfile.findUnique.mockResolvedValue(null);
+    const service = new ProjectsService(prisma as never);
+
+    const result = await service.getFabricProfile(userA, "project-1");
+
+    expect(result).toBeNull();
+  });
+
+  it("denies reading a fabric profile for a nonexistent project", async () => {
+    const { prisma } = buildPrismaMock();
+    prisma.project.findFirst.mockResolvedValue(null);
+    const service = new ProjectsService(prisma as never);
+
+    await expect(service.getFabricProfile(userA, "project-1")).rejects.toBeInstanceOf(NotFoundException);
+  });
+});
+
+describe("ProjectsService.upsertFabricProfile", () => {
+  it("creates a fabric profile when none exists yet", async () => {
+    const { prisma, tx } = buildPrismaMock();
+    tx.project.findFirst.mockResolvedValue({ id: "project-1", factoryId: "factory-a", archivedAt: null });
+    tx.fabricProfile.upsert.mockImplementation(({ create }: { create: Record<string, unknown> }) =>
+      Promise.resolve({ id: "profile-1", ...create }),
+    );
+    const service = new ProjectsService(prisma as never);
+
+    const result = await service.upsertFabricProfile(userA, "project-1", VALID_FABRIC_PROFILE);
+
+    expect(tx.fabricProfile.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { projectId: "project-1" },
+        create: expect.objectContaining({ projectId: "project-1", fabricType: "cottonWoven" }),
+      }),
+    );
+    expect(result.id).toBe("profile-1");
+    expect(tx.auditEvent.create).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ actionType: "FABRIC_PROFILE_SAVED" }) }),
+    );
+  });
+
+  it("updates an existing fabric profile, clearing omitted optional fields to null", async () => {
+    const { prisma, tx } = buildPrismaMock();
+    tx.project.findFirst.mockResolvedValue({ id: "project-1", factoryId: "factory-a", archivedAt: null });
+    tx.fabricProfile.upsert.mockResolvedValue({ id: "profile-1" });
+    const service = new ProjectsService(prisma as never);
+
+    await service.upsertFabricProfile(userA, "project-1", {
+      ...VALID_FABRIC_PROFILE,
+      fabricType: "denim",
+      // knitOrientation/lengthWarpShrinkagePercent/etc. all omitted.
+    });
+
+    const call = tx.fabricProfile.upsert.mock.calls[0][0];
+    expect(call.update.fabricType).toBe("denim");
+    // Every optional field the DTO left unset must be explicitly nulled,
+    // not silently dropped — a nullable scalar column (unlike PatternGeometry's
+    // Json ones) takes a plain `null` directly, no Prisma.DbNull sentinel
+    // needed.
+    expect(call.update.knitOrientation).toBeNull();
+    expect(call.update.lengthWarpShrinkagePercent).toBeNull();
+    expect(call.update.nominalFabricWidthCm).toBeNull();
+  });
+
+  // Stage 2C-2 — the DTO/service must map fields explicitly rather than
+  // spreading the raw body, so an id/projectId/timestamp/ownership field a
+  // caller stuffs into the request body can never reach Prisma. projectId
+  // always comes from the authenticated route param, never the body.
+  it("ignores protected fields even if present in the request body", async () => {
+    const { prisma, tx } = buildPrismaMock();
+    tx.project.findFirst.mockResolvedValue({ id: "project-1", factoryId: "factory-a", archivedAt: null });
+    tx.fabricProfile.upsert.mockResolvedValue({ id: "profile-1" });
+    const service = new ProjectsService(prisma as never);
+
+    const maliciousDto = {
+      ...VALID_FABRIC_PROFILE,
+      id: "attacker-supplied-id",
+      projectId: "some-other-project",
+      createdAt: "2000-01-01T00:00:00.000Z",
+      updatedAt: "2000-01-01T00:00:00.000Z",
+      createdByUserId: "attacker-user",
+    } as unknown as Parameters<typeof service.upsertFabricProfile>[2];
+
+    await service.upsertFabricProfile(userA, "project-1", maliciousDto);
+
+    const call = tx.fabricProfile.upsert.mock.calls[0][0];
+    expect(call.where).toEqual({ projectId: "project-1" });
+    expect(call.create.projectId).toBe("project-1");
+    expect(call.create.id).toBeUndefined();
+    expect(call.create.createdAt).toBeUndefined();
+    expect(call.create.updatedAt).toBeUndefined();
+    expect(call.create.createdByUserId).toBeUndefined();
+    expect(call.update.id).toBeUndefined();
+    expect(call.update.projectId).toBeUndefined();
+    expect(call.update.createdAt).toBeUndefined();
+    expect(call.update.updatedAt).toBeUndefined();
+  });
+
+  it("rejects a missing required field", async () => {
+    const { prisma } = buildPrismaMock();
+    const service = new ProjectsService(prisma as never);
+
+    await expect(
+      service.upsertFabricProfile(userA, "project-1", { ...VALID_FABRIC_PROFILE, fabricType: undefined as never }),
+    ).rejects.toBeInstanceOf(BadRequestException);
+  });
+
+  it("rejects a non-positive usableFabricWidthCm", async () => {
+    const { prisma } = buildPrismaMock();
+    const service = new ProjectsService(prisma as never);
+
+    await expect(
+      service.upsertFabricProfile(userA, "project-1", { ...VALID_FABRIC_PROFILE, usableFabricWidthCm: 0 }),
+    ).rejects.toBeInstanceOf(BadRequestException);
+  });
+
+  it("rejects an out-of-range optional shrinkage percentage", async () => {
+    const { prisma } = buildPrismaMock();
+    const service = new ProjectsService(prisma as never);
+
+    await expect(
+      service.upsertFabricProfile(userA, "project-1", {
+        ...VALID_FABRIC_PROFILE,
+        lengthWarpShrinkagePercent: 150,
+      }),
+    ).rejects.toBeInstanceOf(BadRequestException);
+  });
+
+  it("accepts a null maximumMarkerLengthCm (no limit specified)", async () => {
+    const { prisma, tx } = buildPrismaMock();
+    tx.project.findFirst.mockResolvedValue({ id: "project-1", factoryId: "factory-a", archivedAt: null });
+    tx.fabricProfile.upsert.mockResolvedValue({ id: "profile-1" });
+    const service = new ProjectsService(prisma as never);
+
+    await service.upsertFabricProfile(userA, "project-1", {
+      ...VALID_FABRIC_PROFILE,
+      maximumMarkerLengthOption: "notSpecified",
+      maximumMarkerLengthCm: null,
+    });
+
+    const call = tx.fabricProfile.upsert.mock.calls[0][0];
+    expect(call.update.maximumMarkerLengthCm).toBeNull();
+  });
+
+  it("rejects a non-positive maximumMarkerLengthCm", async () => {
+    const { prisma } = buildPrismaMock();
+    const service = new ProjectsService(prisma as never);
+
+    await expect(
+      service.upsertFabricProfile(userA, "project-1", {
+        ...VALID_FABRIC_PROFILE,
+        maximumMarkerLengthOption: "custom",
+        maximumMarkerLengthCm: -5,
+      }),
+    ).rejects.toBeInstanceOf(BadRequestException);
+  });
+
+  it("rejects modifying the fabric profile on an archived project", async () => {
+    const { prisma, tx } = buildPrismaMock();
+    tx.project.findFirst.mockResolvedValue({ id: "project-1", factoryId: "factory-a", archivedAt: new Date() });
+    const service = new ProjectsService(prisma as never);
+
+    await expect(
+      service.upsertFabricProfile(userA, "project-1", VALID_FABRIC_PROFILE),
+    ).rejects.toBeInstanceOf(BadRequestException);
+    expect(tx.fabricProfile.upsert).not.toHaveBeenCalled();
   });
 });
 

@@ -16,8 +16,12 @@ import { UpdatePatternPieceDto } from "./update-pattern-piece.dto";
 import { UpsertPatternGeometryDto } from "./upsert-pattern-geometry.dto";
 import { CreateMarkerRunDto } from "./create-marker-run.dto";
 import { InitialPatternPieceDto } from "./initial-pattern-piece.dto";
+import { UpsertFabricProfileDto } from "./upsert-fabric-profile.dto";
 import {
   MAX_CUT_QUANTITY,
+  MAX_FABRIC_PROFILE_MARKER_LENGTH_CM,
+  MAX_FABRIC_PROFILE_PERCENT,
+  MAX_FABRIC_PROFILE_WIDTH_CM,
   MAX_FABRIC_WIDTH,
   MAX_INITIAL_PATTERNS,
   MAX_NAME_LENGTH,
@@ -103,6 +107,103 @@ export class ProjectsService {
   private validateOptionalName(value: unknown, field: string): string | undefined {
     if (value === undefined || value === null) return undefined;
     return this.validateName(value, field);
+  }
+
+  // Stage 2C-2 — FabricProfile's optional numeric fields (shrinkage
+  // percentages, print repeats, nominal width) are all "record it if the
+  // engineer entered one" values, not required for a valid profile — 0 is a
+  // legitimate value (e.g. no shrinkage), so unlike validatePositiveNumber
+  // this only rejects out-of-range, never <= 0.
+  private validateOptionalFiniteNumber(value: unknown, field: string, min: number, max: number): number | undefined {
+    if (value === undefined || value === null) return undefined;
+    if (typeof value !== "number" || !Number.isFinite(value)) {
+      throw new BadRequestException(`${field} must be a number.`);
+    }
+    if (value < min || value > max) {
+      throw new BadRequestException(`${field} must be between ${min} and ${max}.`);
+    }
+    return value;
+  }
+
+  // maximumMarkerLengthCm is a required DTO key whose valid value set
+  // includes null (see FabricProfile.maximumMarkerLengthCm's own comment:
+  // "null when not specified") — distinct from the optional-and-omittable
+  // fields above, which use undefined for "not specified" instead.
+  private validateNullableNumber(value: unknown, field: string, max: number): number | null {
+    if (value === null || value === undefined) return null;
+    if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) {
+      throw new BadRequestException(`${field} must be greater than zero, or null.`);
+    }
+    if (value > max) {
+      throw new BadRequestException(`${field} must be ${max} or less.`);
+    }
+    return value;
+  }
+
+  // Stage 2C-2 — every FabricProfile field the client may set, mapped
+  // explicitly (never a raw dto spread) so no unexpected client-supplied
+  // property can ever reach the database. An omitted optional field is
+  // nulled out rather than left stale, matching PUT's full-replace
+  // semantics (same idiom as upsertPatternGeometry).
+  private validateFabricProfileFields(dto: UpsertFabricProfileDto) {
+    return {
+      fabricType: this.validateName(dto.fabricType, "fabricType"),
+      construction: this.validateName(dto.construction, "construction"),
+
+      grainControl: this.validateName(dto.grainControl, "grainControl"),
+      faceDirection: this.validateName(dto.faceDirection, "faceDirection"),
+      nap: this.validateName(dto.nap, "nap"),
+      allowableRotation: this.validateName(dto.allowableRotation, "allowableRotation"),
+      stretch: this.validateName(dto.stretch, "stretch"),
+      knitOrientation: this.validateOptionalName(dto.knitOrientation, "knitOrientation") ?? null,
+
+      lengthWarpShrinkagePercent:
+        this.validateOptionalFiniteNumber(
+          dto.lengthWarpShrinkagePercent,
+          "lengthWarpShrinkagePercent",
+          0,
+          MAX_FABRIC_PROFILE_PERCENT,
+        ) ?? null,
+      widthWeftShrinkagePercent:
+        this.validateOptionalFiniteNumber(
+          dto.widthWeftShrinkagePercent,
+          "widthWeftShrinkagePercent",
+          0,
+          MAX_FABRIC_PROFILE_PERCENT,
+        ) ?? null,
+
+      matchingRequirement: this.validateName(dto.matchingRequirement, "matchingRequirement"),
+      horizontalRepeat:
+        this.validateOptionalFiniteNumber(dto.horizontalRepeat, "horizontalRepeat", 0, MAX_FABRIC_PROFILE_WIDTH_CM) ??
+        null,
+      verticalRepeat:
+        this.validateOptionalFiniteNumber(dto.verticalRepeat, "verticalRepeat", 0, MAX_FABRIC_PROFILE_WIDTH_CM) ??
+        null,
+      repeatUnit: this.validateOptionalName(dto.repeatUnit, "repeatUnit") ?? null,
+
+      directionalFabric: this.validateName(dto.directionalFabric, "directionalFabric"),
+
+      nominalFabricWidthCm:
+        this.validateOptionalFiniteNumber(
+          dto.nominalFabricWidthCm,
+          "nominalFabricWidthCm",
+          0,
+          MAX_FABRIC_PROFILE_WIDTH_CM,
+        ) ?? null,
+      usableFabricWidthCm: this.validatePositiveNumber(
+        dto.usableFabricWidthCm,
+        "usableFabricWidthCm",
+        MAX_FABRIC_PROFILE_WIDTH_CM,
+      ),
+      fabricWidthUnit: this.validateName(dto.fabricWidthUnit, "fabricWidthUnit"),
+
+      maximumMarkerLengthOption: this.validateName(dto.maximumMarkerLengthOption, "maximumMarkerLengthOption"),
+      maximumMarkerLengthCm: this.validateNullableNumber(
+        dto.maximumMarkerLengthCm,
+        "maximumMarkerLengthCm",
+        MAX_FABRIC_PROFILE_MARKER_LENGTH_CM,
+      ),
+    };
   }
 
   // Stage 1B core fields — see CreateProjectDto/UpdateProjectDto. `create`
@@ -644,6 +745,60 @@ export class ProjectsService {
     return this.prisma.markerRun.findMany({
       where: { projectId },
       orderBy: { createdAt: "desc" },
+    });
+  }
+
+  // GET /projects/:id/fabric-profile — one FabricProfile per project (see
+  // that model's own @unique projectId). Returns null, not a 404, when the
+  // project exists but has never had a profile saved — the same "null when
+  // absent" convention this backend already uses for a pattern piece's
+  // optional PatternGeometry (see getProject's own include), since a
+  // missing FabricProfile is a normal state for a valid project, not an
+  // error.
+  async getFabricProfile(user: AuthenticatedUser, projectId: string) {
+    const project = await this.prisma.project.findFirst({
+      where: { id: projectId, factoryId: user.factoryId },
+    });
+    if (!project) {
+      throw new NotFoundException(`No project found with id "${projectId}".`);
+    }
+
+    return this.prisma.fabricProfile.findUnique({ where: { projectId } });
+  }
+
+  // PUT /projects/:id/fabric-profile — idempotent create-or-replace, keyed
+  // on the project's own unique FabricProfile relation (never a second
+  // profile per project). Mirrors upsertPatternGeometry's shape: same
+  // ownership/archived-project checks, same audit-event pattern.
+  async upsertFabricProfile(user: AuthenticatedUser, projectId: string, dto: UpsertFabricProfileDto) {
+    const fields = this.validateFabricProfileFields(dto);
+
+    return this.prisma.$transaction(async (tx) => {
+      const project = await tx.project.findFirst({ where: { id: projectId, factoryId: user.factoryId } });
+      if (!project) {
+        throw new NotFoundException(`No project found with id "${projectId}".`);
+      }
+      if (project.archivedAt) {
+        throw new BadRequestException("Cannot modify the fabric profile on an archived project.");
+      }
+
+      const profile = await tx.fabricProfile.upsert({
+        where: { projectId },
+        create: { projectId, ...fields },
+        update: fields,
+      });
+
+      await tx.auditEvent.create({
+        data: {
+          factoryId: user.factoryId,
+          entityName: "FabricProfile",
+          entityId: profile.id,
+          actionType: "FABRIC_PROFILE_SAVED",
+          performedBy: user.userId,
+        },
+      });
+
+      return profile;
     });
   }
 }

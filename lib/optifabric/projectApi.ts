@@ -173,6 +173,66 @@ export function listMarkerRuns(projectId: string): Promise<ServerMarkerRun[]> {
   return apiFetch<ServerMarkerRun[]>(`/projects/${projectId}/marker-runs`);
 }
 
+// Stage 2C-2: mirrors the backend's FabricProfile model / UpsertFabricProfileDto
+// exactly (server/optifabric-api's GET/PUT /projects/:id/fabric-profile) —
+// field-for-field compatible with lib/optifabric/marker/fabricProfileTypes.ts's
+// FabricProfile interface, so the marker page can pass that object directly
+// as SaveFabricProfileInput. id/projectId/createdAt/updatedAt are never
+// client-writable — the backend derives/manages them itself, never taken
+// from this input.
+export interface SaveFabricProfileInput {
+  fabricType: string;
+  construction: string;
+
+  grainControl: string;
+  faceDirection: string;
+  nap: string;
+  allowableRotation: string;
+  stretch: string;
+  knitOrientation?: string;
+
+  lengthWarpShrinkagePercent?: number;
+  widthWeftShrinkagePercent?: number;
+
+  matchingRequirement: string;
+  horizontalRepeat?: number;
+  verticalRepeat?: number;
+  repeatUnit?: string;
+
+  directionalFabric: string;
+
+  nominalFabricWidthCm?: number;
+  usableFabricWidthCm: number;
+  fabricWidthUnit: string;
+
+  maximumMarkerLengthOption: string;
+  maximumMarkerLengthCm: number | null;
+}
+
+export interface ServerFabricProfile extends SaveFabricProfileInput {
+  id: string;
+  projectId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// null when the project exists but has never had a fabric profile saved —
+// the backend's own normal-state convention (see ProjectsService.
+// getFabricProfile's comment), not an error.
+export function getFabricProfile(projectId: string): Promise<ServerFabricProfile | null> {
+  return apiFetch<ServerFabricProfile | null>(`/projects/${projectId}/fabric-profile`);
+}
+
+export function saveFabricProfile(
+  projectId: string,
+  input: SaveFabricProfileInput,
+): Promise<ServerFabricProfile> {
+  return apiFetch<ServerFabricProfile>(`/projects/${projectId}/fabric-profile`, {
+    method: "PUT",
+    body: JSON.stringify(input),
+  });
+}
+
 // The server-authoritative fields carried alongside a cached
 // EngineeringProject once a project is backed by the server — presence of
 // this key is how the frontend distinguishes a server-backed project from a

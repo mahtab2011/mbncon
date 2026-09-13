@@ -8,6 +8,7 @@ import { UpdateProjectDto } from "./update-project.dto";
 import { UpdatePatternPieceDto } from "./update-pattern-piece.dto";
 import { UpsertPatternGeometryDto } from "./upsert-pattern-geometry.dto";
 import { CreateMarkerRunDto } from "./create-marker-run.dto";
+import { UpsertFabricProfileDto } from "./upsert-fabric-profile.dto";
 
 // Every route is factory-scoped server-side by ProjectsService (never by
 // trusting a client-supplied factoryId) — see that file's header comment.
@@ -81,5 +82,15 @@ export class ProjectsController {
   @Get(":id/marker-runs")
   async listMarkerRuns(@Req() request: Request, @Param("id") id: string) {
     return this.projectsService.listMarkerRuns(this.user(request), id);
+  }
+
+  @Get(":id/fabric-profile")
+  async getFabricProfile(@Req() request: Request, @Param("id") id: string) {
+    return this.projectsService.getFabricProfile(this.user(request), id);
+  }
+
+  @Put(":id/fabric-profile")
+  async upsertFabricProfile(@Req() request: Request, @Param("id") id: string, @Body() dto: UpsertFabricProfileDto) {
+    return this.projectsService.upsertFabricProfile(this.user(request), id, dto);
   }
 }

@@ -110,7 +110,11 @@ import {
 
 import {
   createMarkerRun,
+  getFabricProfile,
   listMarkerRuns,
+  saveFabricProfile as putFabricProfile,
+  type SaveFabricProfileInput,
+  type ServerFabricProfile,
   type ServerMarkerRun,
   type ServerProjectMeta,
 } from "@/lib/optifabric/projectApi";
@@ -558,6 +562,54 @@ function formatMarkerRunTimestamp(createdAt: string): string {
     dateStyle: "medium",
     timeStyle: "short",
   });
+}
+
+// Stage 2C-2: ServerFabricProfile -> the frontend's own FabricProfile shape
+// — strips id/projectId/createdAt/updatedAt (never part of the editable
+// profile) and converts the server's `null` (nullable Prisma columns) back
+// to `undefined` for every field FabricProfile itself declares optional.
+// maximumMarkerLengthCm is the one exception: FabricProfile declares it
+// `number | null` itself (see that interface's own comment), so it passes
+// through unchanged.
+function mapServerFabricProfile(serverProfile: ServerFabricProfile): FabricProfile {
+  return {
+    fabricType: serverProfile.fabricType as FabricProfile["fabricType"],
+    construction: serverProfile.construction as FabricProfile["construction"],
+
+    grainControl: serverProfile.grainControl as FabricProfile["grainControl"],
+    faceDirection: serverProfile.faceDirection as FabricProfile["faceDirection"],
+    nap: serverProfile.nap as FabricProfile["nap"],
+    allowableRotation: serverProfile.allowableRotation as FabricProfile["allowableRotation"],
+    stretch: serverProfile.stretch as FabricProfile["stretch"],
+    knitOrientation:
+      (serverProfile.knitOrientation as FabricProfile["knitOrientation"]) ?? undefined,
+
+    lengthWarpShrinkagePercent: serverProfile.lengthWarpShrinkagePercent ?? undefined,
+    widthWeftShrinkagePercent: serverProfile.widthWeftShrinkagePercent ?? undefined,
+
+    matchingRequirement: serverProfile.matchingRequirement as FabricProfile["matchingRequirement"],
+    horizontalRepeat: serverProfile.horizontalRepeat ?? undefined,
+    verticalRepeat: serverProfile.verticalRepeat ?? undefined,
+    repeatUnit: (serverProfile.repeatUnit as FabricProfile["repeatUnit"]) ?? undefined,
+
+    directionalFabric: serverProfile.directionalFabric as FabricProfile["directionalFabric"],
+
+    nominalFabricWidthCm: serverProfile.nominalFabricWidthCm ?? undefined,
+    usableFabricWidthCm: serverProfile.usableFabricWidthCm,
+    fabricWidthUnit: serverProfile.fabricWidthUnit as FabricProfile["fabricWidthUnit"],
+
+    maximumMarkerLengthOption:
+      serverProfile.maximumMarkerLengthOption as FabricProfile["maximumMarkerLengthOption"],
+    maximumMarkerLengthCm: serverProfile.maximumMarkerLengthCm,
+  };
+}
+
+// Stage 2C-2: FabricProfile -> SaveFabricProfileInput (the PUT body) — the
+// two shapes are already field-for-field identical (see SaveFabricProfileInput's
+// own comment), this only exists so the call site doesn't rely on structural
+// typing implicitly and stays obvious about what's actually sent.
+function toSaveFabricProfileInput(profile: FabricProfile): SaveFabricProfileInput {
+  return { ...profile };
 }
 
 function widthToCentimetres(
@@ -1071,6 +1123,19 @@ export default function MarkerEngineeringPage() {
 
   const [fabricProfileSaved, setFabricProfileSaved] = useState(true);
   const [fabricProfileSaveError, setFabricProfileSaveError] = useState("");
+  const [fabricProfileSaving, setFabricProfileSaving] = useState(false);
+  const [fabricProfileLoadError, setFabricProfileLoadError] = useState("");
+
+  // Mirrors fabricProfileSaved for the async hydration effect below, which
+  // must see the CURRENT value at the moment its server response resolves —
+  // same reasoning as hasUnsavedChangesRef/markerRunSavingRef elsewhere on
+  // this page.
+  const fabricProfileSavedRef = useRef(fabricProfileSaved);
+  const fabricProfileSavingRef = useRef(false);
+
+  useEffect(() => {
+    fabricProfileSavedRef.current = fabricProfileSaved;
+  }, [fabricProfileSaved]);
 
   useEffect(() => {
     if (project?.fabricProfile) {
@@ -1078,6 +1143,69 @@ export default function MarkerEngineeringPage() {
       setFabricProfileSaved(true);
     }
   }, [project]);
+
+  /* ============================================================================
+   * Stage 2C-2 — FabricProfile server hydration
+   *
+   * For server-backed projects, loads this project's persisted FabricProfile
+   * once on mount and — only when the user hasn't already started an unsaved
+   * local edit — uses it as the authoritative starting point, same
+   * "server wins unless local is already dirty" policy the marker-run save
+   * guard and Stage 2B's reconciliation already use. A legacy local-only
+   * project never makes this request; a failure here is non-blocking (the
+   * existing local/default fabricProfile state is simply left as-is).
+   * ========================================================================== */
+
+  useEffect(() => {
+    if (!projectId || !isServerBackedProject) {
+      return;
+    }
+
+    let cancelled = false;
+
+    setFabricProfileLoadError("");
+
+    getFabricProfile(projectId)
+      .then((serverProfile) => {
+        if (cancelled || !serverProfile || !fabricProfileSavedRef.current) {
+          return;
+        }
+
+        const resolvedProfile = mapServerFabricProfile(serverProfile);
+
+        setFabricProfile(resolvedProfile);
+        setFabricProfileSaved(true);
+
+        setProject((current) =>
+          current
+            ? {
+                ...current,
+                fabricProfile: resolvedProfile,
+              }
+            : current
+        );
+      })
+      .catch((error) => {
+        if (cancelled) return;
+
+        console.error(
+          "Unable to load the saved OptiFabric fabric profile:",
+          error
+        );
+
+        // Non-blocking: the marker workflow above is entirely unaffected —
+        // the existing local/default fabric profile state is left as-is.
+        setFabricProfileLoadError(
+          error instanceof Error
+            ? error.message
+            : "The saved fabric profile could not be loaded."
+        );
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [projectId, isServerBackedProject]);
 
   function updateFabricProfile(patch: Partial<FabricProfile>): void {
     setFabricProfile((current) => ({ ...current, ...patch }));
@@ -1112,28 +1240,79 @@ export default function MarkerEngineeringPage() {
     setFabricProfileSaved(false);
   }
 
-  function saveFabricProfile(): void {
+  // Stage 2C-2: for a server-backed project, PUTs the current fabricProfile
+  // state and — on success — adopts the authoritative server response as
+  // the new local state, same pattern Save Marker Run already established
+  // (ref-guarded against rapid repeat clicks, failure leaves everything as
+  // it was). A legacy local-only project keeps its original behaviour
+  // exactly (write straight to localStorage, no server request).
+  async function saveFabricProfile(): Promise<void> {
     if (!project) {
       return;
     }
 
+    if (!isServerBackedProject) {
+      try {
+        const updatedProject: MarkerProject = {
+          ...project,
+          fabricProfile,
+          updatedAt: new Date().toISOString(),
+        };
+
+        localStorage.setItem(projectStorageKey, JSON.stringify(updatedProject));
+        setProject(updatedProject);
+        setFabricProfileSaved(true);
+        setFabricProfileSaveError("");
+      } catch (error) {
+        console.error("Unable to save the fabric production profile:", error);
+
+        setFabricProfileSaveError(
+          "The fabric production profile could not be saved."
+        );
+      }
+
+      return;
+    }
+
+    if (fabricProfileSavingRef.current) {
+      return;
+    }
+
+    fabricProfileSavingRef.current = true;
+    setFabricProfileSaving(true);
+    setFabricProfileSaveError("");
+
     try {
+      const saved = await putFabricProfile(
+        projectId,
+        toSaveFabricProfileInput(fabricProfile)
+      );
+
+      const resolvedProfile = mapServerFabricProfile(saved);
+
       const updatedProject: MarkerProject = {
         ...project,
-        fabricProfile,
+        fabricProfile: resolvedProfile,
         updatedAt: new Date().toISOString(),
       };
 
       localStorage.setItem(projectStorageKey, JSON.stringify(updatedProject));
       setProject(updatedProject);
+      setFabricProfile(resolvedProfile);
       setFabricProfileSaved(true);
-      setFabricProfileSaveError("");
     } catch (error) {
+      // The current fabric inputs and marker result are untouched — only
+      // the save-error status changes on failure.
       console.error("Unable to save the fabric production profile:", error);
 
       setFabricProfileSaveError(
-        "The fabric production profile could not be saved."
+        error instanceof Error
+          ? error.message
+          : "The fabric production profile could not be saved."
       );
+    } finally {
+      fabricProfileSavingRef.current = false;
+      setFabricProfileSaving(false);
     }
   }
 
@@ -4647,17 +4826,34 @@ export default function MarkerEngineeringPage() {
                   <button
                     type="button"
                     onClick={saveFabricProfile}
-                    disabled={!project}
+                    disabled={!project || fabricProfileSaving}
                     className="rounded-xl border border-violet-400/40 bg-violet-500/10 px-4 py-2 text-sm font-black text-violet-100 transition hover:bg-violet-500/20 disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    {lang.term("saveFabricProfile")}
+                    {fabricProfileSaving
+                      ? "Saving..."
+                      : lang.term("saveFabricProfile")}
                   </button>
                 </div>
               </div>
 
+              {!isServerBackedProject ? (
+                <p className="mt-3 text-xs leading-5 text-slate-500">
+                  This project is local-only — the fabric profile saves to
+                  this browser, same as before, but not to your account.
+                </p>
+              ) : null}
+
+              {fabricProfileLoadError ? (
+                <p className="mt-3 rounded-xl border border-amber-500/30 bg-amber-950/20 px-4 py-3 text-sm font-bold text-amber-200">
+                  Could not load your saved fabric profile:{" "}
+                  {fabricProfileLoadError}. Using the current local values
+                  instead.
+                </p>
+              ) : null}
+
               {fabricProfileSaveError ? (
                 <p className="mt-3 rounded-xl border border-red-500/30 bg-red-950/20 px-4 py-3 text-sm font-bold text-red-200">
-                  {fabricProfileSaveError}
+                  Save failed: {fabricProfileSaveError}
                 </p>
               ) : null}
 
