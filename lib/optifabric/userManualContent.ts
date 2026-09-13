@@ -345,7 +345,10 @@ export const manualRoles: ManualRole[] = [
         screenNumber: "06",
         screenTitle: "AI Marker Layout Review",
         screenTitleBangla: "AI মার্কার লে-আউট যাচাই",
-        route: "/optifabric/cutting-assistant/fabric-consumption",
+        // Stage 2D-3: was pointing at the fabric-consumption demo route —
+        // corrected to the route this entry's own title/steps actually
+        // describe.
+        route: "/optifabric/cutting-assistant/marker-layout",
         purpose:
           "Review the proposed placement of pattern pieces inside the marker.",
         purposeBangla:
@@ -476,13 +479,13 @@ export const manualRoles: ManualRole[] = [
     sections: [
       {
         screenNumber: "08",
-        screenTitle: "Fabric Consumption Review",
-        screenTitleBangla: "কাপড়ের ব্যবহার যাচাই",
+        screenTitle: "Fabric Consumption Review (Legacy Demo)",
+        screenTitleBangla: "কাপড়ের ব্যবহার যাচাই (Legacy Demo)",
         route: "/optifabric/cutting-assistant/fabric-consumption",
         purpose:
-          "Review estimated marker efficiency, fabric utilisation and consumption.",
+          "Review estimated marker efficiency, fabric utilisation and consumption using the legacy Cutting Assistant demo calculation — this does not use a project's saved Marker Run or Fabric Profile. For real project consumption, use Marker-Based Fabric Consumption in the Project → Marker workflow.",
         purposeBangla:
-          "Estimated marker efficiency, fabric utilisation এবং consumption যাচাই করা।",
+          "Legacy Cutting Assistant demo calculation ব্যবহার করে estimated marker efficiency, fabric utilisation এবং consumption যাচাই করা — এটি project-এর saved Marker Run বা Fabric Profile ব্যবহার করে না। Real project consumption-এর জন্য Project → Marker workflow-এ Marker-Based Fabric Consumption ব্যবহার করুন।",
         whyAiAsks:
           "AI compares pattern area with marker area to estimate utilisation, wastage and consumption.",
         whyAiAsksBangla:

@@ -57,6 +57,35 @@ export default function FabricConsumptionPage() {
           </p>
         </section>
 
+        {/* Stage 2D-3 — this page's calculation uses fixed example numbers
+            below, not any project's persisted MarkerRun/FabricProfile. See
+            app/optifabric/project/[projectId]/marker/page.tsx's Fabric
+            Planning section (Stage 2D-2) for the real, Marker-Based Fabric
+            Consumption feature. */}
+        <section className="mt-8 rounded-2xl border border-amber-400/40 bg-amber-950/20 p-6">
+          <p className="text-xs font-black uppercase tracking-[0.2em] text-amber-300">
+            Legacy Demo
+          </p>
+
+          <h2 className="mt-2 text-xl font-black text-amber-100">
+            This is a legacy/demo Cutting Assistant calculation
+          </h2>
+
+          <p className="mt-3 leading-7 text-slate-300">
+            The figures below use fixed example numbers — they do not use
+            this or any project&apos;s persisted Marker Run or Fabric
+            Profile. For real project fabric consumption, use Marker-Based
+            Fabric Consumption in the Project → Marker workflow.
+          </p>
+
+          <Link
+            href="/optifabric/projects"
+            className="mt-4 inline-block rounded-xl bg-amber-400 px-5 py-3 font-bold text-slate-950 transition hover:bg-amber-300"
+          >
+            Go to your projects →
+          </Link>
+        </section>
+
         <section className="mt-8 grid gap-6 md:grid-cols-2">
           <div className="rounded-2xl border border-slate-700 bg-slate-900 p-6">
             <h2 className="text-2xl font-bold">

@@ -468,6 +468,34 @@ export default function EngineeringWizardPage() {
           </span>
         </div>
 
+        {/* Stage 2D-3 — this wizard's fabric-consumption figures are a
+            training simulation, not the real project calculation. See
+            app/optifabric/project/[projectId]/marker/page.tsx's Fabric
+            Planning section (Stage 2D-2) for the real, Marker-Based Fabric
+            Consumption feature, driven by a project's saved MarkerRun and
+            FabricProfile. */}
+        <div className="mt-6 rounded-2xl border border-amber-400 bg-amber-50 p-5">
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-700">
+            Training Simulation
+          </p>
+
+          <p className="mt-2 text-sm leading-6 text-amber-900">
+            This wizard is a training/simulation tool. Its fabric-consumption
+            figures are illustrative only — they are not the production
+            project calculation. Real project fabric consumption is
+            calculated from a project&apos;s saved Marker Runs and Fabric
+            Profile using Marker-Based Fabric Consumption in the
+            Project → Marker workflow.
+          </p>
+
+          <Link
+            href="/optifabric/projects"
+            className="mt-3 inline-flex items-center font-bold text-amber-800 underline hover:text-amber-950"
+          >
+            Go to your projects →
+          </Link>
+        </div>
+
         <div className="mt-6 rounded-3xl bg-slate-950 p-6 text-white sm:p-8">
           <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
             <div>
