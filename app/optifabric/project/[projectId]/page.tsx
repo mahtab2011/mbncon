@@ -13,6 +13,7 @@ import {
   extractStatusCode,
   getProject as getServerProject,
   mapServerProjectToCachedProject,
+  reconcileCachedPatternsWithServer,
   type CachedProject,
 } from "@/lib/optifabric/projectApi";
 import { saveGeometryRecord } from "@/lib/optifabric/geometrySaveEngine";
@@ -184,12 +185,23 @@ export default function EngineeringCommandCentrePage() {
       setLoading(false);
 
       // Server-backed project (tagged by the create flow) — refresh the
-      // core/identity fields from the server, but never touch patterns/
-      // geometry, which stay local-only until a later stage migrates them.
+      // core/identity fields from the server, and (Stage 2B-2) reconcile
+      // patterns/geometry too: pieces added on another device are pulled
+      // in, and a piece's saved geometry is refreshed only when the
+      // server's copy is newer than what this browser already has, so
+      // unsaved/in-progress local tracing work is never clobbered. See
+      // lib/optifabric/projectApi.ts's reconcileCachedPatternsWithServer
+      // for the exact merge policy.
       if (parsedProject._server) {
         try {
           const serverProject = await getServerProject(projectId);
           if (cancelled) return;
+
+          const { patterns, geometryRecordsToPersist } =
+            reconcileCachedPatternsWithServer(
+              serverProject,
+              parsedProject.patterns
+            );
 
           const refreshed: CachedProject = {
             ...parsedProject,
@@ -209,6 +221,7 @@ export default function EngineeringCommandCentrePage() {
             fabricWidth: serverProject.fabricWidth,
             orderQuantity: serverProject.orderQuantity,
             scaleLength: serverProject.scaleLength,
+            patterns,
             _server: {
               code: serverProject.code,
               updatedAt: serverProject.updatedAt,
@@ -220,6 +233,15 @@ export default function EngineeringCommandCentrePage() {
             `optifabric-project-${projectId}`,
             JSON.stringify(refreshed)
           );
+
+          // Each reconciled piece's finalized geometry also lives under its
+          // own optifabric-geometry-{projectId}-{patternId} key (see
+          // lib/optifabric/geometrySaveEngine.ts), independently read by the
+          // pattern-tracing page — keep it in sync with the main project
+          // object above, same as the fresh-device branch does.
+          for (const record of geometryRecordsToPersist) {
+            saveGeometryRecord(record);
+          }
 
           setProject(refreshed);
           setRefreshWarning("");

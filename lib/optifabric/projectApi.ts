@@ -319,9 +319,10 @@ function mapPieceGeometryToSavedGeometryRecord(
 // each piece's own optifabric-geometry-{projectId}-{patternId} key (via
 // geometrySaveEngine's saveGeometryRecord) alongside the main project cache
 // — see app/optifabric/project/[projectId]/page.tsx's fresh-device branch.
-// Only used for genuinely fresh devices (no prior local cache at all); the
-// existing "refresh an already-cached server project" path deliberately
-// leaves patterns/geometry alone, so this is never called there.
+// Used for genuinely fresh devices (no prior local cache at all); an
+// already-cached server project instead goes through
+// reconcileCachedPatternsWithServer below, which is more conservative about
+// not overwriting local work.
 export function extractSavedGeometryRecords(serverProject: ServerProject): SavedGeometryRecord[] {
   const records: SavedGeometryRecord[] = [];
   for (const piece of serverProject.patternPieces ?? []) {
@@ -329,6 +330,114 @@ export function extractSavedGeometryRecords(serverProject: ServerProject): Saved
     if (record) records.push(record);
   }
   return records;
+}
+
+// -- Stage 2B-2: already-cached project reconciliation -----------------------
+//
+// Stage 2B-1 (extractSavedGeometryRecords / mapServerProjectToCachedProject
+// above) only ever runs for a genuinely fresh device with no local cache at
+// all. A server-backed project that IS already cached locally previously
+// refreshed only its project-level identity fields on load (see
+// app/optifabric/project/[projectId]/page.tsx) and never touched
+// patterns/geometry — so geometry saved on another device never appeared
+// here. This closes that gap by reconciling the existing local patterns[]
+// against the same GET /projects/:id response, reusing
+// mapGeometryToTracingProjectFields / mapPieceGeometryToSavedGeometryRecord
+// rather than a second reconstruction system.
+//
+// Merge policy:
+//  - A piece present on both sides has its core ownership fields
+//    (name/sequence/cutQuantity/cutOnFold/required/custom) always follow the
+//    server, same as the project-level identity fields the refresh branch
+//    already overwrites unconditionally elsewhere. Its geometry-derived
+//    fields only follow the server when the server's saved geometry is
+//    strictly newer than this browser's own geometryTracingCompletedAt (or
+//    this browser has none yet) — a local trace at least as recent as the
+//    server's copy is left untouched rather than clobbered, which is what
+//    protects unsaved/in-progress local tracing work. patternTracing (image
+//    metadata, never persisted server-side) is never touched here, same
+//    restriction as the fresh-device path.
+//  - A piece present on the server but not locally (a pattern piece added
+//    on another device) is appended, built the same way a brand-new
+//    fresh-device piece is built.
+//  - A piece present locally but not on the server is left exactly as-is —
+//    this stage never deletes a local pattern piece.
+export function reconcileCachedPatternsWithServer(
+  serverProject: ServerProject,
+  localPatterns: PatternStatus[],
+): {
+  patterns: PatternStatus[];
+  geometryRecordsToPersist: SavedGeometryRecord[];
+} {
+  const localById = new Map(localPatterns.map((pattern) => [pattern.id, pattern]));
+  const serverPatternIds = new Set(
+    (serverProject.patternPieces ?? []).map((piece) => piece.patternId),
+  );
+  const geometryRecordsToPersist: SavedGeometryRecord[] = [];
+
+  const reconciledFromServer: PatternStatus[] = (serverProject.patternPieces ?? []).map(
+    (piece) => {
+      const serverCoreFields = {
+        name: piece.name,
+        required: piece.required,
+        cutQuantity: piece.cutQuantity,
+        cutOnFold: piece.cutOnFold,
+        custom: piece.custom,
+        sequence: piece.sequence,
+      };
+
+      const local = localById.get(piece.patternId) as
+        | (PatternStatus & Partial<PatternTracingProjectFields>)
+        | undefined;
+
+      if (!local) {
+        const geometryRecord = piece.geometry
+          ? mapPieceGeometryToSavedGeometryRecord(serverProject, piece)
+          : null;
+        if (geometryRecord) geometryRecordsToPersist.push(geometryRecord);
+
+        return {
+          id: piece.patternId,
+          uploaded: false,
+          recognised: false,
+          ...serverCoreFields,
+          ...(piece.geometry ? mapGeometryToTracingProjectFields(piece.geometry) : {}),
+        } as PatternStatus;
+      }
+
+      const localGeometryAt = local.geometryTracingCompletedAt
+        ? Date.parse(local.geometryTracingCompletedAt)
+        : NaN;
+      const serverGeometryAt = piece.geometry ? Date.parse(piece.geometry.updatedAt) : NaN;
+
+      const serverGeometryIsNewer =
+        Boolean(piece.geometry) &&
+        !Number.isNaN(serverGeometryAt) &&
+        (Number.isNaN(localGeometryAt) || serverGeometryAt > localGeometryAt);
+
+      if (!serverGeometryIsNewer) {
+        return { ...local, ...serverCoreFields };
+      }
+
+      const geometryRecord = mapPieceGeometryToSavedGeometryRecord(serverProject, piece);
+      if (geometryRecord) geometryRecordsToPersist.push(geometryRecord);
+
+      return {
+        ...local,
+        ...serverCoreFields,
+        ...mapGeometryToTracingProjectFields(piece.geometry as ServerPatternGeometry),
+      };
+    },
+  );
+
+  const localOnlyPatterns = localPatterns.filter(
+    (pattern) => !serverPatternIds.has(pattern.id),
+  );
+
+  return {
+    patterns: [...reconciledFromServer, ...localOnlyPatterns],
+    geometryRecordsToPersist,
+  };
 }
 
 // Server response -> a local working EngineeringProject cache, used to
