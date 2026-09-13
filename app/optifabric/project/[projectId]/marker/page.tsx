@@ -120,6 +120,11 @@ import {
 } from "@/lib/optifabric/projectApi";
 
 import {
+  calculateMarkerFabricConsumption,
+  type MarkerFabricConsumptionInput,
+} from "@/lib/optifabric/markerFabricConsumptionEngine";
+
+import {
   FABRIC_TYPES,
   GRAIN_CONTROL_OPTIONS,
   FACE_DIRECTION_OPTIONS,
@@ -539,6 +544,13 @@ function summariseMarkerRunResult(resultJson: unknown): {
   utilisationPercent?: number;
   wastePercent?: number;
   markerLengthCm?: number;
+  // Stage 2D-2: additional bestCandidate fields the fabric-consumption
+  // engine needs — read with the exact same defensive convention as the
+  // three fields above (undefined for anything absent/malformed, never a
+  // throw).
+  fabricWidthCm?: number;
+  placedPieceCount?: number;
+  expectedPieceCount?: number;
 } {
   if (!resultJson || typeof resultJson !== "object") return {};
 
@@ -548,6 +560,9 @@ function summariseMarkerRunResult(resultJson: unknown): {
     utilisationPercent: readOpaqueNumber(bestCandidate, "utilisationPercent"),
     wastePercent: readOpaqueNumber(bestCandidate, "wastePercent"),
     markerLengthCm: readOpaqueNumber(bestCandidate, "markerLengthCm"),
+    fabricWidthCm: readOpaqueNumber(bestCandidate, "fabricWidthCm"),
+    placedPieceCount: readOpaqueNumber(bestCandidate, "placedPieceCount"),
+    expectedPieceCount: readOpaqueNumber(bestCandidate, "expectedPieceCount"),
   };
 }
 
@@ -1013,6 +1028,26 @@ export default function MarkerEngineeringPage() {
 
   const [selectedMarkerRun, setSelectedMarkerRun] =
     useState<ServerMarkerRun | null>(null);
+
+  // Stage 2D-2: which saved run (if any) is the source for fabric-consumption
+  // analysis. Deliberately a SEPARATE piece of state from selectedMarkerRun
+  // above — clicking a run to inspect it (read-only, Stage 2C-1) must never
+  // change this, and choosing a run for consumption must never touch the
+  // live/editable marker or nesting state. Page/session state only: never
+  // persisted, never auto-set to "the latest run".
+  const [selectedConsumptionRun, setSelectedConsumptionRun] =
+    useState<ServerMarkerRun | null>(null);
+
+  // Defensive: if the saved-runs list ever changes (e.g. a reload) and the
+  // previously-selected consumption run is no longer in it, drop the
+  // selection rather than silently keep computing against stale data.
+  useEffect(() => {
+    setSelectedConsumptionRun((current) =>
+      current && !savedMarkerRuns.some((run) => run.id === current.id)
+        ? null
+        : current
+    );
+  }, [savedMarkerRuns]);
 
   // Synchronous guard against a rapid double-click submitting two save
   // requests — state alone can't guarantee this (two clicks in the same
@@ -2526,6 +2561,10 @@ export default function MarkerEngineeringPage() {
   const defectAllowanceMetresValue =
     parseNonNegative(defectAllowanceMetres);
 
+  // Used both for display here and as an input elsewhere on this page
+  // (e.g. the engineering-consultant report below) — kept independent of
+  // marker/consumption selection, unlike the figures Stage 2D-2 moved into
+  // the shared engine below.
   const usableRollLengthMetres = Math.max(
     0,
     grossRollLengthMetresValue -
@@ -2534,49 +2573,63 @@ export default function MarkerEngineeringPage() {
       defectAllowanceMetresValue
   );
 
-  const rollLengthCm = usableRollLengthMetres * 100;
-
-  /*
-   * Fabric consumption figures are only meaningful when the marker actually
-   * contains every piece it should. A marker missing pieces would understate
-   * consumption and overstate how many garments a roll yields.
-   */
-  const markerWithinMaximumLength =
-    optionalMaximumMarkerLengthCm <= 0 ||
-    markerLengthCm <= optionalMaximumMarkerLengthCm;
-
-  const planningValid =
-    markerIsComplete &&
-    markerLengthCm > 0 &&
-    markerWithinMaximumLength;
-
-  const fabricPerGarmentCm = planningValid
-    ? markerLengthCm / setsPerMarker
-    : 0;
-
-  const markersPerRoll =
-    planningValid && rollLengthCm > 0
-      ? Math.floor(rollLengthCm / markerLengthCm)
-      : 0;
-
-  const garmentsPerRoll = markersPerRoll * setsPerMarker;
-
-  const rollRemainderCm =
-    planningValid && rollLengthCm > 0
-      ? rollLengthCm - markersPerRoll * markerLengthCm
-      : 0;
-
-  const costPerGarment =
-    planningValid && project?.fabricCost
-      ? (fabricPerGarmentCm / 100) * project.fabricCost.costPerMetre
-      : 0;
-
   const orderQuantity = toFiniteNumber(project?.orderQuantity);
 
-  const rollsForOrder =
-    planningValid && orderQuantity > 0 && garmentsPerRoll > 0
-      ? Math.ceil(orderQuantity / garmentsPerRoll)
-      : 0;
+  /* ============================================================================
+   * Stage 2D-2 — marker-based fabric consumption
+   *
+   * Calculated ONLY against an explicitly selected saved MarkerRun
+   * (selectedConsumptionRun) via the shared, pure
+   * lib/optifabric/markerFabricConsumptionEngine.ts — never the live/current
+   * nesting session, and never auto-selected as "the latest run". No
+   * formulas are duplicated here; this block only adapts real persisted
+   * data (MarkerRun.resultJson, FabricProfile, project, this page's own
+   * roll/allowance inputs) into the engine's input shape.
+   *
+   * Width authority: FabricProfile.usableFabricWidthCm (fabricProfile.
+   * usableFabricWidthCm below) — never Project.fabricWidth (not even
+   * exposed on this page's MarkerProject type) and never the separate,
+   * page-local `usableFabricWidthCm` (nominal-width-minus-edge-exclusion)
+   * used above for live marker nesting — that is a different concept this
+   * stage does not touch.
+   * ========================================================================== */
+
+  // Deliberately a plain const, not useMemo — calculateMarkerFabricConsumption
+  // is cheap, pure arithmetic (a handful of numeric operations, no loops
+  // over pattern/marker data), so there is nothing expensive here worth
+  // caching across renders. A new useMemo in this region of the component
+  // was previously found to make the React Compiler give up optimising the
+  // component entirely (the same lesson already learned for Stage 2C-1's
+  // own productionOptimisationResult) — avoided here by simply not adding
+  // one. consumptionMarkerSummary is read once and reused for both the
+  // engine input and the "Marker Length" display below.
+  const consumptionMarkerSummary = selectedConsumptionRun
+    ? summariseMarkerRunResult(selectedConsumptionRun.resultJson)
+    : null;
+
+  const consumptionResult = selectedConsumptionRun && consumptionMarkerSummary
+    ? calculateMarkerFabricConsumption({
+        markerLengthCm: consumptionMarkerSummary.markerLengthCm ?? 0,
+        markerFabricWidthCm: consumptionMarkerSummary.fabricWidthCm,
+        expectedPieceCount: consumptionMarkerSummary.expectedPieceCount,
+        placedPieceCount: consumptionMarkerSummary.placedPieceCount,
+
+        usableFabricWidthCm: fabricProfile.usableFabricWidthCm,
+        maximumMarkerLengthCm: fabricProfile.maximumMarkerLengthCm,
+
+        setsPerMarker,
+        orderQuantity,
+
+        grossRollLengthMetres: grossRollLengthMetresValue,
+        startAllowanceMetres: startAllowanceMetresValue,
+        endAllowanceMetres: endAllowanceMetresValue,
+        defectAllowanceMetres: defectAllowanceMetresValue,
+
+        fabricCost: project?.fabricCost
+          ? { costPerMetre: project.fabricCost.costPerMetre }
+          : undefined,
+      } satisfies MarkerFabricConsumptionInput)
+    : null;
 
   /* ---------------------- AI engineering intelligence ------------------- */
 
@@ -6907,33 +6960,74 @@ export default function MarkerEngineeringPage() {
                             run.resultJson
                           );
 
+                          const isInspecting =
+                            selectedMarkerRun?.id === run.id;
+                          const isConsumptionSelected =
+                            selectedConsumptionRun?.id === run.id;
+
                           return (
                             <li key={run.id}>
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setSelectedMarkerRun((current) =>
-                                    current?.id === run.id ? null : run
-                                  )
-                                }
-                                className={`w-full rounded-xl border px-3 py-2 text-left transition ${
-                                  selectedMarkerRun?.id === run.id
+                              <div
+                                className={`rounded-xl border px-3 py-2 transition ${
+                                  isInspecting
                                     ? "border-cyan-300 bg-cyan-950/40"
-                                    : "border-slate-700 bg-slate-950/60 hover:border-slate-500"
+                                    : "border-slate-700 bg-slate-950/60"
                                 }`}
                               >
-                                <p className="text-sm font-bold text-white">
-                                  {formatMarkerRunTimestamp(run.createdAt)}
-                                </p>
+                                {/* Read-only inspection (Stage 2C-1) — never
+                                    changes the consumption selection below. */}
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setSelectedMarkerRun((current) =>
+                                      current?.id === run.id ? null : run
+                                    )
+                                  }
+                                  className="w-full text-left"
+                                >
+                                  <div className="flex items-center justify-between gap-2">
+                                    <p className="text-sm font-bold text-white">
+                                      {formatMarkerRunTimestamp(
+                                        run.createdAt
+                                      )}
+                                    </p>
 
-                                <p className="mt-0.5 text-xs text-slate-400">
-                                  Run {run.id.slice(0, 8)}
-                                  {typeof rowSummary.utilisationPercent ===
-                                  "number"
-                                    ? ` · ${formatNumber(rowSummary.utilisationPercent, 1)}% utilisation`
-                                    : ""}
-                                </p>
-                              </button>
+                                    {isConsumptionSelected ? (
+                                      <span className="rounded-full border border-emerald-400/40 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-300">
+                                        Consumption
+                                      </span>
+                                    ) : null}
+                                  </div>
+
+                                  <p className="mt-0.5 text-xs text-slate-400">
+                                    Run {run.id.slice(0, 8)}
+                                    {typeof rowSummary.utilisationPercent ===
+                                    "number"
+                                      ? ` · ${formatNumber(rowSummary.utilisationPercent, 1)}% utilisation`
+                                      : ""}
+                                  </p>
+                                </button>
+
+                                {/* Stage 2D-2 — explicit, separate action.
+                                    Selecting this never touches
+                                    selectedMarkerRun (inspection) above, and
+                                    never modifies the saved run or any live
+                                    marker/nesting state — it only points the
+                                    consumption calculation below at this
+                                    run. */}
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setSelectedConsumptionRun(run)
+                                  }
+                                  disabled={isConsumptionSelected}
+                                  className="mt-2 rounded-lg border border-emerald-400/40 bg-emerald-950/30 px-2 py-1 text-[11px] font-bold text-emerald-200 transition hover:border-emerald-300 hover:bg-emerald-900/40 disabled:cursor-not-allowed disabled:opacity-60"
+                                >
+                                  {isConsumptionSelected
+                                    ? "Selected for Consumption"
+                                    : "Use for Consumption"}
+                                </button>
+                              </div>
                             </li>
                           );
                         })}
@@ -7097,82 +7191,197 @@ export default function MarkerEngineeringPage() {
                 </p>
               </div>
 
-              {planningValid ? (
-                <>
-                  <div className="mt-5 space-y-3">
-                    <MarkerMetric
-                      label="Nominal Width"
-                      value={`${formatNumber(nominalFabricWidthCm, 2)} cm`}
-                    />
+              {/* Live nesting-width figures — describe the marker currently
+                  being built on this page, independent of any saved
+                  MarkerRun or consumption selection below. */}
+              <div className="mt-5 space-y-3">
+                <MarkerMetric
+                  label="Nominal Width"
+                  value={`${formatNumber(nominalFabricWidthCm, 2)} cm`}
+                />
 
-                    <MarkerMetric
-                      label="Usable Width"
-                      value={`${formatNumber(usableFabricWidthCm, 2)} cm`}
-                    />
+                <MarkerMetric
+                  label="Usable Width (Live Nesting)"
+                  value={`${formatNumber(usableFabricWidthCm, 2)} cm`}
+                />
 
-                    <MarkerMetric
-                      label="Total Edge Exclusion"
-                      value={`${formatNumber(edgeExclusionTotalCm, 2)} cm`}
-                    />
+                <MarkerMetric
+                  label="Total Edge Exclusion"
+                  value={`${formatNumber(edgeExclusionTotalCm, 2)} cm`}
+                />
+              </div>
 
-                    <MarkerMetric
-                      label="Garments per Marker"
-                      value={String(setsPerMarker)}
-                    />
+              <p className="mt-4 text-xs leading-5 text-slate-500">
+                Roll planning uses the usable roll length after start, end and
+                defect allowances. Marker nesting uses the usable width after
+                both edge exclusions.
+              </p>
 
-                    <MarkerMetric
-                      label="Fabric per Garment"
-                      value={`${formatNumber(fabricPerGarmentCm / 100, 4)} m`}
-                    />
+              {/* ======================================================================
+               * Stage 2D-2 — Marker-based fabric consumption, driven ONLY by
+               * an explicitly selected saved MarkerRun (see "Marker Run
+               * History" above) via the shared engine.
+               * ================================================================== */}
 
-                    <MarkerMetric
-                      label="Markers per Usable Roll"
-                      value={String(markersPerRoll)}
-                    />
-
-                    <MarkerMetric
-                      label="Garments per Usable Roll"
-                      value={String(garmentsPerRoll)}
-                    />
-
-                    <MarkerMetric
-                      label="Unused Usable Roll End"
-                      value={`${formatNumber(rollRemainderCm / 100, 3)} m`}
-                    />
-
-                    {project.fabricCost && currencySymbol ? (
-                      <MarkerMetric
-                        label="Fabric Cost per Garment"
-                        value={`${currencySymbol}${formatNumber(
-                          costPerGarment,
-                          4
-                        )}`}
-                      />
-                    ) : null}
-
-                    {rollsForOrder > 0 ? (
-                      <MarkerMetric
-                        label={`Rolls for ${orderQuantity.toLocaleString(
-                          "en-GB"
-                        )} Garments`}
-                        value={String(rollsForOrder)}
-                      />
-                    ) : null}
-                  </div>
-
-                  <p className="mt-4 text-xs leading-5 text-slate-500">
-                    Roll planning uses the usable roll length after start, end and
-                    defect allowances. Marker nesting uses the usable width after
-                    both edge exclusions.
-                  </p>
-                </>
-              ) : (
-                <p className="mt-4 text-sm leading-6 text-amber-200">
-                  Fabric figures are withheld until the marker contains every
-                  required piece, has no collisions, does not exhaust its search
-                  budget, and remains within the optional maximum marker length.
+              <div className="mt-6 border-t border-slate-700 pt-5">
+                <p className="text-xs font-black uppercase tracking-wide text-slate-500">
+                  Marker-Based Consumption
                 </p>
-              )}
+
+                {!isServerBackedProject ? (
+                  <p className="mt-3 text-sm leading-6 text-slate-400">
+                    Consumption analysis uses saved marker runs, which
+                    requires a server-synced engineering project. This
+                    project is local-only — the rest of the marker workflow
+                    above is unaffected.
+                  </p>
+                ) : !project?.fabricProfile ? (
+                  <p className="mt-3 text-sm leading-6 text-slate-400">
+                    A Fabric Profile must be completed and saved (see the
+                    Fabric section above) before consumption can be
+                    calculated — the current usable width shown there has
+                    not been confirmed for this project yet.
+                  </p>
+                ) : savedMarkerRuns.length === 0 ? (
+                  <p className="mt-3 text-sm leading-6 text-slate-400">
+                    No marker runs saved yet. Generate a marker and use{" "}
+                    &quot;Save Marker Run&quot; above before running a
+                    consumption analysis.
+                  </p>
+                ) : !selectedConsumptionRun ? (
+                  <p className="mt-3 text-sm leading-6 text-slate-400">
+                    Select &quot;Use for Consumption&quot; on a saved marker
+                    run above to calculate fabric consumption from it.
+                  </p>
+                ) : (
+                  <>
+                    <p className="mt-3 text-sm font-bold text-white">
+                      Selected run:{" "}
+                      {formatMarkerRunTimestamp(
+                        selectedConsumptionRun.createdAt
+                      )}{" "}
+                      (Run {selectedConsumptionRun.id.slice(0, 8)})
+                    </p>
+
+                    {consumptionResult
+                      ? consumptionResult.issues
+                          .filter((issue) => issue.severity === "error")
+                          .map((issue) => (
+                            <p
+                              key={issue.code}
+                              className="mt-3 rounded-xl border border-red-500/30 bg-red-950/20 px-4 py-3 text-sm font-bold text-red-200"
+                            >
+                              {issue.message}
+                            </p>
+                          ))
+                      : null}
+
+                    {consumptionResult
+                      ? consumptionResult.issues
+                          .filter((issue) => issue.severity === "warning")
+                          .map((issue) => (
+                            <p
+                              key={issue.code}
+                              className="mt-3 rounded-xl border border-amber-500/30 bg-amber-950/20 px-4 py-3 text-sm text-amber-200"
+                            >
+                              {issue.message}
+                            </p>
+                          ))
+                      : null}
+
+                    {consumptionResult?.valid ? (
+                      <div className="mt-4 space-y-3">
+                        <MarkerMetric
+                          label="Marker Length"
+                          value={`${formatNumber(
+                            consumptionMarkerSummary?.markerLengthCm ?? 0,
+                            1
+                          )} cm`}
+                        />
+
+                        <MarkerMetric
+                          label="Usable Fabric Width (Fabric Profile)"
+                          value={`${formatNumber(
+                            fabricProfile.usableFabricWidthCm,
+                            2
+                          )} cm`}
+                        />
+
+                        <MarkerMetric
+                          label="Sets per Marker"
+                          value={String(setsPerMarker)}
+                        />
+
+                        <MarkerMetric
+                          label="Usable Roll Length"
+                          value={`${formatNumber(
+                            consumptionResult.usableRollLengthMetres,
+                            2
+                          )} m`}
+                        />
+
+                        <MarkerMetric
+                          label="Fabric Consumption per Garment/Set"
+                          value={`${formatNumber(
+                            (consumptionResult.fabricConsumptionPerGarmentCm ??
+                              0) / 100,
+                            4
+                          )} m`}
+                        />
+
+                        <MarkerMetric
+                          label="Markers per Roll"
+                          value={String(consumptionResult.markersPerRoll)}
+                        />
+
+                        <MarkerMetric
+                          label="Garments/Sets per Roll"
+                          value={String(consumptionResult.garmentsPerRoll)}
+                        />
+
+                        <MarkerMetric
+                          label="Roll Remainder"
+                          value={`${formatNumber(
+                            (consumptionResult.rollRemainderCm ?? 0) / 100,
+                            3
+                          )} m`}
+                        />
+
+                        <MarkerMetric
+                          label="Total Fabric Requirement"
+                          value={`${formatNumber(
+                            consumptionResult.totalFabricRequiredMetres ?? 0,
+                            2
+                          )} m`}
+                        />
+
+                        {consumptionResult.rollsRequiredForOrder !== null &&
+                        consumptionResult.rollsRequiredForOrder > 0 ? (
+                          <MarkerMetric
+                            label={`Rolls for ${orderQuantity.toLocaleString(
+                              "en-GB"
+                            )} Garments`}
+                            value={String(
+                              consumptionResult.rollsRequiredForOrder
+                            )}
+                          />
+                        ) : null}
+
+                        {consumptionResult.costPerGarment !== null &&
+                        currencySymbol ? (
+                          <MarkerMetric
+                            label="Fabric Cost per Garment/Set"
+                            value={`${currencySymbol}${formatNumber(
+                              consumptionResult.costPerGarment,
+                              4
+                            )}`}
+                          />
+                        ) : null}
+                      </div>
+                    ) : null}
+                  </>
+                )}
+              </div>
             </section>
 
             {collisionPairs.length > 0 ? (
