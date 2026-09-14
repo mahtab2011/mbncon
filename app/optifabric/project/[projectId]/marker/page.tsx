@@ -125,6 +125,13 @@ import {
 } from "@/lib/optifabric/markerFabricConsumptionEngine";
 
 import {
+  buildEngineeringRecommendations,
+  type EngineeringRecommendationSeverity,
+} from "@/lib/optifabric/engineeringRecommendationsEngine";
+
+import type { ProductionSafetyGateIssue } from "@/lib/optifabric/markerOptimization/productionSafetyGateEngine";
+
+import {
   FABRIC_TYPES,
   GRAIN_CONTROL_OPTIONS,
   FACE_DIRECTION_OPTIONS,
@@ -578,6 +585,136 @@ function formatMarkerRunTimestamp(createdAt: string): string {
     timeStyle: "short",
   });
 }
+
+const SAFETY_GATE_SEVERITIES = new Set([
+  "critical",
+  "review",
+  "advisory",
+  "passed",
+]);
+
+// Stage 2E-2: defensive reader for a saved MarkerRun's opaque
+// resultJson.bestCandidate.safetyGate.issues — same "never throw, drop
+// anything absent/malformed" convention as summariseMarkerRunResult above.
+// Does not call productionSafetyGateEngine and does not reconstruct its
+// rules; this only extracts the ALREADY-COMPUTED issues array that engine
+// wrote into the MarkerRun at generation time. A malformed/missing
+// safetyGate (e.g. from a MarkerRun saved before this field existed, or any
+// unexpected shape) yields an empty array, never a throw.
+function readSafetyGateIssues(
+  resultJson: unknown
+): ProductionSafetyGateIssue[] {
+  if (!resultJson || typeof resultJson !== "object") return [];
+
+  const bestCandidate = (resultJson as Record<string, unknown>).bestCandidate;
+  if (!bestCandidate || typeof bestCandidate !== "object") return [];
+
+  const safetyGate = (bestCandidate as Record<string, unknown>).safetyGate;
+  if (!safetyGate || typeof safetyGate !== "object") return [];
+
+  const issues = (safetyGate as Record<string, unknown>).issues;
+  if (!Array.isArray(issues)) return [];
+
+  return issues.filter((issue): issue is ProductionSafetyGateIssue => {
+    if (!issue || typeof issue !== "object") return false;
+
+    const candidate = issue as Record<string, unknown>;
+
+    return (
+      typeof candidate.code === "string" &&
+      typeof candidate.severity === "string" &&
+      SAFETY_GATE_SEVERITIES.has(candidate.severity) &&
+      typeof candidate.title === "string" &&
+      typeof candidate.message === "string" &&
+      typeof candidate.blocksRelease === "boolean"
+    );
+  }) as ProductionSafetyGateIssue[];
+}
+
+function isPersistedGeometryPoint(value: unknown): boolean {
+  return (
+    Boolean(value) &&
+    typeof value === "object" &&
+    typeof (value as Record<string, unknown>).x === "number" &&
+    typeof (value as Record<string, unknown>).y === "number"
+  );
+}
+
+// Stage 2E-2: reads which pattern pieces in this project's own cached
+// geometry (the SAME optifabric-project-{projectId} object the trace page
+// writes grainLineFirstPoint/grainLineSecondPoint into — Stage 2B-3) have a
+// traced grain line, keyed by the pattern id trace/geometry pages use
+// (PatternStatus.id) so it can be cross-referenced against this page's own
+// markerPatterns (keyed by MarkerGeometryPattern.patternId — the same
+// underlying value, different field name). Presence-only: this checks that
+// both endpoints are well-formed {x,y} points, never angles/compliance.
+// project here is typed narrowly as MarkerProject (only the fields this
+// page otherwise cares about) but carries the full shared project object at
+// runtime, hence the defensive unknown-cast rather than trusting the type.
+function readGrainLineTracedPatternIds(project: unknown): Set<string> {
+  const rawPatterns =
+    project && typeof project === "object"
+      ? (project as Record<string, unknown>).patterns
+      : undefined;
+  if (!Array.isArray(rawPatterns)) return new Set();
+
+  const traced = new Set<string>();
+
+  for (const raw of rawPatterns) {
+    if (!raw || typeof raw !== "object") continue;
+
+    const record = raw as Record<string, unknown>;
+
+    const patternId =
+      typeof record.id === "string"
+        ? record.id
+        : typeof record.patternId === "string"
+          ? record.patternId
+          : undefined;
+
+    if (!patternId) continue;
+
+    if (
+      isPersistedGeometryPoint(record.grainLineFirstPoint) &&
+      isPersistedGeometryPoint(record.grainLineSecondPoint)
+    ) {
+      traced.add(patternId);
+    }
+  }
+
+  return traced;
+}
+
+// Stage 2E-2: purely presentational — visual styling only, no judgement.
+const RECOMMENDATION_SEVERITY_STYLES: Record<
+  EngineeringRecommendationSeverity,
+  { label: string; badge: string; panel: string; text: string }
+> = {
+  critical: {
+    label: "Critical",
+    badge: "border-red-400/40 bg-red-500/10 text-red-200",
+    panel: "border-red-500/30 bg-red-950/20",
+    text: "text-red-200",
+  },
+  review: {
+    label: "Review",
+    badge: "border-orange-400/40 bg-orange-500/10 text-orange-200",
+    panel: "border-orange-500/30 bg-orange-950/20",
+    text: "text-orange-100",
+  },
+  advisory: {
+    label: "Advisory",
+    badge: "border-amber-400/40 bg-amber-500/10 text-amber-200",
+    panel: "border-amber-500/30 bg-amber-950/20",
+    text: "text-amber-200",
+  },
+  passed: {
+    label: "Passed",
+    badge: "border-emerald-400/40 bg-emerald-500/10 text-emerald-300",
+    panel: "border-emerald-500/30 bg-emerald-950/20",
+    text: "text-emerald-200",
+  },
+};
 
 // Stage 2C-2: ServerFabricProfile -> the frontend's own FabricProfile shape
 // — strips id/projectId/createdAt/updatedAt (never part of the editable
@@ -2630,6 +2767,62 @@ export default function MarkerEngineeringPage() {
           : undefined,
       } satisfies MarkerFabricConsumptionInput)
     : null;
+
+  /* ============================================================================
+   * Stage 2E-2 — Engineering Recommendations UI integration
+   *
+   * A plain, deterministic mapping of state this page already holds into
+   * lib/optifabric/engineeringRecommendationsEngine.ts's own input shape —
+   * no new engineering rules, thresholds, severity mapping, dedup, or
+   * ordering here; all of that belongs exclusively to that module (Stage
+   * 2E-1) and is not duplicated.
+   *
+   * CRITICAL CONSISTENCY RULE: sourced from selectedConsumptionRun only —
+   * the exact same run already driving Marker-Based Fabric Consumption
+   * above — never selectedMarkerRun (read-only inspection, Stage 2C-1) and
+   * never the live/current nesting session. If no consumption run is
+   * selected, engineeringRecommendations is simply an empty array and the
+   * panel below explains why instead of showing anything run-specific.
+   * ========================================================================== */
+
+  // Deliberately a plain const, not useMemo — same React Compiler
+  // memoization-preservation lesson already noted above for
+  // consumptionMarkerSummary/consumptionResult.
+  const safetyGateIssues = selectedConsumptionRun
+    ? readSafetyGateIssues(selectedConsumptionRun.resultJson)
+    : [];
+
+  // FabricProfile completeness only applies once a consumption analysis is
+  // actually being attempted against a server-backed project — the same
+  // real-world condition the Marker-Based Consumption panel itself gates on
+  // (!isServerBackedProject / !project?.fabricProfile above), so this can
+  // never disagree with what that panel already shows. A legacy/local-only
+  // project (isServerBackedProject === false) never has this recommendation
+  // apply, matching instruction Section 3.
+  const engineeringFabricProfileApplicable = Boolean(
+    isServerBackedProject && selectedConsumptionRun
+  );
+
+  const grainLineTracedPatternIds = readGrainLineTracedPatternIds(project);
+
+  // markerPatterns (Stage 2B geometry) is the relevant pattern set for the
+  // current marker/project — the same set already rendered/nested above.
+  const grainLineTracePieces = markerPatterns.map((pattern) => ({
+    patternId: pattern.patternId,
+    hasTracedGrainLine: grainLineTracedPatternIds.has(pattern.patternId),
+  }));
+
+  const engineeringRecommendations = selectedConsumptionRun
+    ? buildEngineeringRecommendations({
+        safetyGateIssues,
+        consumptionIssues: consumptionResult?.issues ?? null,
+        fabricProfile: {
+          applicable: engineeringFabricProfileApplicable,
+          present: Boolean(project?.fabricProfile),
+        },
+        grainLineTrace: { pieces: grainLineTracePieces },
+      })
+    : [];
 
   /* ---------------------- AI engineering intelligence ------------------- */
 
@@ -7382,6 +7575,158 @@ export default function MarkerEngineeringPage() {
                   </>
                 )}
               </div>
+            </section>
+
+            {/* ======================================================================
+             * Stage 2E-2 — Engineering Recommendations
+             *
+             * A deterministic, read-only aggregated view over the SAME
+             * selectedConsumptionRun already driving Marker-Based Fabric
+             * Consumption above (never selectedMarkerRun / read-only
+             * inspection, never the live nesting session). This panel does
+             * not decide production release — that authority remains the
+             * Safety Gate baked into each saved MarkerRun; this is an
+             * aggregated engineering view on top of it, not a new one.
+             * ================================================================== */}
+
+            <section className="rounded-3xl border border-slate-700 bg-slate-900/60 p-5">
+              <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">
+                Engineering Recommendations
+              </p>
+
+              <h2 className="mt-2 text-2xl font-black">
+                Engineering Recommendations
+              </h2>
+
+              <p className="mt-2 text-xs leading-5 text-slate-500">
+                Aggregated from the Safety Gate and Fabric Consumption results
+                of the same marker run selected for consumption above, plus
+                Fabric Profile and grain-line trace completeness. This is not
+                a production-release decision — the Safety Gate remains the
+                sole release authority.
+              </p>
+
+              {!isServerBackedProject ? (
+                <p className="mt-3 text-sm leading-6 text-slate-400">
+                  Engineering recommendations use saved marker runs, which
+                  requires a server-synced engineering project. This project
+                  is local-only — the rest of the marker workflow above is
+                  unaffected.
+                </p>
+              ) : savedMarkerRuns.length === 0 ? (
+                <p className="mt-3 text-sm leading-6 text-slate-400">
+                  No marker runs saved yet. Generate a marker and use{" "}
+                  &quot;Save Marker Run&quot; above before viewing engineering
+                  recommendations.
+                </p>
+              ) : !selectedConsumptionRun ? (
+                <p className="mt-3 text-sm leading-6 text-slate-400">
+                  Select &quot;Use for Consumption&quot; on a saved marker run
+                  above to view engineering recommendations for it.
+                </p>
+              ) : (
+                <>
+                  <p className="mt-3 text-sm font-bold text-white">
+                    Selected run:{" "}
+                    {formatMarkerRunTimestamp(
+                      selectedConsumptionRun.createdAt
+                    )}{" "}
+                    (Run {selectedConsumptionRun.id.slice(0, 8)})
+                  </p>
+
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {(
+                      [
+                        "critical",
+                        "review",
+                        "advisory",
+                        "passed",
+                      ] as EngineeringRecommendationSeverity[]
+                    ).map((severity) => {
+                      const count = engineeringRecommendations.filter(
+                        (recommendation) =>
+                          recommendation.severity === severity
+                      ).length;
+                      const style = RECOMMENDATION_SEVERITY_STYLES[severity];
+
+                      return (
+                        <span
+                          key={severity}
+                          className={`rounded-full border px-3 py-1 text-xs font-bold ${style.badge}`}
+                        >
+                          {style.label}: {count}
+                        </span>
+                      );
+                    })}
+                  </div>
+
+                  {engineeringRecommendations.length === 0 ? (
+                    <p className="mt-4 text-sm leading-6 text-slate-400">
+                      No engineering recommendations to show for this run —
+                      the safety gate reported no issues, the consumption
+                      result reported no issues, and there is nothing
+                      applicable to report for Fabric Profile or grain-line
+                      trace completeness.
+                    </p>
+                  ) : (
+                    <div className="mt-4 space-y-3">
+                      {engineeringRecommendations.map((recommendation) => {
+                        const style =
+                          RECOMMENDATION_SEVERITY_STYLES[
+                            recommendation.severity
+                          ];
+
+                        return (
+                          <div
+                            key={`${recommendation.source}:${recommendation.code}`}
+                            className={`rounded-xl border px-4 py-3 ${style.panel}`}
+                          >
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span
+                                className={`rounded-full border px-2 py-0.5 text-[10px] font-black uppercase tracking-wide ${style.badge}`}
+                              >
+                                {style.label}
+                              </span>
+
+                              {recommendation.blocking ? (
+                                <span className="rounded-full border border-red-400/40 bg-red-500/20 px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-red-100">
+                                  Blocking
+                                </span>
+                              ) : null}
+
+                              <span className="text-[10px] font-bold uppercase tracking-wide text-slate-500">
+                                {recommendation.category} · {recommendation.source}
+                              </span>
+                            </div>
+
+                            <p
+                              className={`mt-2 text-sm font-bold ${style.text}`}
+                            >
+                              {recommendation.title}
+                            </p>
+
+                            <p className="mt-1 text-sm leading-6 text-slate-300">
+                              {recommendation.message}
+                            </p>
+
+                            {recommendation.evidence ? (
+                              <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
+                                {Object.entries(recommendation.evidence).map(
+                                  ([key, value]) => (
+                                    <span key={key}>
+                                      {key}: {String(value)}
+                                    </span>
+                                  )
+                                )}
+                              </div>
+                            ) : null}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </>
+              )}
             </section>
 
             {collisionPairs.length > 0 ? (
