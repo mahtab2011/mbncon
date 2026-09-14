@@ -9,7 +9,7 @@ import {
   UseGuards,
 } from "@nestjs/common";
 import type { Request } from "express";
-import { JwtAuthGuard } from "../auth/jwt-auth.guard";
+import { SkipJwtAuth } from "../auth/jwt-auth.guard";
 import { SkipSubscriptionCheck } from "../../common/guards/subscription.guard";
 import { PlatformRepGuard } from "../../common/guards/platform-rep.guard";
 import { SubscriptionService } from "./subscription.service";
@@ -35,6 +35,7 @@ export class SubscriptionController {
   // registered in Bangladesh (checked dynamically per-factory by
   // SubscriptionService.getEffectiveState() from Factory.country); the terms
   // below apply to factories outside Bangladesh.
+  @SkipJwtAuth()
   @SkipSubscriptionCheck()
   @Get("pricing")
   getPricing() {
@@ -65,8 +66,10 @@ export class SubscriptionController {
     };
   }
 
+  // JwtAuthGuard is now the global APP_GUARD (see app.module.ts) — no
+  // per-route @UseGuards(JwtAuthGuard) needed; JWT is still required, only
+  // entitlement enforcement is skipped.
   @SkipSubscriptionCheck()
-  @UseGuards(JwtAuthGuard)
   @Get("status")
   async getStatus(@Req() request: Request) {
     const user = request.user as AuthenticatedUser;
@@ -79,11 +82,10 @@ export class SubscriptionController {
   // activateSubscription() doc comment and the incident this patch
   // addresses. Online activation is not implemented; a factory activates a
   // paid plan only through the rep-gated POST /subscription/grant-seats
-  // (PlatformRepGuard), after payment is confirmed offline. JwtAuthGuard is
-  // kept so an unauthenticated caller still gets a normal 401 rather than
-  // this message.
+  // (PlatformRepGuard), after payment is confirmed offline. The global
+  // JwtAuthGuard (app.module.ts) still runs on this route, so an
+  // unauthenticated caller gets a normal 401 rather than this message.
   @SkipSubscriptionCheck()
-  @UseGuards(JwtAuthGuard)
   @Post("activate")
   activate(): never {
     throw new NotImplementedException(
@@ -92,7 +94,6 @@ export class SubscriptionController {
   }
 
   @SkipSubscriptionCheck()
-  @UseGuards(JwtAuthGuard)
   @Post("cancel")
   async cancel(@Req() request: Request) {
     const user = request.user as AuthenticatedUser;
@@ -105,7 +106,9 @@ export class SubscriptionController {
   // An OptiFabric representative grants any factory (Bangladeshi or foreign)
   // extra seats after confirming payment offline. Gated by PlatformRepGuard (a
   // shared server-only secret) rather than a factory-scoped JWT, since a
-  // representative is not a member of any one tenant.
+  // representative is not a member of any one tenant — so this route must
+  // skip the global JWT guard.
+  @SkipJwtAuth()
   @SkipSubscriptionCheck()
   @UseGuards(PlatformRepGuard)
   @Post("grant-seats")

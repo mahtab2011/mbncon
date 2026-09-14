@@ -6,7 +6,7 @@ import { Throttle } from "@nestjs/throttler";
 import type { Request } from "express";
 import { AuthService } from "./auth.service";
 import { LoginDto } from "./login.dto";
-import { JwtAuthGuard } from "./jwt-auth.guard";
+import { SkipJwtAuth } from "./jwt-auth.guard";
 import { AuthenticatedUser } from "./auth.types";
 import { SkipSubscriptionCheck } from "../../common/guards/subscription.guard";
 import { PlatformRepGuard } from "../../common/guards/platform-rep.guard";
@@ -16,12 +16,16 @@ import { PlatformRepGuard } from "../../common/guards/platform-rep.guard";
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  // Genuinely unauthenticated — no JWT exists yet at signup, and login is
+  // how one is obtained.
+  @SkipJwtAuth()
   @Throttle({ default: { limit: 5, ttl: 60_000 } })
   @Post("signup")
   async signUp(@Body() body: Parameters<AuthService["signUp"]>[0]) {
     return this.authService.signUp(body);
   }
 
+  @SkipJwtAuth()
   @Throttle({ default: { limit: 5, ttl: 60_000 } })
   @Post("login")
   async login(@Body() dto: LoginDto) {
@@ -29,7 +33,8 @@ export class AuthController {
     return this.authService.issueToken(user);
   }
 
-  @UseGuards(JwtAuthGuard)
+  // JwtAuthGuard is now the global APP_GUARD (see app.module.ts) — no
+  // per-route @UseGuards(JwtAuthGuard) needed here anymore.
   @Post("logout")
   async logout(@Req() request: Request) {
     const user = request.user as AuthenticatedUser | undefined;
@@ -43,7 +48,9 @@ export class AuthController {
   // free/trial seat limit, after confirming payment was arranged offline (no
   // payment gateway exists yet — see SEATS_ALLOWED_BEFORE_APPROVAL). Gated by
   // PlatformRepGuard rather than a factory-scoped JWT, matching
-  // SubscriptionController's grant-seats endpoint.
+  // SubscriptionController's grant-seats endpoint — a representative has no
+  // factory-scoped JWT at all, so this route must skip the global JWT guard.
+  @SkipJwtAuth()
   @UseGuards(PlatformRepGuard)
   @Post("approve-user")
   async approveUser(@Body() body: { userId: string; note?: string }) {

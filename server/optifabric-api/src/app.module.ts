@@ -6,6 +6,7 @@ import { SubscriptionModule } from "./modules/subscription/subscription.module";
 import { HealthModule } from "./modules/health/health.module";
 import { ProjectsModule } from "./modules/projects/projects.module";
 import { SubscriptionGuard } from "./common/guards/subscription.guard";
+import { JwtAuthGuard } from "./modules/auth/jwt-auth.guard";
 import { EntitlementIntegrationModule } from "./entitlement/entitlement.module";
 
 @Module({
@@ -30,6 +31,13 @@ import { EntitlementIntegrationModule } from "./entitlement/entitlement.module";
   controllers: [],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },
+    // Phase 4D: global authentication — MUST run before SubscriptionGuard so
+    // request.user is populated when entitlement is evaluated (see
+    // jwt-auth.guard.ts's header comment for the full ordering rationale).
+    // Routes that don't need a JWT — genuinely public (signup/login/health)
+    // or authenticated by PlatformRepGuard's shared secret instead — carry
+    // @SkipJwtAuth().
+    { provide: APP_GUARD, useClass: JwtAuthGuard },
     // Runs on every route unless the handler/controller carries
     // @SkipSubscriptionCheck() (auth and the subscription endpoints themselves
     // are exempted).

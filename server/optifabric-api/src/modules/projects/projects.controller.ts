@@ -1,6 +1,5 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, Req } from "@nestjs/common";
 import type { Request } from "express";
-import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { AuthenticatedUser } from "../auth/auth.types";
 import { ProjectsService } from "./projects.service";
 import { CreateProjectDto } from "./create-project.dto";
@@ -12,10 +11,10 @@ import { UpsertFabricProfileDto } from "./upsert-fabric-profile.dto";
 
 // Every route is factory-scoped server-side by ProjectsService (never by
 // trusting a client-supplied factoryId) — see that file's header comment.
-// SubscriptionGuard (global APP_GUARD) is deliberately NOT skipped here:
-// engineering-data access requires an active trial/subscription, same as any
-// other core OptiFabric feature.
-@UseGuards(JwtAuthGuard)
+// Neither JwtAuthGuard nor SubscriptionGuard is skipped here (both are
+// global APP_GUARDs — see app.module.ts): engineering-data access requires
+// both a valid JWT and an active trial/subscription, same as any other core
+// OptiFabric feature.
 @Controller("projects")
 export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
