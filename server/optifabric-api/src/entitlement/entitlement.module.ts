@@ -9,7 +9,7 @@
 import { Module } from "@nestjs/common";
 import { SubscriptionService } from "../modules/subscription/subscription.service";
 import { PrismaService } from "../common/prisma.service";
-import { entitlementPrismaProvider } from "./entitlement-providers";
+import { entitlementPrismaProvider, EntitlementPrismaLifecycle } from "./entitlement-providers";
 import { EntitlementDecisionService } from "./entitlement-decision.service";
 import { OrganisationResolverService } from "./organisation-resolver.service";
 import { EntitlementOnboardingService } from "./entitlement-onboarding.service";
@@ -21,6 +21,7 @@ import { EntitlementBackfillService } from "./entitlement-backfill.service";
     PrismaService,
     SubscriptionService,
     entitlementPrismaProvider,
+    EntitlementPrismaLifecycle,
     EntitlementDecisionService,
     OrganisationResolverService,
     EntitlementOnboardingService,

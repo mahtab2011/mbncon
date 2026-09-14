@@ -73,6 +73,17 @@ async function bootstrap() {
 
   app.setGlobalPrefix(env.API_PREFIX.replace(/^\//, ""));
 
+  // Stage A2: without this, PrismaService's existing onModuleDestroy
+  // ($disconnect — see common/prisma.service.ts) and the entitlement
+  // client's own shutdown hook (see entitlement-providers.ts) are only
+  // ever invoked by an explicit app.close() call, which nothing in this
+  // process makes. enableShutdownHooks() makes Nest listen for SIGTERM/
+  // SIGINT (the signals a process manager or container orchestrator sends
+  // on deploy/restart) and call app.close() itself, so both Postgres
+  // connections are actually closed on a graceful stop rather than left to
+  // OS-level socket cleanup on process exit.
+  app.enableShutdownHooks();
+
   await app.listen(env.PORT, "0.0.0.0");
 }
 void bootstrap();

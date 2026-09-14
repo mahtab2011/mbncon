@@ -3,10 +3,14 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "nest build",
+    "build": "npm run prisma:generate && npm run prisma:generate:entitlement && nest build",
     "lint": "tsc --noEmit",
     "test": "jest",
+    "start": "node dist/src/main.js",
     "start:dev": "nest start --watch",
+    "postinstall": "npm run prisma:generate && npm run prisma:generate:entitlement",
+    "prisma:generate": "prisma generate",
+    "prisma:generate:entitlement": "prisma generate --schema=prisma/entitlement/schema.prisma",
     "check:entitlement-schema-parity": "ts-node scripts/entitlement-schema-parity.ts",
     "backfill:optifabric-entitlements": "ts-node scripts/backfill-optifabric-entitlements.ts"
   },

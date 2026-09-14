@@ -8,7 +8,7 @@
 // This is ONE authoritative database, not two: ENTITLEMENT_DATABASE_URL
 // must be set to the exact same connection string as entitlement-api's own
 // DATABASE_URL at deploy time. See docs/PHASE-2-ENTITLEMENT-CUTOVER.md.
-import { Provider } from "@nestjs/common";
+import { Inject, Injectable, OnModuleDestroy, Provider } from "@nestjs/common";
 import * as path from "node:path";
 // Type-only: elided from emitted JS, so this relative path is only ever
 // resolved by tsc against the SOURCE tree at compile time (where it's
@@ -60,5 +60,20 @@ export const entitlementPrismaProvider: Provider = {
       datasources: { db: { url: requireEntitlementDatabaseUrl() } },
     }),
 };
+
+// Stage A2: entitlementPrismaProvider is a plain value factory, so it can't
+// implement OnModuleDestroy itself. Nest providers are singletons by
+// default, so this injects the SAME client instance every other consumer
+// gets (OrganisationResolverService, EntitlementDecisionService, etc.) —
+// this class adds nothing to that shape, it only closes the connection when
+// the app shuts down (see main.ts's enableShutdownHooks()).
+@Injectable()
+export class EntitlementPrismaLifecycle implements OnModuleDestroy {
+  constructor(@Inject(ENTITLEMENT_PRISMA) private readonly client: EntitlementPrismaClientType) {}
+
+  async onModuleDestroy(): Promise<void> {
+    await this.client.$disconnect();
+  }
+}
 
 export type { EntitlementPrismaClientType as EntitlementPrismaClient };
