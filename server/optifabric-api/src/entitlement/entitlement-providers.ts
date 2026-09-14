@@ -17,15 +17,18 @@ import * as path from "node:path";
 import type { PrismaClient as EntitlementPrismaClientType } from "../../node_modules/.prisma-entitlement-client";
 
 // The VALUE import cannot use the same static relative path: after `nest
-// build`, this file runs from dist/src/entitlement/, where "../../" resolves
-// into dist/ instead of the package root, throwing MODULE_NOT_FOUND. Since
-// this file has no fixed depth relative to the package root once compiled
-// (unlike the type import above, which tsc always resolves from source),
-// resolve it instead from process.cwd() — the repo's start commands
-// (`nest start`/`nest build` output, and the backfill script's documented
-// `ts-node scripts/...` usage) are always run from server/optifabric-api,
-// so this is stable across both the compiled dist/ layout and direct
-// ts-node source execution.
+// build`, this file runs from somewhere under dist/ (the exact depth has
+// already changed once — dist/src/entitlement/ before tsconfig.build.json
+// was added to scope `nest build` to src/ only, dist/entitlement/ after —
+// see docs/DEPLOYMENT-READINESS.md), so a relative "../../"-style path
+// would break the moment that depth changes again, throwing
+// MODULE_NOT_FOUND. Since this file has no fixed
+// depth relative to the package root once compiled (unlike the type import
+// above, which tsc always resolves from source), resolve it instead from
+// process.cwd() — the repo's start commands (`nest start`/`nest build`
+// output, and the backfill script's documented `ts-node scripts/...` usage)
+// are always run from server/optifabric-api, so this is stable regardless
+// of dist/'s internal layout or direct ts-node source execution.
 const entitlementClientPath = path.join(
   process.cwd(),
   "node_modules",

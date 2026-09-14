@@ -1,4 +1,4 @@
-# OptiFabric API — Deployment Readiness (Stage A2)
+# OptiFabric API — Deployment Readiness (Stage A2, updated)
 
 **Status: production-runnable locally. Not deployed anywhere. No DNS/hosting configured.**
 
@@ -21,13 +21,28 @@ infrastructure this stage doesn't need.
 
 ```
 npm run build   # prisma generate (both clients) -> nest build -> dist/
-npm run start   # node dist/src/main.js
+npm run start   # node dist/main.js
 ```
 
 `npm install` also runs both `prisma generate` steps via `postinstall`.
-`prisma` is a devDependency — the install/build phase must include
-devDependencies (the default on most platforms); only the final runtime
-image needs to exclude them.
+
+**Correction:** `@nestjs/cli`, `typescript`, `prisma`, and the `@types/*`
+packages needed by `src/` (`express`, `bcrypt`, `passport-jwt`, `node`) were
+originally `devDependencies`. A real Render deployment proved this wrong —
+most hosting platforms (Render included) set `NODE_ENV=production` during
+`npm install`, which makes npm skip `devDependencies` entirely, so `nest`
+and `tsc` were never installed and the build failed (`nest: not found`).
+All of the above are now regular `dependencies` so the build succeeds
+regardless of `NODE_ENV` during install. Only test-only tooling
+(`jest`, `ts-jest`, `ts-node`, `@types/jest`) remains in `devDependencies`.
+
+A `tsconfig.build.json` was also added (the standard Nest CLI convention)
+so `nest build` only compiles/type-checks `src/**/*.ts`, not `test/**/*.ts`
+— test files need `@types/jest`, which is intentionally still dev-only.
+This also changed the compiled output layout: it is now flat at
+`dist/main.js` (previously `dist/src/main.js`, back when `test/` was still
+part of the same compilation and TypeScript inferred a deeper common root).
+The `start` script above already reflects the corrected path.
 
 ## Required environment variables (names only)
 
