@@ -62,6 +62,51 @@ else -> deny
 
 Untouched: `Subscription` Prisma model, `subscription.service.ts`, `subscription.controller.ts`, all existing price constants — all still exist, still work, still have their own passing tests. `AuthService.signUp()` still writes a legacy `Subscription` row exactly as before (unchanged), specifically so legacy state remains available for comparison/rollback, per instruction. The only thing that changed is: **the guard no longer reads `SubscriptionService.getEffectiveState()` as its primary decision** — it's now consulted only by the narrow Bangladesh transitional path above.
 
+## Post-cutover incident: guard-ordering defect (found and fixed)
+
+**Issue:** `SubscriptionGuard` was registered as a global `APP_GUARD` (see "Guard logic, exactly" above) while `JwtAuthGuard` was applied only at controller/method level (`@UseGuards(JwtAuthGuard)`). Nest executes global guards before controller-level guards, so the real request order was:
+
+```
+ThrottlerGuard -> SubscriptionGuard -> controller-level JwtAuthGuard
+```
+
+`SubscriptionGuard`'s own `if (!user) return true` branch — written to defer to `JwtAuthGuard`'s 401 when there's genuinely no authenticated user — instead saw `request.user` as always-undefined at that point, because `JwtAuthGuard` hadn't run yet. It therefore allowed every request through, skipping entitlement enforcement entirely. `JwtAuthGuard` still ran afterward and correctly authenticated the request, so this was **an entitlement/paywall bypass, not an unauthenticated-access bypass** — a request with no or invalid JWT still received its normal 401.
+
+**Blast radius at discovery:** all 11 `ProjectsController` routes — the entire intended entitlement-protected surface. `AuthController`/`HealthController`/`SubscriptionController` were already intentionally entitlement-exempt and unaffected. No other global `request.user` dependency was found.
+
+**Why existing tests missed it:** every guard/entitlement test in this repo (`test/entitlement-cutover.spec.ts`, `test/subscription-licensing.spec.ts`) instantiates `SubscriptionGuard` directly (`new SubscriptionGuard(...)`) and calls `.canActivate()` against a hand-built `ExecutionContext` whose `request.user` is already populated — i.e. every test assumed `JwtAuthGuard` had already run. That assumption is exactly what was false in production. No test booted a real Nest application or exercised Nest's actual global-guard execution order before this fix.
+
+**Fix (commit `f8d195162e3471da8a2c70b0f69ea127dbebe661`):** `JwtAuthGuard` is now also registered globally, positioned before `SubscriptionGuard`:
+
+```
+ThrottlerGuard -> JwtAuthGuard -> SubscriptionGuard
+```
+
+A new `@SkipJwtAuth()` decorator (`src/modules/auth/jwt-auth.guard.ts`) was introduced for routes that genuinely don't need a JWT — signup, login, health, and the `PlatformRepGuard`-only routes (`approve-user`, `grant-seats`), which authenticate via a shared secret rather than a JWT at all. This is deliberately a **separate** concept from `@SkipSubscriptionCheck()` — do not conflate them:
+
+- `@SkipJwtAuth()` — no JWT authentication required for this route at all.
+- `@SkipSubscriptionCheck()` — a JWT may still be required; only entitlement enforcement is skipped.
+
+Redundant per-controller `@UseGuards(JwtAuthGuard)` declarations were removed once the global guard provided identical protection (`ProjectsController`, `AuthController.logout`, `SubscriptionController.status/activate/cancel`). Neither `PlatformRepGuard` nor `SubscriptionGuard` itself was modified.
+
+**Preserved behavior**, confirmed unchanged: health remains fully public; signup/login remain public; authenticated subscription-management routes (`status`, `activate`, `cancel`) remain JWT-protected but entitlement-exempt; `PlatformRepGuard` routes retain their own shared-secret authorization, independent of JWT.
+
+**Automated verification:** `test/guard-ordering-e2e.spec.ts` boots a real Nest application (`NestFactory.create`, not a mock) and issues real HTTP requests through the actual guard pipeline, proving: no JWT -> 401; invalid JWT -> 401; valid JWT + active entitlement -> 200; valid JWT + expired entitlement -> 402; health stays public; `subscription/status` requires a JWT but is entitlement-exempt; `PlatformRepGuard` behavior is unchanged. It also asserts, by reading `app.module.ts`'s own `@Module()` metadata directly, that the real `APP_GUARD` order is exactly `[ThrottlerGuard, JwtAuthGuard, SubscriptionGuard]` — so a future accidental reordering is caught even without booting the full app. Full suite: **10 test suites, 182/182 tests passing**; `tsc --noEmit` clean; `nest build` clean.
+
+**Live verification:** repeated against the real local backend and real local Postgres databases (a fresh QA international signup; no database mutation left in place afterward): active entitlement -> `GET /projects` = 200; no `Authorization` header -> 401; the same valid JWT with the QA organisation's OPTIFABRIC entitlement temporarily set to an expired `trialEndsAt` -> 402; entitlement restored to its exact original value -> 200 again. The OPTISEWING entitlement and the legacy `Subscription` row were confirmed untouched throughout; no schema, migration, or business-rule change was involved.
+
+### Current guarantee
+
+For every entitlement-protected OptiFabric route:
+
+```
+unauthenticated                                             -> 401
+authenticated + active OPTIFABRIC entitlement                -> access allowed
+authenticated + expired/missing (non-fallback) entitlement  -> 402
+```
+
+Authentication now always executes before entitlement enforcement — this ordering is itself covered by the regression suite above, not just by convention.
+
 ## Rollback
 
 Revert `subscription.guard.ts`, `app.module.ts`, `auth.module.ts`, `auth.service.ts`, `env-validation.config.ts`, and `tsconfig.json` to their pre-Phase-2 state (all other Phase 2 files are new and can simply be deleted); nothing else needs to change, since the legacy Subscription system was never modified or removed.
