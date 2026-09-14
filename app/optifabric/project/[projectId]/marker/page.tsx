@@ -2815,7 +2815,17 @@ export default function MarkerEngineeringPage() {
   const engineeringRecommendations = selectedConsumptionRun
     ? buildEngineeringRecommendations({
         safetyGateIssues,
-        consumptionIssues: consumptionResult?.issues ?? null,
+        // Stage 2E-4: consumptionResult is computed against whatever
+        // fabricProfile currently holds in local state, which stays at
+        // createDefaultFabricProfile("custom") when no profile has actually
+        // been saved (see the FabricProfile useState above) — the exact same
+        // unsaved-default value Marker-Based Consumption itself refuses to
+        // display in that case. Gate on the same persisted-profile indicator
+        // used for `present` below so this never surfaces a consumption
+        // issue derived from that unsaved default.
+        consumptionIssues: project?.fabricProfile
+          ? (consumptionResult?.issues ?? null)
+          : null,
         fabricProfile: {
           applicable: engineeringFabricProfileApplicable,
           present: Boolean(project?.fabricProfile),
