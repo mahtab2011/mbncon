@@ -9,7 +9,32 @@
 // must be set to the exact same connection string as entitlement-api's own
 // DATABASE_URL at deploy time. See docs/PHASE-2-ENTITLEMENT-CUTOVER.md.
 import { Provider } from "@nestjs/common";
-import { PrismaClient as EntitlementPrismaClient } from "../../node_modules/.prisma-entitlement-client";
+import * as path from "node:path";
+// Type-only: elided from emitted JS, so this relative path is only ever
+// resolved by tsc against the SOURCE tree at compile time (where it's
+// correct, two levels up from src/entitlement/) — it never affects runtime
+// module resolution below.
+import type { PrismaClient as EntitlementPrismaClientType } from "../../node_modules/.prisma-entitlement-client";
+
+// The VALUE import cannot use the same static relative path: after `nest
+// build`, this file runs from dist/src/entitlement/, where "../../" resolves
+// into dist/ instead of the package root, throwing MODULE_NOT_FOUND. Since
+// this file has no fixed depth relative to the package root once compiled
+// (unlike the type import above, which tsc always resolves from source),
+// resolve it instead from process.cwd() — the repo's start commands
+// (`nest start`/`nest build` output, and the backfill script's documented
+// `ts-node scripts/...` usage) are always run from server/optifabric-api,
+// so this is stable across both the compiled dist/ layout and direct
+// ts-node source execution.
+const entitlementClientPath = path.join(
+  process.cwd(),
+  "node_modules",
+  ".prisma-entitlement-client",
+);
+
+const { PrismaClient: EntitlementPrismaClient } = require(entitlementClientPath) as {
+  PrismaClient: typeof EntitlementPrismaClientType;
+};
 
 export const ENTITLEMENT_PRISMA = "ENTITLEMENT_PRISMA";
 
@@ -30,10 +55,10 @@ export function requireEntitlementDatabaseUrl(): string {
 
 export const entitlementPrismaProvider: Provider = {
   provide: ENTITLEMENT_PRISMA,
-  useFactory: (): EntitlementPrismaClient =>
+  useFactory: (): EntitlementPrismaClientType =>
     new EntitlementPrismaClient({
       datasources: { db: { url: requireEntitlementDatabaseUrl() } },
     }),
 };
 
-export type { EntitlementPrismaClient };
+export type { EntitlementPrismaClientType as EntitlementPrismaClient };
