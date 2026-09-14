@@ -56,6 +56,90 @@ type GatewayCard = {
   style: string;
 };
 
+type PlatformCard = {
+  name: string;
+  domain: string;
+  description: string;
+  href: string | null;
+  status: "live" | "comingSoon";
+  style: string;
+};
+
+const platformCards: PlatformCard[] = [
+  {
+    name: "Bangladesh Apparel",
+    domain: "bangladeshapparel.com",
+    description:
+      "Global sourcing and industry showcase platform connecting international buyers with Bangladesh garment manufacturers and related businesses.",
+    href: "https://bangladeshapparel.com",
+    status: "live",
+    style: "border-sky-300 bg-sky-50 text-sky-950",
+  },
+  {
+    name: "Shoes from Bangladesh",
+    domain: "shoesfrombangladesh.com",
+    description:
+      "Dedicated export platform promoting Bangladesh footwear manufacturers, products and sourcing opportunities.",
+    href: "https://shoesfrombangladesh.com",
+    status: "live",
+    style: "border-amber-300 bg-amber-50 text-amber-950",
+  },
+  {
+    name: "Medicines from Bangladesh",
+    domain: "medicinesfrombangladesh.com",
+    description:
+      "Platform presenting Bangladesh's pharmaceutical capabilities and export potential to international markets.",
+    href: "https://medicinesfrombangladesh.com",
+    status: "live",
+    style: "border-rose-300 bg-rose-50 text-rose-950",
+  },
+  {
+    name: "Exports from Bangladesh",
+    domain: "exportsfrombangladesh.com",
+    description:
+      "Umbrella gateway connecting international buyers and investors with specialist Bangladesh export platforms.",
+    href: "https://exportsfrombangladesh.com",
+    status: "live",
+    style: "border-indigo-300 bg-indigo-50 text-indigo-950",
+  },
+  {
+    name: "London Food Hubs",
+    domain: "londonfoodhubs.com",
+    description:
+      "Multilingual London food marketplace connecting restaurants, takeaways, caterers, bakeries, grocery businesses and specialist food providers.",
+    href: "https://londonfoodhubs.com",
+    status: "live",
+    style: "border-lime-300 bg-lime-50 text-lime-950",
+  },
+  {
+    name: "OptiFabric",
+    domain: "optifabric.mahtabsiddiqui.com",
+    description:
+      "AI-assisted fabric and engineering optimisation platform for garment manufacturing, including pattern tracing, marker planning, fabric consumption and engineering recommendations.",
+    href: null,
+    status: "comingSoon",
+    style: "border-emerald-300 bg-emerald-50 text-emerald-950",
+  },
+  {
+    name: "OptiSewing",
+    domain: "optisewing.mahtabsiddiqui.com",
+    description:
+      "Manufacturing productivity and industrial engineering platform for sewing operations, work measurement, line improvement, Kaizen and production optimisation.",
+    href: null,
+    status: "comingSoon",
+    style: "border-violet-300 bg-violet-50 text-violet-950",
+  },
+  {
+    name: "OptiFootwear",
+    domain: "optifootwear.mahtabsiddiqui.com",
+    description:
+      "Footwear manufacturing optimisation platform covering materials, natural leather, production planning and industrial engineering.",
+    href: null,
+    status: "comingSoon",
+    style: "border-teal-300 bg-teal-50 text-teal-950",
+  },
+];
+
 const gatewayCards: GatewayCard[] = [
   {
     title: "Executive Intelligence & Enterprise Control",
@@ -339,6 +423,70 @@ export default function HomePage() {
                 Explore OptiSewing →
               </p>
             </Link>
+          </div>
+        </div>
+      </section>
+
+      <section
+        id="platforms"
+        className="scroll-mt-28 px-6 py-16"
+      >
+        <div className="mx-auto max-w-7xl rounded-3xl border border-slate-300 bg-slate-100 p-8 shadow-sm transition duration-300 hover:shadow-xl sm:p-10">
+          <p className="text-sm font-bold uppercase tracking-widest text-cyan-700">
+            Our Digital Platforms
+          </p>
+
+          <h2 className="mt-4 max-w-4xl text-3xl font-extrabold text-slate-950">
+            Our Platforms & Applications
+          </h2>
+
+          <p className="mt-5 max-w-4xl text-lg leading-8 text-slate-700">
+            MBN Consulting develops practical digital platforms and
+            AI-enabled tools for manufacturing, exports, productivity and
+            business transformation.
+          </p>
+
+          <div className="mt-8 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+            {platformCards.map((platform) =>
+              platform.status === "live" && platform.href ? (
+                <a
+                  key={platform.name}
+                  href={platform.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`flex min-h-56 flex-col rounded-2xl border p-6 shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-2xl ${platform.style}`}
+                >
+                  <h3 className="text-xl font-bold">{platform.name}</h3>
+                  <p className="mt-1 text-xs font-semibold uppercase tracking-wide opacity-70">
+                    {platform.domain}
+                  </p>
+                  <p className="mt-4 flex-1 text-sm leading-7">
+                    {platform.description}
+                  </p>
+                  <p className="mt-5 text-sm font-bold opacity-90">
+                    Visit Website →
+                  </p>
+                </a>
+              ) : (
+                <div
+                  key={platform.name}
+                  className={`flex min-h-56 flex-col rounded-2xl border border-dashed p-6 opacity-90 ${platform.style}`}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <h3 className="text-xl font-bold">{platform.name}</h3>
+                    <span className="whitespace-nowrap rounded-full border border-current px-3 py-1 text-xs font-bold uppercase tracking-wide">
+                      Coming Soon
+                    </span>
+                  </div>
+                  <p className="mt-1 text-xs font-semibold uppercase tracking-wide opacity-70">
+                    {platform.domain}
+                  </p>
+                  <p className="mt-4 flex-1 text-sm leading-7">
+                    {platform.description}
+                  </p>
+                </div>
+              ),
+            )}
           </div>
         </div>
       </section>

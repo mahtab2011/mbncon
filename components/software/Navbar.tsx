@@ -17,7 +17,7 @@ export default function Navbar() {
           MBNCON
         </Link>
 
-        <nav className="hidden items-center gap-3 lg:flex">
+        <nav className="hidden flex-wrap items-center justify-end gap-x-3 gap-y-2 lg:flex">
           <Link
             href="/about-mbncon"
             className="rounded-full border border-cyan-400/20 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-cyan-400/10"
@@ -69,6 +69,13 @@ export default function Navbar() {
             className="rounded-full border border-white/10 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
           >
             Modules
+          </Link>
+
+          <Link
+            href="/#platforms"
+            className="rounded-full border border-white/10 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
+          >
+            Our Platforms
           </Link>
 
           <Link
@@ -131,6 +138,13 @@ export default function Navbar() {
               className="rounded-2xl border border-white/10 px-4 py-3 text-slate-200"
             >
               Modules
+            </Link>
+
+            <Link
+              href="/#platforms"
+              className="rounded-2xl border border-white/10 px-4 py-3 text-slate-200"
+            >
+              Our Platforms
             </Link>
 
             <Link
