@@ -107,6 +107,14 @@ authenticated + expired/missing (non-fallback) entitlement  -> 402
 
 Authentication now always executes before entitlement enforcement — this ordering is itself covered by the regression suite above, not just by convention.
 
+## Stage 2F-2 — the subscription/status page now reads this same decision
+
+Until Stage 2F-2, `app/optifabric/subscription/page.tsx` displayed only the legacy `SubscriptionService.getEffectiveState()` status (`GET /subscription/status`) — a second, independent read of access state that could disagree with what `SubscriptionGuard` (above) actually enforced on `/projects` and friends. Stage 2F-1 started sending entitlement-denied users to that page (via a 402 response); Stage 2F-2 closed the resulting mismatch.
+
+`GET /entitlements/me/optifabric` (`src/entitlement/entitlement-status.controller.ts`) is now the first public HTTP exposure of the central entitlement system — read-only, composing the exact same `FactoryOrganisationMappingService` / `EntitlementDecisionService` / `EntitlementOnboardingService` calls `SubscriptionGuard.canActivate()` makes, so the status this route reports can never disagree with the guard's own decision. `app/optifabric/subscription/page.tsx` now reads this route for its primary access/status display.
+
+**`SubscriptionService`/the legacy `Subscription` model remain exactly what this document already says above: not authoritative for protected OptiFabric access.** They are still fully in use — `SubscriptionController`'s pricing, seat-billing, and cancel routes; the Bangladesh transitional fallback in `EntitlementOnboardingService`; the one-time migration in `EntitlementBackfillService`; and `AuthService.signUp()`'s legacy bookkeeping row — none of that changed. The subscription page also still reads `GET /subscription/status`, but Stage 2F-2 narrowed that read to SEAT-usage display only (a concept the central entitlement model has no equivalent of at all) — never again for deciding whether access is allowed or which status banner to show.
+
 ## Rollback
 
 Revert `subscription.guard.ts`, `app.module.ts`, `auth.module.ts`, `auth.service.ts`, `env-validation.config.ts`, and `tsconfig.json` to their pre-Phase-2 state (all other Phase 2 files are new and can simply be deleted); nothing else needs to change, since the legacy Subscription system was never modified or removed.

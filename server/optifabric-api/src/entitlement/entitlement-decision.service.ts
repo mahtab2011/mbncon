@@ -73,6 +73,26 @@ export class EntitlementDecisionService {
   }
 
   /**
+   * Stage 2F-2 — read-only helper for UI display purposes only (e.g. "N
+   * days remaining"). Deliberately NOT part of the entitlement-api mirror
+   * above (getEffectiveEntitlement/canAccess/startInternationalTrial stay
+   * byte-for-byte identical to that file's own three methods) — this is a
+   * plain data read of the same row, added for the status endpoint that
+   * needs the raw dates behind getEffectiveEntitlement's boolean/reason.
+   * Returns null fields when no row exists, same "no row = nothing to
+   * report" convention as the rest of this service.
+   */
+  async getEntitlementDates(
+    organisationId: string,
+    product: Product,
+  ): Promise<{ trialEndsAt: Date | null; currentPeriodEnd: Date | null }> {
+    const row = await this.prisma.productEntitlement.findUnique({
+      where: { organisationId_product: { organisationId, product } },
+    });
+    return { trialEndsAt: row?.trialEndsAt ?? null, currentPeriodEnd: row?.currentPeriodEnd ?? null };
+  }
+
+  /**
    * Logic mirrors EntitlementService.startInternationalTrial() exactly:
    * idempotent (a no-op if either product already has an entitlement row),
    * both products created atomically with identical server-generated
