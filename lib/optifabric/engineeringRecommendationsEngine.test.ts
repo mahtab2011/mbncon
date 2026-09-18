@@ -1,14 +1,50 @@
 /**
  * Stage 2E-1 — focused unit tests for engineeringRecommendationsEngine.ts.
  *
- * Same convention as lib/optifabric/markerFabricConsumptionEngine.test.ts
- * (Stage 2D-1): no test framework is configured anywhere in this frontend
+ * Same no-test-framework convention as lib/optifabric/markerFabricConsumptionEngine.test.ts
+ * (Stage 2D-1): no Jest/Vitest is configured anywhere in this frontend
  * project, so this is a small, dependency-free, self-executing check —
- * plain assertions against the real exported engine. Run with the same
- * transpile-and-execute technique used for that file, e.g.:
+ * plain assertions against the real exported engine.
  *
- *   npx tsc --outDir <tmp> lib/optifabric/engineeringRecommendationsEngine.ts lib/optifabric/engineeringRecommendationsEngine.test.ts --module commonjs --target es2019
- *   node <tmp>/lib/optifabric/engineeringRecommendationsEngine.test.js
+ * UNLIKE that file, this one's subject module (engineeringRecommendationsEngine.ts)
+ * imports two other modules via the project's `@/` path alias
+ * (markerOptimization/productionSafetyGateEngine.ts and
+ * markerFabricConsumptionEngine.ts) — so the plain two-file
+ * `npx tsc a.ts b.ts` recipe markerFabricConsumptionEngine.test.ts documents
+ * does NOT work here; it fails with TS2307 ("Cannot find module
+ * '@/lib/optifabric/...'"). This needs the project's real path-alias
+ * mapping, which only comes from a tsconfig (tsc has no CLI flag for
+ * `paths`). Same recipe as lib/optifabric/apiClient.test.ts (Stage 2F-1),
+ * substituting this file's own dependencies. From the repo root:
+ *
+ *   cat > /tmp/engineeringRecommendationsEngine.test.tsconfig.json <<'EOF'
+ *   {
+ *     "extends": "<absolute path to repo>/tsconfig.json",
+ *     "compilerOptions": {
+ *       "noEmit": false, "module": "commonjs", "moduleResolution": "node",
+ *       "target": "es2019", "isolatedModules": false,
+ *       "outDir": "<some tmp dir>", "baseUrl": "<absolute path to repo>",
+ *       "typeRoots": ["<absolute path to repo>/node_modules/@types"],
+ *       "paths": { "@/*": ["<absolute path to repo>/*"] },
+ *       "types": ["node"]
+ *     },
+ *     "include": [
+ *       "<absolute path to repo>/lib/optifabric/engineeringRecommendationsEngine.ts",
+ *       "<absolute path to repo>/lib/optifabric/engineeringRecommendationsEngine.test.ts",
+ *       "<absolute path to repo>/lib/optifabric/markerOptimization/productionSafetyGateEngine.ts",
+ *       "<absolute path to repo>/lib/optifabric/markerFabricConsumptionEngine.ts"
+ *     ]
+ *   }
+ *   EOF
+ *   npx tsc -p /tmp/engineeringRecommendationsEngine.test.tsconfig.json
+ *   node <tmp dir>/engineeringRecommendationsEngine.test.js
+ *
+ * Without the explicit `typeRoots` line above, tsc fails outright with
+ * "TS2688: Cannot find type definition file for 'node'" — a temp config
+ * living outside the repo does not reliably discover the repo's own
+ * node_modules/@types on its own (same fix apiClient.test.ts's header
+ * documents, for the same reason). (Verified by actually running this
+ * exact command — Stage 2F-3.)
  *
  * No marker optimisation is invoked anywhere below — every fixture is a
  * hand-built plain object matching the real ProductionSafetyGateIssue /

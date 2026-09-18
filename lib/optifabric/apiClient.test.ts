@@ -28,6 +28,7 @@
  *       "noEmit": false, "module": "commonjs", "moduleResolution": "node",
  *       "target": "es2019", "isolatedModules": false,
  *       "outDir": "<some tmp dir>", "baseUrl": "<absolute path to repo>",
+ *       "typeRoots": ["<absolute path to repo>/node_modules/@types"],
  *       "paths": { "@/*": ["<absolute path to repo>/*"] },
  *       "types": ["node"]
  *     },
@@ -35,7 +36,19 @@
  *   }
  *   EOF
  *   npx tsc -p /tmp/apiClient.test.tsconfig.json
- *   node <tmp dir>/lib/optifabric/apiClient.test.js
+ *   node <tmp dir>/apiClient.test.js
+ *
+ * (Stage 2F-3 fixes, both verified by actually running this exact command:
+ * (1) without the explicit `typeRoots` line above, tsc fails outright with
+ * "TS2688: Cannot find type definition file for 'node'" — a temp config
+ * living outside the repo does not reliably discover the repo's own
+ * node_modules/@types on its own. (2) the final `node` invocation's path
+ * was previously documented as `<tmp dir>/lib/optifabric/apiClient.test.js`
+ * — wrong: tsc's implicit common-root inference across this file's full
+ * transitive import graph (projectApi.ts, patternGeometryEngine.ts, the
+ * pattern library, etc. — all under lib/optifabric/) makes lib/optifabric/
+ * itself the root, so apiClient.test.js lands flat under <tmp dir>, not
+ * nested under it.)
  *
  * Shims `global.window.localStorage` and `global.fetch` — apiClient.ts is
  * the one module in lib/optifabric that legitimately touches those browser

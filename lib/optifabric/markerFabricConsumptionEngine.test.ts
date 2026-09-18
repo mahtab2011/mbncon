@@ -9,7 +9,15 @@
  * Node/TypeScript and no framework:
  *
  *   npx tsc --outDir <tmp> lib/optifabric/markerFabricConsumptionEngine.ts lib/optifabric/markerFabricConsumptionEngine.test.ts --module commonjs --target es2019
- *   node <tmp>/lib/optifabric/markerFabricConsumptionEngine.test.js
+ *   node <tmp>/markerFabricConsumptionEngine.test.js
+ *
+ * (Stage 2F-3 fix: the output path above was previously documented as
+ * `<tmp>/lib/optifabric/markerFabricConsumptionEngine.test.js` — wrong. Both
+ * input files live directly in the same directory, so tsc's implicit
+ * common-root inference emits them flat under <tmp>, with no lib/optifabric
+ * subdirectory. Verified by actually running this exact command. This file
+ * has no imports of its own — unlike engineeringRecommendationsEngine.test.ts,
+ * it never needed the project's `@/` path alias in the first place.)
  *
  * (or any equivalent transpile-and-run of this file). It exits non-zero on
  * any failed assertion, so it is CI-runnable as-is despite needing no

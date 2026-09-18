@@ -1,6 +1,6 @@
 # OptiFabric — Central Entitlement Guard Cutover (Phase 2)
 
-**Status: implemented and tested. Not committed yet — awaiting review.**
+**Status (updated, Stage 2F-3): implemented, tested, and committed to `main` — this is the live guard behavior as of the current HEAD. ("Not committed yet — awaiting review" was accurate when this document was first written and is stale; superseded by Stage 2A's hardening and Stage 2F-1/2F-2's frontend/status-endpoint work, both also on `main`.) Current live deployment status is a separate question this document does not answer — see `docs/DEPLOYMENT-READINESS.md`/`docs/STAGING-DEPLOYMENT-PLAN.md`.**
 
 This document is the detailed companion to the Phase 2 report. It covers the parts that need more than a paragraph: why the integration is shaped the way it is, and the one compatibility rule that isn't obvious from the code alone.
 
@@ -61,6 +61,10 @@ else -> deny
 ## Legacy subscription system status
 
 Untouched: `Subscription` Prisma model, `subscription.service.ts`, `subscription.controller.ts`, all existing price constants — all still exist, still work, still have their own passing tests. `AuthService.signUp()` still writes a legacy `Subscription` row exactly as before (unchanged), specifically so legacy state remains available for comparison/rollback, per instruction. The only thing that changed is: **the guard no longer reads `SubscriptionService.getEffectiveState()` as its primary decision** — it's now consulted only by the narrow Bangladesh transitional path above.
+
+## A note on stage numbering
+
+This document and its companions use "Phase 2"/"Phase 2A." The incident below and its regression test (`test/guard-ordering-e2e.spec.ts`) instead label themselves "Stage 4B"/"Stage 4D" in their own code comments. These are not two different efforts that happen to overlap — "Phase 2/2A" is this document's own entitlement-integration work track, while "Stage 4B/4D" is the label a separate, parallel work-tracking sequence gave to the guard-ordering fix specifically. Both names refer to the same real commits and the same real code. No rename across the codebase was undertaken to unify this terminology (a purely cosmetic, broad change with real risk of touching unrelated comments); this note exists so a future reader isn't misled into thinking two different, disconnected changes are being described.
 
 ## Post-cutover incident: guard-ordering defect (found and fixed)
 

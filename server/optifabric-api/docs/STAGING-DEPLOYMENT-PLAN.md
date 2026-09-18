@@ -1,6 +1,6 @@
 # OptiFabric API — Hosting Selection & Staging Deployment Plan (Stage A3)
 
-**Status: planning/documentation only. Nothing deployed. No account created. No DNS changed.**
+**Status (updated, Stage 2F-3): this document itself was, and remains, planning/documentation only — nothing in this stage created an account, deployed anything, or changed DNS. However, repository history since this document was written shows that at least some of §12's "next actions" were subsequently carried out: a later commit ("Fix OptiFabric API Render build: nest CLI unavailable in production install") describes reproducing a real Render build failure and fixing it, which is only possible if a Render account, connected repo, and Web Service already existed and a real deploy was attempted. Current live deployment status — whether that service exists today, is running, or is reachable — is NOT checked by this document and must be verified directly against Render, not inferred from this plan.**
 
 ## 1. Hosting requirements (derived from the actual backend)
 
@@ -201,4 +201,9 @@ This stage deliberately stops before any account/billing/DNS action:
 6. Deploy, then work through the §5 verification checklist, finishing with
    the §8 SIGTERM check.
 
-None of this was performed as part of this stage.
+None of this was performed as part of this stage. (Stage 2F-3 note: repository
+history indicates steps 1–4, and at least one deploy attempt, were carried
+out in a later stage — see this document's updated status line above. Steps
+5's exact secret values and the full §5/§8 verification checklist are not
+confirmed by repository evidence and must be checked directly against
+Render.)

@@ -1,8 +1,12 @@
 # Central Entitlement — Phase 1
 
-**Status: foundation built and unit-tested. Not wired into OptiFabric or OptiSewing yet. No payment gateway. Not deployed.**
+**Status (updated, Stage 2F-3): foundation built and unit-tested here in `server/entitlement-api/`. As of the OptiFabric Phase 2/2A/2F cutover, this model IS wired into OptiFabric — see "OptiFabric cutover: current state" below. OptiSewing is unaffected and still not wired. No payment gateway. `server/entitlement-api/` itself is still not deployed and still has no bootstrap/HTTP layer of its own (see "Why a new isolated package" below) — the OptiFabric cutover was implemented as a local, schema-and-logic-mirrored copy inside `server/optifabric-api/`, not by this package being imported or deployed directly (see "Why a new isolated package, not a new microservice" for why a direct import was attempted and abandoned).**
 
-This document describes `server/entitlement-api/`, a new, isolated package inside the MBNCON repository that will become the single source of truth for whether an organisation can use OptiFabric and/or OptiSewing. It does not yet gate anything — see "Future OptiFabric cutover" and "Future OptiSewing cutover" below.
+This document describes `server/entitlement-api/`, a new, isolated package inside the MBNCON repository that is the single authoritative database/schema for whether an organisation can use OptiFabric and/or OptiSewing.
+
+### OptiFabric cutover: current state
+
+`server/optifabric-api/`'s `SubscriptionGuard` now decides protected OptiFabric access from a **local mirror** of this package's `ProductEntitlement` model and decision logic (`server/optifabric-api/src/entitlement/`), kept in schema/logic parity with this package by an automated schema-parity check — see `server/optifabric-api/docs/PHASE-2-ENTITLEMENT-CUTOVER.md` for why a mirror rather than a direct import, and `server/optifabric-api/docs/PHASE-2A-MAPPING-BACKFILL-HARDENING.md` for the mapping/backfill hardening that followed. `GET /entitlements/me/optifabric` (added in Stage 2F-2) is the first authenticated read-only HTTP exposure of this decision, and `app/optifabric/subscription/page.tsx` now displays it. The legacy Bangladesh transitional-compatibility fallback (reading the old per-factory `SubscriptionService` state) remains active until an explicitly authorized one-time backfill migrates existing Bangladesh factories to a real central `BANGLADESH_FREE` row — **that backfill has not been run**. OptiSewing has no equivalent cutover yet; everything below describing OptiSewing as a future integration remains accurate.
 
 ## Why a new isolated package, not a new microservice
 

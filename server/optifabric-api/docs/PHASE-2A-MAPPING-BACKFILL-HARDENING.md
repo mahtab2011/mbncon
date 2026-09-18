@@ -1,8 +1,8 @@
 # OptiFabric — Pre-Commit Mapping / Backfill / Onboarding Hardening (Phase 2A)
 
-**Status: implemented and tested. Not committed yet — awaiting review, same as Phase 2.**
+**Status (updated, Stage 2F-3): implemented, tested, and committed to `main`, same as Phase 2 (see that document's own updated status line). The title's "Pre-Commit" reflects when this document was written, not the current state.**
 
-This is a companion to [PHASE-2-ENTITLEMENT-CUTOVER.md](./PHASE-2-ENTITLEMENT-CUTOVER.md) — read that first for the base architecture (why a local Prisma client adapter exists, the organisation-mapping model, the Bangladesh transitional rule's original shape). This document covers what Phase 2A changed and why, closing four gaps identified in the Phase 2 checkpoint review before anything is committed.
+This is a companion to [PHASE-2-ENTITLEMENT-CUTOVER.md](./PHASE-2-ENTITLEMENT-CUTOVER.md) — read that first for the base architecture (why a local Prisma client adapter exists, the organisation-mapping model, the Bangladesh transitional rule's original shape). This document covers what Phase 2A changed and why, closing four gaps identified in the Phase 2 checkpoint review.
 
 ## Issue 1 — existing Bangladesh factory lockout (confirmed and fixed)
 

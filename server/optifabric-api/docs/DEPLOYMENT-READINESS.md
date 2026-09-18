@@ -1,6 +1,6 @@
 # OptiFabric API — Deployment Readiness (Stage A2, updated)
 
-**Status: production-runnable locally. Not deployed anywhere. No DNS/hosting configured.**
+**Status (updated, Stage 2F-3): production-runnable locally. Repository history contains Render staging deployment work — see the "Correction" note below, added after "a real Render deployment proved this wrong," and see `docs/STAGING-DEPLOYMENT-PLAN.md`'s own updated status line. Current live deployment status (whether that Render service exists today, is currently running, or is reachable) is NOT verified by this document and must be checked directly against Render — this document was corrected from repository evidence only, without accessing Render. No DNS is known, from repository evidence, to have been configured for a public OptiFabric API hostname.**
 
 ## Recommended hosting model
 
