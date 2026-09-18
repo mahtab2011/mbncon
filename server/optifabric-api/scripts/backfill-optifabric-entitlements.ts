@@ -30,10 +30,29 @@
 // only be run from a trusted shell with direct access to both database
 // connection strings, never triggered by a request.
 //
-// USAGE:
+// USAGE — LOCAL DEVELOPMENT (ts-node, a devDependency, is available):
 //   npx ts-node scripts/backfill-optifabric-entitlements.ts            # safe preview, no writes
 //   npx ts-node scripts/backfill-optifabric-entitlements.ts --dry-run  # same, explicit
 //   npx ts-node scripts/backfill-optifabric-entitlements.ts --apply    # REAL WRITES — see checklist below
+//
+// USAGE — DEPLOYED / RENDER RUNTIME (Stage 2H-3): ts-node is a devDependency
+// and is not installed when Render (or any host) runs `npm install` under
+// NODE_ENV=production — see docs/DEPLOYMENT-READINESS.md's "Correction"
+// note, which fixed the exact same class of problem for the Nest CLI
+// earlier. Rather than promoting ts-node to a real dependency just for this
+// one script, `npm run build` now also compiles this file to plain
+// JavaScript via tsconfig.scripts.json, requiring nothing beyond the
+// runtime `node` binary already used to run the whole service:
+//   node dist/scripts/backfill-optifabric-entitlements.js             # safe preview, no writes
+//   node dist/scripts/backfill-optifabric-entitlements.js --dry-run   # same, explicit
+//   node dist/scripts/backfill-optifabric-entitlements.js --apply     # REAL WRITES — see checklist below
+// (equivalently: npm run backfill:optifabric-entitlements:compiled:dry-run / :apply)
+// This is the SAME source file and the SAME parseBackfillCliArgs/
+// EntitlementBackfillService logic as the ts-node path above — compiling it
+// does not create a second implementation, only a second way to run the one
+// that already exists. Requires `npm run build` (or at minimum `npm run
+// build:backfill-script`) to have already produced dist/scripts/ — if that
+// path doesn't exist yet, run the build first.
 //
 // ==================== --apply WRITES TO A REAL DATABASE ====================
 // SAFETY CHECKLIST before ever running with --apply:
@@ -103,8 +122,13 @@ async function main() {
   const parsed = parseBackfillCliArgs(process.argv.slice(2));
 
   if (parsed.mode === "error") {
+    // Reflects however this file was actually invoked (ts-node against the
+    // .ts source in local development, or plain `node` against the
+    // Stage 2H-3 compiled artifact in a deployed runtime — see
+    // tsconfig.scripts.json) rather than hardcoding one form.
+    const invokedAs = `node ${path.relative(process.cwd(), process.argv[1] ?? __filename)}`;
     console.error(`Backfill script: ${parsed.message}`);
-    console.error("Usage: npx ts-node scripts/backfill-optifabric-entitlements.ts [--dry-run|--apply]");
+    console.error(`Usage: ${invokedAs} [--dry-run|--apply]`);
     console.error("No database connection was attempted and no writes occurred.");
     process.exit(1);
     return;

@@ -63,31 +63,44 @@ One factory's error is captured and the batch continues — a single bad row nev
 
 **Invocation, and the dry-run/--apply safety gate (Stage 2H-1):** `scripts/backfill-optifabric-entitlements.ts` — a script, not an HTTP endpoint, per instruction. It boots a minimal Nest application context, resolves `EntitlementBackfillService`, runs it, and prints the JSON report.
 
+**Compiled artifact for deployed runtimes (Stage 2H-3):** `ts-node` (used below for local development) is a `devDependency`, and is not installed when Render or any host runs `npm install` under `NODE_ENV=production` — the same class of problem `docs/DEPLOYMENT-READINESS.md`'s "Correction" note already fixed once for the Nest CLI. Rather than promoting `ts-node` to a real dependency for one script, `npm run build` now also compiles `scripts/backfill-optifabric-entitlements.ts` to plain JavaScript (`tsconfig.scripts.json`, a separate compilation pass from `nest build`'s own — see that file's comments for why: merging the two would reintroduce the exact nested-`dist/src/main.js` output problem the Render build fix already solved once). The verified output path is `dist/scripts/backfill-optifabric-entitlements.js`. This is the same source file and the same `parseBackfillCliArgs`/`EntitlementBackfillService` logic as the `ts-node` path — nothing is duplicated, only compiled a second way.
+
 Simply invoking the script performs **no writes at all** — it defaults to a dry run:
 
 ```
-npm run backfill:optifabric-entitlements                       # SAFE PREVIEW — no writes
-npm run backfill:optifabric-entitlements:dry-run                # same, explicit
-npx ts-node scripts/backfill-optifabric-entitlements.ts          # same (no argument)
-npx ts-node scripts/backfill-optifabric-entitlements.ts --dry-run # same, explicit
+# Local development (ts-node available):
+npm run backfill:optifabric-entitlements                          # SAFE PREVIEW — no writes
+npm run backfill:optifabric-entitlements:dry-run                   # same, explicit
+npx ts-node scripts/backfill-optifabric-entitlements.ts             # same (no argument)
+npx ts-node scripts/backfill-optifabric-entitlements.ts --dry-run   # same, explicit
+
+# Deployed / Render runtime (plain node, after `npm run build`):
+npm run backfill:optifabric-entitlements:compiled:dry-run                        # SAFE PREVIEW — no writes
+node dist/scripts/backfill-optifabric-entitlements.js                            # same (no argument)
+node dist/scripts/backfill-optifabric-entitlements.js --dry-run                  # same, explicit
 ```
 
-A dry run executes the exact same eligibility/classification/planning logic described above — the same organisation-mapping lookup, the same idempotency check, the same Bangladesh identification, the same trial/paid/grace-period date calculations — and prints the same report shape, but the two calls that would write (`Organisation`/`OrganisationExternalRef` creation, and the final `ProductEntitlement` creation) are skipped. There is exactly one classification code path for both modes (`EntitlementBackfillService.backfillOneFactory`) — dry-run and apply can never silently diverge in what they'd count, only in whether they persist it.
+A dry run executes the exact same eligibility/classification/planning logic described above — the same organisation-mapping lookup, the same idempotency check, the same Bangladesh identification, the same trial/paid/grace-period date calculations — and prints the same report shape, but the two calls that would write (`Organisation`/`OrganisationExternalRef` creation, and the final `ProductEntitlement` creation) are skipped. There is exactly one classification code path for both modes (`EntitlementBackfillService.backfillOneFactory`) — dry-run and apply can never silently diverge in what they'd count, only in whether they persist it. This holds identically whether the code is run via `ts-node` or as the compiled artifact — it is the same compiled logic either way.
 
 **Real mutation requires the explicit `--apply` flag** — nothing else authorizes a write, and it is never inferred from an environment variable:
 
 ```
-npm run backfill:optifabric-entitlements:apply                   # REAL WRITES
-npx ts-node scripts/backfill-optifabric-entitlements.ts --apply   # same
+# Local development:
+npm run backfill:optifabric-entitlements:apply                     # REAL WRITES
+npx ts-node scripts/backfill-optifabric-entitlements.ts --apply     # same
+
+# Deployed / Render runtime:
+npm run backfill:optifabric-entitlements:compiled:apply             # REAL WRITES
+node dist/scripts/backfill-optifabric-entitlements.js --apply       # same
 ```
 
-**⚠️ `--apply` writes to whatever `DATABASE_URL`/`ENTITLEMENT_DATABASE_URL` the process resolves to.** Before ever running with `--apply`:
+**⚠️ `--apply` (either form) writes to whatever `DATABASE_URL`/`ENTITLEMENT_DATABASE_URL` the process resolves to.** Before ever running with `--apply`:
 1. Confirm those two connection strings point at the environment you actually intend to backfill (never production without a deliberate, separate decision to do so).
 2. Run staging (or the target environment) with `--dry-run` first and read the preview report — it is a trustworthy preview of exactly what `--apply` would do against the same source state.
 3. Take a database backup/snapshot before running with `--apply`.
 4. Have explicit authorization to run it for real.
 
-An unknown argument, or `--dry-run` and `--apply` given together, **fails closed**: the script exits non-zero before even attempting a database connection, and performs no writes. See `test/backfill-cli.spec.ts` for the full argument-parsing contract, and `test/entitlement-backfill.spec.ts`'s "dry-run safety (Stage 2H-1)" tests for proof that dry-run performs zero create/update/delete calls and that dry-run/apply agree on classification. **This script has still not been run against any real (staging or production) database** — see "No real database cutover."
+An unknown argument, or `--dry-run` and `--apply` given together, **fails closed** in both the `ts-node` and compiled forms: the process exits non-zero before even attempting a database connection, and performs no writes. See `test/backfill-cli.spec.ts` for the full argument-parsing contract (including dedicated tests that spawn the real compiled artifact with invalid/conflicting flags and assert it exits non-zero without ever printing the DRY RUN/APPLY MODE banner that only appears once Nest is about to boot), and `test/entitlement-backfill.spec.ts`'s "dry-run safety (Stage 2H-1)" tests for proof that dry-run performs zero create/update/delete calls and that dry-run/apply agree on classification. **Neither form of this script has been run against any real (staging or production) database** — see "No real database cutover."
 
 ## Bangladesh Legacy Transition — why this stays temporary
 
