@@ -20,6 +20,7 @@ import {
   type ProjectRegistryStatus,
 } from "@/lib/optifabric/projectRegistry";
 import {
+  isEntitlementDeniedError,
   listProjects,
   type ServerProject,
 } from "@/lib/optifabric/projectApi";
@@ -177,6 +178,13 @@ export default function EngineeringProjectCentrePage() {
   >([]);
   const [serverLoading, setServerLoading] = useState(true);
   const [serverError, setServerError] = useState("");
+  // Stage 2F-1: set only when the server explicitly denied this request for
+  // entitlement reasons (HTTP 402) — distinct from serverError, which
+  // covers everything else (network/server failure). Drives a calm,
+  // subscription-focused message and CTA instead of the generic
+  // retry-oriented one below.
+  const [serverEntitlementDenied, setServerEntitlementDenied] =
+    useState(false);
 
   function refreshRegistry() {
     setRegistry(getProjectRegistry());
@@ -215,6 +223,7 @@ export default function EngineeringProjectCentrePage() {
   async function loadServerProjects() {
     setServerLoading(true);
     setServerError("");
+    setServerEntitlementDenied(false);
 
     try {
       const [active, archived] = await Promise.all([
@@ -224,12 +233,26 @@ export default function EngineeringProjectCentrePage() {
 
       setServerProjects([...active, ...archived]);
     } catch (error) {
+      setServerProjects([]);
+
+      if (isEntitlementDeniedError(error)) {
+        // Not a technical fault: the backend explicitly denied this
+        // request because the factory's trial/subscription entitlement is
+        // not currently active. Do not log this as an error and do not
+        // use the generic "could not be loaded" wording below — that
+        // implies a fault on our side, which this is not.
+        setServerEntitlementDenied(true);
+        setServerError(
+          "Your OptiFabric trial or subscription is not currently active. Server-backed project access is unavailable — your local-only projects below are still shown. Review your subscription to continue."
+        );
+        return;
+      }
+
       console.error(
         "Unable to load server-backed OptiFabric projects:",
         error
       );
 
-      setServerProjects([]);
       setServerError(
         "Server-backed projects could not be loaded. Showing local-only projects saved in this browser."
       );
@@ -515,13 +538,22 @@ export default function EngineeringProjectCentrePage() {
           <section className="mt-6 flex flex-col gap-4 rounded-2xl border border-amber-400/30 bg-amber-950/20 px-5 py-4 font-bold text-amber-200 sm:flex-row sm:items-center sm:justify-between">
             <p>{serverError}</p>
 
-            <button
-              type="button"
-              onClick={() => void loadServerProjects()}
-              className="self-start rounded-lg border border-amber-400/30 px-3 py-1 text-sm font-black transition hover:bg-amber-900/40 sm:self-auto"
-            >
-              Retry
-            </button>
+            {serverEntitlementDenied ? (
+              <Link
+                href="/optifabric/subscription"
+                className="self-start rounded-lg border border-amber-400/30 px-3 py-1 text-sm font-black transition hover:bg-amber-900/40 sm:self-auto"
+              >
+                Review subscription
+              </Link>
+            ) : (
+              <button
+                type="button"
+                onClick={() => void loadServerProjects()}
+                className="self-start rounded-lg border border-amber-400/30 px-3 py-1 text-sm font-black transition hover:bg-amber-900/40 sm:self-auto"
+              >
+                Retry
+              </button>
+            )}
           </section>
         ) : null}
 
@@ -552,9 +584,11 @@ export default function EngineeringProjectCentrePage() {
           ) : visibleServerProjects.length === 0 ? (
             <div className="mt-7 rounded-3xl border border-dashed border-slate-600 bg-slate-900 px-6 py-10 text-center">
               <p className="text-slate-400">
-                {serverError
-                  ? "Server projects are unavailable right now."
-                  : "No server-backed projects yet for this view. Create a new project to save it to the server."}
+                {serverEntitlementDenied
+                  ? "Not shown because your trial or subscription is not currently active."
+                  : serverError
+                    ? "Server projects are unavailable right now."
+                    : "No server-backed projects yet for this view. Create a new project to save it to the server."}
               </p>
             </div>
           ) : (

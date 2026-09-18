@@ -9,7 +9,7 @@
 // see that module for the authoritative shape. mainCategory/subcategory are
 // optional, mirroring EngineeringProject's own garmentMainCategory?/
 // garmentSubcategory? (lib/optifabric/projectMaster.ts).
-import { apiFetch } from "./apiClient";
+import { apiFetch, OptiFabricApiError } from "./apiClient";
 import type { EngineeringProject, PatternStatus } from "./projectMaster";
 import type { GeometryPoint } from "./patternGeometryTypes";
 import { calculateBoundingBox } from "./patternGeometryEngine";
@@ -250,13 +250,48 @@ export type CachedProject = EngineeringProject & {
   _server?: ServerProjectMeta;
 };
 
-// apiFetch throws a plain Error("API request failed (${status}): ${body}")
-// — this pulls the status back out without needing apiClient.ts itself to
-// change (not in Stage 2A's allowed file list) or a second HTTP layer.
+// Prefers the typed OptiFabricApiError.status (Stage 2F-1) — apiFetch now
+// throws that class directly. The regex fallback stays for defensiveness
+// (any other Error shape that happened to reach a caller) but is no longer
+// the primary path.
 export function extractStatusCode(error: unknown): number | null {
+  if (error instanceof OptiFabricApiError) return error.status;
   if (!(error instanceof Error)) return null;
   const match = error.message.match(/^API request failed \((\d+)\)/);
   return match ? Number(match[1]) : null;
+}
+
+// Stage 2F-1 — the one, typed way to ask "was this request denied because
+// the factory's OptiFabric trial/subscription entitlement is not active?"
+// (HTTP 402 from SubscriptionGuard). Callers should branch on this rather
+// than matching status codes or message text themselves.
+export function isEntitlementDeniedError(error: unknown): error is OptiFabricApiError {
+  return error instanceof OptiFabricApiError && error.category === "entitlement";
+}
+
+// Stage 2F-1 — the one canonical, calm sentence for "server-backed
+// OptiFabric access is unavailable because entitlement denied this
+// request." Deliberately does NOT claim a server outage, deletion, or a
+// failed payment — the backend's 402 is the sole authoritative fact this
+// wording reflects; nothing here infers or fabricates entitlement state
+// beyond what the response already established. Pages may prefix/suffix
+// this with their own context (e.g. what specifically failed to load) but
+// should not alter its substance.
+export const ENTITLEMENT_DENIED_MESSAGE =
+  "Your OptiFabric trial or subscription is not currently active. Server-backed project access is unavailable. Review your subscription to continue.";
+
+// Stage 2F-1 — shared by the several callers (see the marker page's saved
+// marker runs / fabric profile load+save) that previously all repeated the
+// same `error instanceof Error ? error.message : fallback` shape, which let
+// a raw OptiFabricApiError message (including embedded backend JSON, for a
+// 402) reach the screen unfiltered. Only the entitlement-denied path is
+// special-cased here; every other error keeps its exact prior behavior
+// (the underlying Error's own message, or fallbackMessage for a non-Error
+// throw) — this task does not change how any other failure is presented.
+export function describeProtectedRequestError(error: unknown, fallbackMessage: string): string {
+  if (isEntitlementDeniedError(error)) return ENTITLEMENT_DENIED_MESSAGE;
+  if (error instanceof Error) return error.message;
+  return fallbackMessage;
 }
 
 // Frontend PatternStatus -> the backend's initial-pattern-piece shape, used

@@ -110,6 +110,7 @@ import {
 
 import {
   createMarkerRun,
+  describeProtectedRequestError,
   getFabricProfile,
   listMarkerRuns,
   saveFabricProfile as putFabricProfile,
@@ -1215,9 +1216,10 @@ export default function MarkerEngineeringPage() {
         // Non-blocking: the marker-generation workflow above is entirely
         // unaffected by this failing — only the history list shows an error.
         setMarkerRunsLoadError(
-          error instanceof Error
-            ? error.message
-            : "Saved marker runs could not be loaded."
+          describeProtectedRequestError(
+            error,
+            "Saved marker runs could not be loaded."
+          )
         );
       })
       .finally(() => {
@@ -1368,9 +1370,10 @@ export default function MarkerEngineeringPage() {
         // Non-blocking: the marker workflow above is entirely unaffected —
         // the existing local/default fabric profile state is left as-is.
         setFabricProfileLoadError(
-          error instanceof Error
-            ? error.message
-            : "The saved fabric profile could not be loaded."
+          describeProtectedRequestError(
+            error,
+            "The saved fabric profile could not be loaded."
+          )
         );
       });
 
@@ -1478,9 +1481,10 @@ export default function MarkerEngineeringPage() {
       console.error("Unable to save the fabric production profile:", error);
 
       setFabricProfileSaveError(
-        error instanceof Error
-          ? error.message
-          : "The fabric production profile could not be saved."
+        describeProtectedRequestError(
+          error,
+          "The fabric production profile could not be saved."
+        )
       );
     } finally {
       fabricProfileSavingRef.current = false;
@@ -2344,9 +2348,10 @@ export default function MarkerEngineeringPage() {
       // The current generated marker/result is untouched — only the save
       // status changes on failure.
       setMarkerRunSaveError(
-        error instanceof Error
-          ? error.message
-          : "The marker run could not be saved."
+        describeProtectedRequestError(
+          error,
+          "The marker run could not be saved."
+        )
       );
     } finally {
       markerRunSavingRef.current = false;
@@ -5101,9 +5106,8 @@ export default function MarkerEngineeringPage() {
 
               {fabricProfileLoadError ? (
                 <p className="mt-3 rounded-xl border border-amber-500/30 bg-amber-950/20 px-4 py-3 text-sm font-bold text-amber-200">
-                  Could not load your saved fabric profile:{" "}
-                  {fabricProfileLoadError}. Using the current local values
-                  instead.
+                  Could not load your saved fabric profile: {fabricProfileLoadError}{" "}
+                  Using the current local values instead.
                 </p>
               ) : null}
 

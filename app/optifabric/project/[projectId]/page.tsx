@@ -9,9 +9,11 @@ import {
   getGarmentDisplayName,
 } from "@/lib/optifabric/projectMaster";
 import {
+  ENTITLEMENT_DENIED_MESSAGE,
   extractSavedGeometryRecords,
   extractStatusCode,
   getProject as getServerProject,
+  isEntitlementDeniedError,
   mapServerProjectToCachedProject,
   reconcileCachedPatternsWithServer,
   type CachedProject,
@@ -90,6 +92,11 @@ export default function EngineeringCommandCentrePage() {
   const [project, setProject] = useState<CachedProject | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
+  // Stage 2F-1: true only when the initial load failed specifically because
+  // the server denied the request for entitlement reasons (HTTP 402) — see
+  // the fresh-device catch block below. Drives a "Review subscription" CTA
+  // instead of the generic "Create New Project" one.
+  const [loadEntitlementDenied, setLoadEntitlementDenied] = useState(false);
   const [refreshWarning, setRefreshWarning] = useState("");
 
   useEffect(() => {
@@ -98,6 +105,7 @@ export default function EngineeringCommandCentrePage() {
     }
 
     let cancelled = false;
+    setLoadEntitlementDenied(false);
 
     async function load() {
       let parsedProject: CachedProject;
@@ -147,7 +155,13 @@ export default function EngineeringCommandCentrePage() {
 
             const status = extractStatusCode(fetchError);
 
-            if (status === 404) {
+            if (isEntitlementDeniedError(fetchError)) {
+              // Not a technical fault, and not "not found" either — the
+              // server declined this request because entitlement is not
+              // currently active. Do not log this as an error.
+              setLoadEntitlementDenied(true);
+              setLoadError(ENTITLEMENT_DENIED_MESSAGE);
+            } else if (status === 404) {
               setLoadError(
                 "This engineering project could not be found in this browser."
               );
@@ -247,6 +261,16 @@ export default function EngineeringCommandCentrePage() {
           setRefreshWarning("");
         } catch (refreshError) {
           if (cancelled) return;
+
+          if (isEntitlementDeniedError(refreshError)) {
+            // Not a technical fault: entitlement denied this refresh. The
+            // last saved local copy is still shown below, same as any other
+            // refresh failure — only the wording differs.
+            setRefreshWarning(
+              `${ENTITLEMENT_DENIED_MESSAGE} Showing the last saved local copy.`
+            );
+            return;
+          }
 
           console.error(
             "Unable to refresh OptiFabric project from the server:",
@@ -478,13 +502,25 @@ export default function EngineeringCommandCentrePage() {
   if (loadError || !project) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-slate-950 px-6 text-white">
-        <section className="w-full max-w-2xl rounded-3xl border border-red-400/30 bg-red-950/20 p-8 text-center">
-          <p className="text-sm font-black uppercase tracking-[0.25em] text-red-300">
-            Project unavailable
+        <section
+          className={`w-full max-w-2xl rounded-3xl border p-8 text-center ${
+            loadEntitlementDenied
+              ? "border-amber-400/30 bg-amber-950/20"
+              : "border-red-400/30 bg-red-950/20"
+          }`}
+        >
+          <p
+            className={`text-sm font-black uppercase tracking-[0.25em] ${
+              loadEntitlementDenied ? "text-amber-300" : "text-red-300"
+            }`}
+          >
+            {loadEntitlementDenied ? "Subscription required" : "Project unavailable"}
           </p>
 
           <h1 className="mt-3 text-3xl font-black">
-            Engineering project not found
+            {loadEntitlementDenied
+              ? "Server-backed access is unavailable"
+              : "Engineering project not found"}
           </h1>
 
           <p className="mt-4 leading-7 text-slate-300">
@@ -492,12 +528,21 @@ export default function EngineeringCommandCentrePage() {
               "The requested engineering project could not be loaded."}
           </p>
 
-          <Link
-            href="/optifabric/project/new"
-            className="mt-7 inline-flex rounded-xl bg-cyan-400 px-6 py-3 font-black text-slate-950 transition hover:bg-cyan-300"
-          >
-            Create New Project
-          </Link>
+          {loadEntitlementDenied ? (
+            <Link
+              href="/optifabric/subscription"
+              className="mt-7 inline-flex rounded-xl bg-amber-400 px-6 py-3 font-black text-slate-950 transition hover:bg-amber-300"
+            >
+              Review Subscription
+            </Link>
+          ) : (
+            <Link
+              href="/optifabric/project/new"
+              className="mt-7 inline-flex rounded-xl bg-cyan-400 px-6 py-3 font-black text-slate-950 transition hover:bg-cyan-300"
+            >
+              Create New Project
+            </Link>
+          )}
         </section>
       </main>
     );

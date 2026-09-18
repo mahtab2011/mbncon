@@ -54,6 +54,47 @@ export function isTokenExpired(token: string): boolean {
   }
 }
 
+// Stage 2F-1 — a typed, discriminated HTTP-failure shape so callers can
+// tell "you're not logged in" (401), "your entitlement doesn't allow this"
+// (402 — SubscriptionGuard, see server/optifabric-api/src/common/guards/
+// subscription.guard.ts), and "something else went wrong" (any other
+// non-2xx status) apart programmatically, instead of matching on
+// human-readable message text. A network failure (fetch() itself rejects —
+// offline, DNS, CORS) never reaches this class at all, so `instanceof
+// OptiFabricApiError` already distinguishes "the server answered with a
+// failure" from "the server was never reached."
+export type OptiFabricApiErrorCategory = "auth" | "entitlement" | "api";
+
+function categoriseStatus(status: number): OptiFabricApiErrorCategory {
+  if (status === 401) return "auth";
+  if (status === 402) return "entitlement";
+  return "api";
+}
+
+export class OptiFabricApiError extends Error {
+  readonly status: number;
+  readonly category: OptiFabricApiErrorCategory;
+  /**
+   * The backend's own `message` field (e.g. SubscriptionGuard's
+   * "Your free trial or subscription has ended...") when the response body
+   * was parseable JSON with a string `message`, otherwise the raw response
+   * body text. This is Nest's standard HttpException JSON shape
+   * (`{statusCode, message}`) — never a stack trace, never request/auth
+   * internals. Kept for logging/diagnostics; UI copy should still prefer
+   * `category`-driven, curated wording over rendering this verbatim, since
+   * the backend's exact phrasing is that system's to change independently.
+   */
+  readonly backendMessage: string;
+
+  constructor(status: number, backendMessage: string) {
+    super(`API request failed (${status}): ${backendMessage}`);
+    this.name = "OptiFabricApiError";
+    this.status = status;
+    this.category = categoriseStatus(status);
+    this.backendMessage = backendMessage;
+  }
+}
+
 export async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
   const token = getStoredToken();
   const headers = new Headers(options.headers);
@@ -70,7 +111,21 @@ export async function apiFetch<T>(path: string, options: RequestInit = {}): Prom
       clearStoredToken();
     }
     const body = await response.text();
-    throw new Error(`API request failed (${response.status}): ${body}`);
+    // Nest's default HttpException JSON body is `{statusCode, message}` —
+    // extract just the message string when present so OptiFabricApiError's
+    // `backendMessage` is the human-readable sentence, not raw JSON. Falls
+    // back to the raw body for any non-JSON or unexpected-shape response
+    // (never throws on malformed JSON here).
+    let backendMessage = body;
+    try {
+      const parsed: unknown = JSON.parse(body);
+      if (parsed && typeof parsed === "object" && typeof (parsed as { message?: unknown }).message === "string") {
+        backendMessage = (parsed as { message: string }).message;
+      }
+    } catch {
+      // Not JSON — keep the raw text.
+    }
+    throw new OptiFabricApiError(response.status, backendMessage);
   }
   if (response.status === 204) return undefined as T;
   return (await response.json()) as T;
