@@ -61,7 +61,33 @@ alreadyMappedOrSkipped, errors: [{ factoryId, message }]
 ```
 One factory's error is captured and the batch continues — a single bad row never aborts the run.
 
-**Invocation:** `scripts/backfill-optifabric-entitlements.ts` (also `npm run backfill:optifabric-entitlements`) — a script, not an HTTP endpoint, per instruction. It boots a minimal Nest application context, resolves `EntitlementBackfillService`, runs it, and prints the JSON report. **This script has not been run** — see "No real database cutover."
+**Invocation, and the dry-run/--apply safety gate (Stage 2H-1):** `scripts/backfill-optifabric-entitlements.ts` — a script, not an HTTP endpoint, per instruction. It boots a minimal Nest application context, resolves `EntitlementBackfillService`, runs it, and prints the JSON report.
+
+Simply invoking the script performs **no writes at all** — it defaults to a dry run:
+
+```
+npm run backfill:optifabric-entitlements                       # SAFE PREVIEW — no writes
+npm run backfill:optifabric-entitlements:dry-run                # same, explicit
+npx ts-node scripts/backfill-optifabric-entitlements.ts          # same (no argument)
+npx ts-node scripts/backfill-optifabric-entitlements.ts --dry-run # same, explicit
+```
+
+A dry run executes the exact same eligibility/classification/planning logic described above — the same organisation-mapping lookup, the same idempotency check, the same Bangladesh identification, the same trial/paid/grace-period date calculations — and prints the same report shape, but the two calls that would write (`Organisation`/`OrganisationExternalRef` creation, and the final `ProductEntitlement` creation) are skipped. There is exactly one classification code path for both modes (`EntitlementBackfillService.backfillOneFactory`) — dry-run and apply can never silently diverge in what they'd count, only in whether they persist it.
+
+**Real mutation requires the explicit `--apply` flag** — nothing else authorizes a write, and it is never inferred from an environment variable:
+
+```
+npm run backfill:optifabric-entitlements:apply                   # REAL WRITES
+npx ts-node scripts/backfill-optifabric-entitlements.ts --apply   # same
+```
+
+**⚠️ `--apply` writes to whatever `DATABASE_URL`/`ENTITLEMENT_DATABASE_URL` the process resolves to.** Before ever running with `--apply`:
+1. Confirm those two connection strings point at the environment you actually intend to backfill (never production without a deliberate, separate decision to do so).
+2. Run staging (or the target environment) with `--dry-run` first and read the preview report — it is a trustworthy preview of exactly what `--apply` would do against the same source state.
+3. Take a database backup/snapshot before running with `--apply`.
+4. Have explicit authorization to run it for real.
+
+An unknown argument, or `--dry-run` and `--apply` given together, **fails closed**: the script exits non-zero before even attempting a database connection, and performs no writes. See `test/backfill-cli.spec.ts` for the full argument-parsing contract, and `test/entitlement-backfill.spec.ts`'s "dry-run safety (Stage 2H-1)" tests for proof that dry-run performs zero create/update/delete calls and that dry-run/apply agree on classification. **This script has still not been run against any real (staging or production) database** — see "No real database cutover."
 
 ## Bangladesh Legacy Transition — why this stays temporary
 

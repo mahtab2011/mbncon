@@ -75,51 +75,79 @@ export class EntitlementBackfillService {
    * ProductEntitlement row — preserving the original trialEndsAt/
    * currentPeriodEnd exactly, never reissuing a fresh 90-day window. Fully
    * idempotent: safe to run repeatedly, safe to interrupt and re-run.
+   *
+   * Stage 2H-1: defaults to `dryRun: true` — the same safe default the CLI
+   * script enforces (see scripts/backfill-optifabric-entitlements.ts). A
+   * caller must explicitly pass `{ dryRun: false }` to write anything. This
+   * is a second, defense-in-depth default at the service layer itself, not
+   * a replacement for the CLI's own --apply gate.
    */
-  async backfillOptiFabricEntitlements(): Promise<BackfillReport> {
+  async backfillOptiFabricEntitlements(options: { dryRun: boolean } = { dryRun: true }): Promise<BackfillReport> {
+    const { dryRun } = options;
     const factories = await this.prisma.factory.findMany();
     const report = emptyReport(factories.length);
 
     for (const factory of factories) {
       try {
-        await this.backfillOneFactory(factory, report);
+        await this.backfillOneFactory(factory, report, dryRun);
       } catch (err) {
         report.errors.push({ factoryId: factory.id, message: (err as Error).message });
         this.logger.error(`Backfill failed for factory ${factory.id}: ${(err as Error).message}`);
       }
     }
 
-    this.logger.log(`Backfill complete: ${JSON.stringify(report)}`);
+    this.logger.log(`${dryRun ? "Dry-run" : "Backfill"} complete: ${JSON.stringify(report)}`);
     return report;
   }
 
+  // Stage 2H-1 — the ONE planning/classification path shared by dry-run and
+  // apply: every eligibility check, classification decision, and date
+  // calculation below runs identically regardless of `dryRun`. Only the two
+  // actual persistence calls (organisation-mapping creation and the final
+  // ProductEntitlement create) are gated behind `!dryRun`. This is what
+  // makes a dry-run report a trustworthy preview of what --apply would do
+  // against the same source state — there is no second, separately
+  // maintained copy of this logic.
   private async backfillOneFactory(
     factory: { id: string; factoryName: string; country: string },
     report: BackfillReport,
+    dryRun: boolean,
   ): Promise<void> {
     const existingOrgId = await this.resolver.resolveOrganisationForOptiFabricFactory(factory.id);
-    let organisationId: string;
-    if (existingOrgId) {
-      organisationId = existingOrgId;
-    } else {
-      organisationId = await this.resolver.resolveOrCreateOrganisationForOptiFabricFactory(
-        factory.id,
-        factory.factoryName,
-        factory.country,
-      );
+    let organisationId: string | null = existingOrgId;
+
+    if (!existingOrgId) {
       report.organisationsCreated++;
       report.refsCreated++;
+      if (dryRun) {
+        // Would create an Organisation + OrganisationExternalRef — counted
+        // above, never written. No real organisationId exists to check an
+        // "existing entitlement" against below, but none COULD exist for an
+        // organisation that itself doesn't exist yet, so that check is
+        // simply skipped rather than faked — see the `if (organisationId)`
+        // guard immediately below.
+        organisationId = null;
+      } else {
+        organisationId = await this.resolver.resolveOrCreateOrganisationForOptiFabricFactory(
+          factory.id,
+          factory.factoryName,
+          factory.country,
+        );
+      }
     }
 
     // Idempotency guard: if a central OPTIFABRIC entitlement already exists
     // for this organisation (from a prior backfill run, or from a live
     // Phase-2 signup/trial), NEVER touch it — never extend, never shorten.
-    const existingRow = await this.entitlementPrisma.productEntitlement.findUnique({
-      where: { organisationId_product: { organisationId, product: "OPTIFABRIC" } },
-    });
-    if (existingRow) {
-      report.alreadyMappedOrSkipped++;
-      return;
+    // Only meaningful when an organisation actually (or already) exists.
+    if (organisationId) {
+      const existingRow = await this.entitlementPrisma.productEntitlement.findUnique({
+        where: { organisationId_product: { organisationId, product: "OPTIFABRIC" } },
+      });
+      if (existingRow) {
+        report.alreadyMappedOrSkipped++;
+        return;
+      }
     }
 
     // Bangladesh rule: identify and report only. Never auto-convert a
@@ -149,15 +177,17 @@ export class EntitlementBackfillService {
       // the closest trustworthy approximation of when the trial began.
       // trialEndsAt is copied EXACTLY, so an expired trial stays expired
       // and an active trial keeps its real remaining time — no new 90 days.
-      await this.entitlementPrisma.productEntitlement.create({
-        data: {
-          organisationId,
-          product: "OPTIFABRIC",
-          source: "INTERNATIONAL_TRIAL",
-          trialStartedAt: subscription.createdAt,
-          trialEndsAt: subscription.trialEndsAt,
-        },
-      });
+      if (!dryRun) {
+        await this.entitlementPrisma.productEntitlement.create({
+          data: {
+            organisationId: organisationId as string,
+            product: "OPTIFABRIC",
+            source: "INTERNATIONAL_TRIAL",
+            trialStartedAt: subscription.createdAt,
+            trialEndsAt: subscription.trialEndsAt,
+          },
+        });
+      }
       if (effective.isAccessAllowed) report.activeTrialsMigrated++;
       else report.expiredTrialsMigrated++;
       return;
@@ -175,17 +205,19 @@ export class EntitlementBackfillService {
           ? (subscription.graceEndsAt ?? addDays(subscription.currentPeriodEnd as Date, GRACE_PERIOD_DAYS))
           : subscription.currentPeriodEnd;
 
-      await this.entitlementPrisma.productEntitlement.create({
-        data: {
-          organisationId,
-          product: "OPTIFABRIC",
-          source: "PAID",
-          planCode: "OPTIFABRIC_MONTHLY",
-          currentPeriodStart: subscription.currentPeriodStart,
-          currentPeriodEnd: effectiveUntil,
-          cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
-        },
-      });
+      if (!dryRun) {
+        await this.entitlementPrisma.productEntitlement.create({
+          data: {
+            organisationId: organisationId as string,
+            product: "OPTIFABRIC",
+            source: "PAID",
+            planCode: "OPTIFABRIC_MONTHLY",
+            currentPeriodStart: subscription.currentPeriodStart,
+            currentPeriodEnd: effectiveUntil,
+            cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
+          },
+        });
+      }
       if (effective.isAccessAllowed) report.activePaidMigrated++;
       else report.expiredMigrated++;
       return;

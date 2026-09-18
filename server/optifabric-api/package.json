@@ -12,7 +12,9 @@
     "prisma:generate": "prisma generate",
     "prisma:generate:entitlement": "prisma generate --schema=prisma/entitlement/schema.prisma",
     "check:entitlement-schema-parity": "ts-node scripts/entitlement-schema-parity.ts",
-    "backfill:optifabric-entitlements": "ts-node scripts/backfill-optifabric-entitlements.ts"
+    "backfill:optifabric-entitlements": "ts-node scripts/backfill-optifabric-entitlements.ts",
+    "backfill:optifabric-entitlements:dry-run": "ts-node scripts/backfill-optifabric-entitlements.ts --dry-run",
+    "backfill:optifabric-entitlements:apply": "ts-node scripts/backfill-optifabric-entitlements.ts --apply"
   },
   "dependencies": {
     "@nestjs/cli": "^10.0.0",

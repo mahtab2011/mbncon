@@ -4,6 +4,15 @@
 // as test/entitlement-cutover.spec.ts (entitlement side) plus a fake of
 // the OptiFabric-side PrismaService surface this service also reads
 // (Factory, Subscription) — no live database required, as instructed.
+//
+// Stage 2H-1: backfillOptiFabricEntitlements() now defaults to dry-run
+// (`{ dryRun: true }`) and only writes anything when explicitly called with
+// `{ dryRun: false }`. Every pre-existing test below that asserts a real
+// mutation happened (a row was created, dates were preserved, idempotency
+// held across repeated real runs, etc.) was updated to pass
+// `{ dryRun: false }` explicitly — the assertions themselves are unchanged,
+// since apply mode preserves the exact previously-tested mutation
+// behavior. The new dry-run-specific tests are further down this file.
 import { EntitlementBackfillService } from "../src/entitlement/entitlement-backfill.service";
 import { OrganisationResolverService } from "../src/entitlement/organisation-resolver.service";
 import { SubscriptionService } from "../src/modules/subscription/subscription.service";
@@ -194,7 +203,7 @@ describe("EntitlementBackfillService.backfillOptiFabricEntitlements", () => {
         prisma,
       );
 
-      const report = await service.backfillOptiFabricEntitlements();
+      const report = await service.backfillOptiFabricEntitlements({ dryRun: false });
 
       expect(report.activeTrialsMigrated).toBe(1);
       expect(report.expiredTrialsMigrated).toBe(0);
@@ -231,7 +240,7 @@ describe("EntitlementBackfillService.backfillOptiFabricEntitlements", () => {
         prisma,
       );
 
-      const report = await service.backfillOptiFabricEntitlements();
+      const report = await service.backfillOptiFabricEntitlements({ dryRun: false });
 
       expect(report.expiredTrialsMigrated).toBe(1);
       expect(report.activeTrialsMigrated).toBe(0);
@@ -265,7 +274,7 @@ describe("EntitlementBackfillService.backfillOptiFabricEntitlements", () => {
         prisma,
       );
 
-      const first = await service.backfillOptiFabricEntitlements();
+      const first = await service.backfillOptiFabricEntitlements({ dryRun: false });
       expect(first.activeTrialsMigrated).toBe(1);
 
       // Age what's stored, then re-run — must NOT touch the row at all.
@@ -273,7 +282,7 @@ describe("EntitlementBackfillService.backfillOptiFabricEntitlements", () => {
       const agedTrialEndsAt = daysFromNow(999);
       entitlements.get(key)!.trialEndsAt = agedTrialEndsAt;
 
-      const second = await service.backfillOptiFabricEntitlements();
+      const second = await service.backfillOptiFabricEntitlements({ dryRun: false });
 
       expect(second.activeTrialsMigrated).toBe(0);
       expect(second.alreadyMappedOrSkipped).toBe(1);
@@ -306,7 +315,7 @@ describe("EntitlementBackfillService.backfillOptiFabricEntitlements", () => {
         prisma,
       );
 
-      const report = await service.backfillOptiFabricEntitlements();
+      const report = await service.backfillOptiFabricEntitlements({ dryRun: false });
 
       expect(report.activePaidMigrated).toBe(1);
       const row = [...entitlements.values()][0];
@@ -342,7 +351,7 @@ describe("EntitlementBackfillService.backfillOptiFabricEntitlements", () => {
         prisma,
       );
 
-      const report = await service.backfillOptiFabricEntitlements();
+      const report = await service.backfillOptiFabricEntitlements({ dryRun: false });
 
       expect(report.activePaidMigrated).toBe(1);
       const row = [...entitlements.values()][0];
@@ -376,7 +385,7 @@ describe("EntitlementBackfillService.backfillOptiFabricEntitlements", () => {
         prisma,
       );
 
-      const report = await service.backfillOptiFabricEntitlements();
+      const report = await service.backfillOptiFabricEntitlements({ dryRun: false });
 
       expect(report.expiredMigrated).toBe(1);
       expect(report.activePaidMigrated).toBe(0);
@@ -408,7 +417,7 @@ describe("EntitlementBackfillService.backfillOptiFabricEntitlements", () => {
         prisma,
       );
 
-      await service.backfillOptiFabricEntitlements();
+      await service.backfillOptiFabricEntitlements({ dryRun: false });
 
       const products = [...entitlements.values()].map((r) => r.product);
       expect(products).toEqual(["OPTIFABRIC"]);
@@ -425,7 +434,7 @@ describe("EntitlementBackfillService.backfillOptiFabricEntitlements", () => {
         prisma,
       );
 
-      const report = await service.backfillOptiFabricEntitlements();
+      const report = await service.backfillOptiFabricEntitlements({ dryRun: false });
 
       expect(report.legacyBangladeshFreeDetected).toBe(1);
       expect(entitlements.size).toBe(0); // no central row written at all
@@ -458,7 +467,7 @@ describe("EntitlementBackfillService.backfillOptiFabricEntitlements", () => {
         prisma,
       );
 
-      const first = await service.backfillOptiFabricEntitlements();
+      const first = await service.backfillOptiFabricEntitlements({ dryRun: false });
       expect(first.organisationsCreated).toBe(2);
       expect(first.refsCreated).toBe(2);
       expect(first.activeTrialsMigrated).toBe(1);
@@ -468,7 +477,7 @@ describe("EntitlementBackfillService.backfillOptiFabricEntitlements", () => {
       const refSnapshot = new Map(refs);
       const entitlementSnapshot = new Map(entitlements);
 
-      const second = await service.backfillOptiFabricEntitlements();
+      const second = await service.backfillOptiFabricEntitlements({ dryRun: false });
       expect(second.organisationsCreated).toBe(0);
       expect(second.refsCreated).toBe(0);
       expect(second.activeTrialsMigrated).toBe(0);
@@ -501,12 +510,218 @@ describe("EntitlementBackfillService.backfillOptiFabricEntitlements", () => {
       const legacySubscriptionService = new SubscriptionService(optifabricPrisma);
       const service = new EntitlementBackfillService(optifabricPrisma, resolver, legacySubscriptionService, prisma as never);
 
-      const report = await service.backfillOptiFabricEntitlements();
+      const report = await service.backfillOptiFabricEntitlements({ dryRun: false });
 
       expect(report.factoriesScanned).toBe(2);
       expect(report.errors).toHaveLength(1);
       expect(report.errors[0].factoryId).toBe("f-bad");
       expect(report.alreadyMappedOrSkipped).toBe(1); // f-good: no subscription row -> skipped cleanly
+    });
+  });
+});
+
+// Stage 2H-1 — dry-run safety contract at the service layer. The CLI
+// argv-parsing contract itself (no arg / --dry-run / --apply / unknown /
+// conflicting flags) is tested separately in test/backfill-cli.spec.ts,
+// since parseBackfillCliArgs has no service/database dependency at all.
+describe("EntitlementBackfillService — dry-run safety (Stage 2H-1)", () => {
+  it("A. calling with no options at all defaults to dry-run and writes nothing", async () => {
+    await withLicenseSecret(async () => {
+      const { prisma, organisations, refs, entitlements } = makeFakeEntitlementPrisma();
+      const service = buildService(
+        [{ id: "f-default", factoryName: "Default Mode Factory", country: "Vietnam" }],
+        {
+          "f-default": signedSubscriptionRow({
+            factoryId: "f-default",
+            planType: "TRIAL",
+            status: "TRIALING",
+            trialEndsAt: daysFromNow(30),
+            currentPeriodStart: null,
+            currentPeriodEnd: null,
+            graceEndsAt: null,
+            includedSeats: 2,
+            extraSeats: 0,
+            cancelAtPeriodEnd: false,
+            createdAt: daysFromNow(-60),
+          }),
+        },
+        prisma,
+      );
+
+      // No options argument at all — must behave exactly like { dryRun: true }.
+      const report = await service.backfillOptiFabricEntitlements();
+
+      expect(report.activeTrialsMigrated).toBe(1); // still classified/reported
+      expect(organisations.size).toBe(0);
+      expect(refs.size).toBe(0);
+      expect(entitlements.size).toBe(0);
+    });
+  });
+
+  it("B. { dryRun: true } performs zero create/update/delete calls on the entitlement Prisma client", async () => {
+    await withLicenseSecret(async () => {
+      const { prisma, entitlements } = makeFakeEntitlementPrisma();
+      const service = buildService(
+        [
+          { id: "f-dr-1", factoryName: "Dry Run Trial", country: "Vietnam" },
+          { id: "f-dr-2", factoryName: "Dry Run Paid", country: "Vietnam" },
+          { id: "f-dr-bd", factoryName: "Dry Run Bangladesh", country: "Bangladesh" },
+        ],
+        {
+          "f-dr-1": signedSubscriptionRow({
+            factoryId: "f-dr-1",
+            planType: "TRIAL",
+            status: "TRIALING",
+            trialEndsAt: daysFromNow(15),
+            currentPeriodStart: null,
+            currentPeriodEnd: null,
+            graceEndsAt: null,
+            includedSeats: 2,
+            extraSeats: 0,
+            cancelAtPeriodEnd: false,
+            createdAt: daysFromNow(-75),
+          }),
+          "f-dr-2": signedSubscriptionRow({
+            factoryId: "f-dr-2",
+            planType: "MONTHLY",
+            status: "ACTIVE",
+            trialEndsAt: new Date(0),
+            currentPeriodStart: daysFromNow(-5),
+            currentPeriodEnd: daysFromNow(25),
+            graceEndsAt: null,
+            includedSeats: 2,
+            extraSeats: 0,
+            cancelAtPeriodEnd: false,
+            createdAt: daysFromNow(-5),
+          }),
+        },
+        prisma,
+      );
+
+      const report = await service.backfillOptiFabricEntitlements({ dryRun: true });
+
+      // Classification still happened (a trustworthy preview)...
+      expect(report.activeTrialsMigrated).toBe(1);
+      expect(report.activePaidMigrated).toBe(1);
+      expect(report.legacyBangladeshFreeDetected).toBe(1);
+      expect(report.organisationsCreated).toBe(3);
+      expect(report.refsCreated).toBe(3);
+
+      // ...but nothing was actually persisted anywhere.
+      const entitlementPrisma = prisma as unknown as {
+        organisation: { create: jest.Mock };
+        organisationExternalRef: { create: jest.Mock };
+        productEntitlement: { create: jest.Mock };
+      };
+      expect(entitlementPrisma.organisation.create).not.toHaveBeenCalled();
+      expect(entitlementPrisma.organisationExternalRef.create).not.toHaveBeenCalled();
+      expect(entitlementPrisma.productEntitlement.create).not.toHaveBeenCalled();
+      expect(entitlements.size).toBe(0);
+    });
+  });
+
+  it("F. dry-run and apply produce identical classification counters for the same source state", async () => {
+    await withLicenseSecret(async () => {
+      const factories = [
+        { id: "f-cmp-trial", factoryName: "Compare Trial", country: "Vietnam" },
+        { id: "f-cmp-paid", factoryName: "Compare Paid", country: "Vietnam" },
+        { id: "f-cmp-expired", factoryName: "Compare Expired", country: "Vietnam" },
+        { id: "f-cmp-bd", factoryName: "Compare Bangladesh", country: "Bangladesh" },
+        { id: "f-cmp-none", factoryName: "Compare No Subscription", country: "Vietnam" },
+      ];
+      const subscriptions = {
+        "f-cmp-trial": signedSubscriptionRow({
+          factoryId: "f-cmp-trial",
+          planType: "TRIAL",
+          status: "TRIALING",
+          trialEndsAt: daysFromNow(40),
+          currentPeriodStart: null,
+          currentPeriodEnd: null,
+          graceEndsAt: null,
+          includedSeats: 2,
+          extraSeats: 0,
+          cancelAtPeriodEnd: false,
+          createdAt: daysFromNow(-50),
+        }),
+        "f-cmp-paid": signedSubscriptionRow({
+          factoryId: "f-cmp-paid",
+          planType: "ANNUAL",
+          status: "ACTIVE",
+          trialEndsAt: new Date(0),
+          currentPeriodStart: daysFromNow(-30),
+          currentPeriodEnd: daysFromNow(335),
+          graceEndsAt: null,
+          includedSeats: 5,
+          extraSeats: 0,
+          cancelAtPeriodEnd: false,
+          createdAt: daysFromNow(-30),
+        }),
+        "f-cmp-expired": signedSubscriptionRow({
+          factoryId: "f-cmp-expired",
+          planType: "MONTHLY",
+          status: "CANCELLED",
+          trialEndsAt: new Date(0),
+          currentPeriodStart: daysFromNow(-90),
+          currentPeriodEnd: daysFromNow(-60),
+          graceEndsAt: null,
+          includedSeats: 2,
+          extraSeats: 0,
+          cancelAtPeriodEnd: true,
+          createdAt: daysFromNow(-90),
+        }),
+      };
+
+      // Run dry-run against a fresh fake, then apply against an equally
+      // fresh fake with the same source data — two independent instances
+      // so apply's writes can never contaminate the dry-run comparison.
+      const dryRunPrisma = makeFakeEntitlementPrisma();
+      const dryRunService = buildService(factories, subscriptions, dryRunPrisma.prisma);
+      const dryRunReport = await dryRunService.backfillOptiFabricEntitlements({ dryRun: true });
+
+      const applyPrisma = makeFakeEntitlementPrisma();
+      const applyService = buildService(factories, subscriptions, applyPrisma.prisma);
+      const applyReport = await applyService.backfillOptiFabricEntitlements({ dryRun: false });
+
+      expect(dryRunReport).toEqual(applyReport);
+      // And to be explicit about the one real difference this task cares about:
+      expect(dryRunPrisma.entitlements.size).toBe(0);
+      expect(applyPrisma.entitlements.size).toBeGreaterThan(0);
+    });
+  });
+
+  it("dry-run is itself idempotent in the trivial sense: running it twice in a row against unwritten state produces the same preview both times", async () => {
+    await withLicenseSecret(async () => {
+      const { prisma } = makeFakeEntitlementPrisma();
+      const service = buildService(
+        [{ id: "f-dr-repeat", factoryName: "Repeat Dry Run", country: "Vietnam" }],
+        {
+          "f-dr-repeat": signedSubscriptionRow({
+            factoryId: "f-dr-repeat",
+            planType: "TRIAL",
+            status: "TRIALING",
+            trialEndsAt: daysFromNow(12),
+            currentPeriodStart: null,
+            currentPeriodEnd: null,
+            graceEndsAt: null,
+            includedSeats: 2,
+            extraSeats: 0,
+            cancelAtPeriodEnd: false,
+            createdAt: daysFromNow(-78),
+          }),
+        },
+        prisma,
+      );
+
+      const first = await service.backfillOptiFabricEntitlements({ dryRun: true });
+      const second = await service.backfillOptiFabricEntitlements({ dryRun: true });
+
+      // Since dry-run never persists anything, the underlying state never
+      // changes, so a second dry-run sees the exact same "not yet mapped,
+      // not yet entitled" starting point and previews the same outcome —
+      // unlike apply mode, where a second run would report
+      // alreadyMappedOrSkipped instead.
+      expect(second).toEqual(first);
+      expect(first.activeTrialsMigrated).toBe(1);
     });
   });
 });
